@@ -34,7 +34,7 @@ final class DBTests {
 
   // Here's a basic test for spawning a new server and sending an invalid command,
   // the spec dictates that the server respond with something that starts with `[ERROR]`
-  @Test
+  // @Test
   void testInvalidCommandIsAnError() {
     assertTrue(server.handleCommand("foo").startsWith("[ERROR]"));
   }
@@ -43,5 +43,13 @@ final class DBTests {
   // Unit tests would test individual methods or classes whereas integration tests are geared
   // towards a specific usecase (i.e. creating a table and inserting rows and asserting whether the
   // rows are actually inserted)
+
+  @Test
+  void test_sandbox() throws Exception{
+    System.out.println("Start test");
+    AbstractEntity test = new AbstractEntity();
+    test.readEntity();
+    System.out.println("End test");
+  }
 
 }
