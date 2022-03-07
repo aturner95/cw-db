@@ -1,5 +1,7 @@
 package edu.uob;
 
+import edu.uob.dbfilesystem.DBFileConstants;
+import edu.uob.dbfilesystem.DBTableFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -47,8 +49,8 @@ final class DBTests {
   @Test
   void test_sandbox() throws Exception{
     System.out.println("Start test");
-    AbstractEntity test = new AbstractEntity();
-    test.readEntity();
+    DBTableFile table = new DBTableFile();
+    table.readInEntity("people");
     System.out.println("End test");
   }
 
