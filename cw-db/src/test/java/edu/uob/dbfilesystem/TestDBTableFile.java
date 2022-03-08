@@ -107,10 +107,11 @@ public class TestDBTableFile {
         assertTrue(tableFile.readRecordIntoEntity(table, row));
         assertEquals(1, table.getRows().size());
         assertEquals(139, table.getRows().get(0).getId());
-        assertEquals(3, table.getRows().get(0).getAttributes().size());
-        assertEquals("Dorchester", table.getRows().get(0).getAttributes().get(0).getValue());
-        assertEquals("1800", table.getRows().get(0).getAttributes().get(1).getValue());
-        assertEquals("3", table.getRows().get(0).getAttributes().get(2).getValue());
+        assertEquals(4, table.getRows().get(0).getAttributes().size());
+        assertEquals("139", table.getRows().get(0).getAttributes().get(0).getValue());
+        assertEquals("Dorchester", table.getRows().get(0).getAttributes().get(1).getValue());
+        assertEquals("1800", table.getRows().get(0).getAttributes().get(2).getValue());
+        assertEquals("3", table.getRows().get(0).getAttributes().get(3).getValue());
     }
 
     @Test
@@ -150,6 +151,8 @@ public class TestDBTableFile {
         assertTrue(tableFile.readRecordIntoEntity(table, row1));
         assertTrue(tableFile.readRecordIntoEntity(table, row2));
         assertEquals(2, table.getRows().size());
+        assertEquals(4, table.getRows().get(0).getAttributes().size());
+        assertEquals(4, table.getRows().get(1).getAttributes().size());
     }
 
 //    @Test

@@ -73,9 +73,9 @@ public class DBTableFile {
             Record record = new Record();
             List<Attribute> listOfAttributes = new ArrayList<>();
 
-            record.setId(Long.valueOf(tabDelimitedRow[0]));
+            // record.setId(Long.valueOf(tabDelimitedRow[0]));
 
-            for(int i = 1; i < tabDelimitedRow.length; i++){
+            for(int i = 0; i < tabDelimitedRow.length; i++){
                 Attribute attr = new Attribute();
                 attr.setValue(tabDelimitedRow[i]);
                 listOfAttributes.add(attr);
