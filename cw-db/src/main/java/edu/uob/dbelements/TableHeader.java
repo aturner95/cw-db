@@ -41,7 +41,7 @@ public class TableHeader {
         return nextId;
     }
 
-    public void setNextId(long nextId) {
-        this.nextId = nextId;
+    public void incrementId() {
+        this.nextId++;
     }
 }

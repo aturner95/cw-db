@@ -2,16 +2,16 @@ package edu.uob.dbelements;
 
 import edu.uob.dbfilesystem.DBDataType;
 
-public abstract class Attribute {
+public class Attribute {
 
-    private Object value;
+    private String value;
     private DBDataType dataType;
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 

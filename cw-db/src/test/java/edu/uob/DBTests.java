@@ -46,11 +46,11 @@ final class DBTests {
   // towards a specific usecase (i.e. creating a table and inserting rows and asserting whether the
   // rows are actually inserted)
 
-  @Test
+  // @Test
   void test_sandbox() throws Exception{
     System.out.println("Start test");
     DBTableFile table = new DBTableFile();
-    table.readInEntity("people");
+    table.readDBFileIntoEntity("people");
     System.out.println("End test");
   }
 

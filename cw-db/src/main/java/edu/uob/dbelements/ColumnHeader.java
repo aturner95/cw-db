@@ -3,7 +3,7 @@ package edu.uob.dbelements;
 import edu.uob.dbfilesystem.DBColumnType;
 import edu.uob.dbfilesystem.DBDataType;
 
-public class Column {
+public class ColumnHeader {
 
     private int colNumber;
     private String colName;
@@ -13,7 +13,7 @@ public class Column {
     private String description;
     private boolean notNull;
 
-    public Column(){
+    public ColumnHeader(){
 
     }
 

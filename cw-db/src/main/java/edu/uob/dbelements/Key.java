@@ -1,6 +1,6 @@
 package edu.uob.dbelements;
 
-public class Key extends Attribute{
+public class Key {
 
     public Key(){
 
