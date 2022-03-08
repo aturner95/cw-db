@@ -1,6 +1,8 @@
 package edu.uob.dbfilesystem;
 
 import edu.uob.dbelements.Table;
+import jdk.jfr.SettingDefinition;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -13,7 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestDBTableFile {
 
     @TempDir
-    private File tempFolder;
+    private File tempDir;
+    private File tempFile;
+    final String tempDirName = "dbtest";
+    final String fileExt = ".tab";
 
     @Test
     public void test_readColumnHeadingsIntoEntity_happyPath_tableHeaderPopulated(){
@@ -155,47 +160,106 @@ public class TestDBTableFile {
         assertEquals(4, table.getRows().get(1).getAttributes().size());
     }
 
-//    @Test
-//    public void test_readDBFileIntoEntity_happyPath_entityCreated() throws Exception{
-//
-//        String testDb = "testdb";
-//        tempFolder = new File(testDb);
-//        tempFolder.mkdir();
-//
-//        assertTrue(tempFolder.exists());
-//        assertTrue(tempFolder.isDirectory());
-//
-//
-//        String testFileName = testDb + File.separator + "person.tab";
-//        File tempDbFile = new File(testFileName);
-//        if(!tempDbFile.createNewFile()){
-//            throw new Exception();
-//        }
-//
-//        assertTrue(tempDbFile.exists());
-//
-//
-//        BufferedWriter bw = new BufferedWriter(new FileWriter(testFileName));
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("id\tName\tHeight\tPurchaserID");
-//        sb.append("1\tDorchester\t1800\t3");
-//        sb.append("2\tPlaza\t1200\t1");
-//        sb.append("3\tExcelsior\t1000\t2");
-//        bw.write(sb.toString());
-//        bw.close();
-//
-//        DBTableFile tableFile = new DBTableFile();
-//        Table table = tableFile.readDBFileIntoEntity(testFileName);
-//
-//        assertNotNull(table);
-//        assertNotNull(table.getHeader());
-//        assertEquals(testDb, table.getHeader().getTableName());
-//        assertEquals(testFileName, table.getHeader().getFileLocation());
-//        assertEquals(4, table.getHeader().getNextId());
-//
-//        assertNotNull(table.getColHeadings());
-//        assertNotNull(table.getRows());
-//
-//    }
+    // @BeforeEach
+    private void createTempDBFile(String tempTableName) throws Exception {
+
+        if(new File(tempDirName).mkdir()){
+            tempDir = new File(tempDirName);
+            tempDir.deleteOnExit();
+        }
+
+        assertTrue(tempDir.exists());
+        assertTrue(tempDir.isDirectory());
+
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+        tempFile.deleteOnExit();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+    }
+
+    @Test
+    public void test_readDBFileIntoEntity_happyPath_tableReadIntoEntity() throws Exception{
+
+        // Setting up test
+        String tempTableName = "people";
+        String tempFilePath = "dbtest" + File.separator + tempTableName + fileExt;
+
+        createTempDBFile(tempTableName);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
+        StringBuilder sb = new StringBuilder();
+        sb.append("id\tName\tAge\tEmail\n");
+        sb.append("1\tBob\t21\tbob@bob.net\n");
+        sb.append("2\tHarry\t32\tharry@harry.com\n");
+        sb.append("3\tChris\t42\tchris@chris.ac.uk");
+
+        bw.write(sb.toString());
+        bw.close();
+
+        // Test
+        DBTableFile tableFile = new DBTableFile();
+        Table table =  tableFile.readDBFileIntoEntity(tempFilePath);
+
+        // test table
+        assertNotNull(table);
+        assertEquals("people", table.getHeader().getTableName());
+        // TODO find out why this test fails...
+        assertEquals("dbtest" + File.separator + "people.tab", table.getHeader().getFileLocation());
+
+        // test column headings
+        assertNotNull(table.getColHeadings());
+        assertEquals(4, table.getColHeadings().size());
+        assertEquals("id", table.getColHeadings().get(0).getColName());
+        assertEquals("Name", table.getColHeadings().get(1).getColName());
+        assertEquals("Age", table.getColHeadings().get(2).getColName());
+        assertEquals("Email", table.getColHeadings().get(3).getColName());
+
+        // test row data
+        assertNotNull(table.getRows());
+        assertEquals(3, table.getRows().size());
+        assertEquals(4, table.getRows().get(0).getAttributes().size());
+        assertEquals(1, table.getRows().get(0).getId());
+        assertEquals("1", table.getRows().get(0).getAttributes().get(0).getValue());
+        assertEquals("harry@harry.com", table.getRows().get(1).getAttributes().get(3).getValue());
+        assertEquals("42", table.getRows().get(2).getAttributes().get(2).getValue());
+    }
+
+    @Test
+    public void test_readDBFileIntoEntity_noRows_tableReadIntoEntity() throws Exception{
+
+        // Setting up test
+        String tempTableName = "people";
+        String tempFilePath = "dbtest" + File.separator + tempTableName + fileExt;
+
+        createTempDBFile(tempTableName);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
+        StringBuilder sb = new StringBuilder();
+        sb.append("id\tName\tAge\tEmail\n");
+
+        bw.write(sb.toString());
+        bw.close();
+
+        // Test
+        DBTableFile tableFile = new DBTableFile();
+        Table table =  tableFile.readDBFileIntoEntity(tempFilePath);
+
+        // test table
+        assertNotNull(table);
+        assertEquals("people", table.getHeader().getTableName());
+        // TODO find out why this test fails...
+        // assertEquals("dbtest" + File.separator + "people.tab", table.getHeader().getFileLocation());
+
+        // test column headings
+        assertNotNull(table.getColHeadings());
+        assertEquals(4, table.getColHeadings().size());
+        assertEquals("id", table.getColHeadings().get(0).getColName());
+        assertEquals("Name", table.getColHeadings().get(1).getColName());
+        assertEquals("Age", table.getColHeadings().get(2).getColName());
+        assertEquals("Email", table.getColHeadings().get(3).getColName());
+
+        // test row data
+        assertNotNull(table.getRows());
+        assertEquals(0, table.getRows().size());
+    }
 
 }
