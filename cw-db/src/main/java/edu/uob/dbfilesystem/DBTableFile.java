@@ -156,7 +156,11 @@ public class DBTableFile {
     // @TODO can #storeColomnHeaderIntoDBFile and #storeRecordIntoDBFile be factorised to use common code?
     /* default */ boolean storeRecordIntoDBFile(Record record, File dbFile){
 
-        if(record != null && record.getAttributes() != null && record.getAttributes().size() > 0) {
+        if(record != null && record.getAttributes() != null) {
+
+            if(record.getAttributes().size() == 0){
+                return true;
+            }
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, true))) {
                 List<Attribute> attributes = record.getAttributes();

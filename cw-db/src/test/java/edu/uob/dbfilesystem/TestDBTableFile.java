@@ -360,6 +360,7 @@ public class TestDBTableFile {
     @Test
     public void test_storeRecordIntoDBFile_happyPath_fileExistsAndContainsSingleRow() throws Exception{
 
+        // given
         String tempTableName = "people";
         tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
 
@@ -377,17 +378,30 @@ public class TestDBTableFile {
 
         DBTableFile tableFile = new DBTableFile();
 
+        // when
+        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+
+        // then
+        assertTrue(result);
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
-        assertTrue(tableFile.storeRecordIntoDBFile(record, tempFile));
+
         assertTrue(checkDBFileContainsString(tempFile, "1\tBob\t21\tbob@bob.net"));
         // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
         // assertEquals("people.tab", tempFile.getName());
     }
 
+    /*
+    I initially had this test down as a Fail...
+    However, having reconsidered this test after further development, I see no reason why
+    this should 'fail' as you can write an empty table to a DB file (i.e., only col
+    headings). Therefore, if we come across a table with no rows, just return true and do
+    nothing.
+     */
     @Test
-    public void test_storeRecordIntoDBFile_noAttributes_returnsFalse() throws Exception{
+    public void test_storeRecordIntoDBFile_noAttributes_returnsTrue() throws Exception{
 
+        // given
         String tempTableName = "people";
         tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
 
@@ -397,40 +411,52 @@ public class TestDBTableFile {
 
         DBTableFile tableFile = new DBTableFile();
 
+        // when
+        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+
+        // then
+        assertTrue(result);
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
-        assertFalse(tableFile.storeRecordIntoDBFile(record, tempFile));
+
     }
 
     @Test
     public void test_storeRecordIntoDBFile_nullAttributes_returnsFalse() throws Exception{
 
+        // given
         String tempTableName = "people";
         tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
-
         Record record = new Record();
         record.setAttributes(null);
-
         DBTableFile tableFile = new DBTableFile();
 
+        // when
+        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+
+        // then
+        assertFalse(result);
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
-        assertFalse(tableFile.storeRecordIntoDBFile(record, tempFile));
     }
 
     @Test
     public void test_storeRecordIntoDBFile_nullRecord_returnsFalse() throws Exception{
 
+        // given
         String tempTableName = "people";
         tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
-
         Record record = null;
-
         DBTableFile tableFile = new DBTableFile();
 
+        // when
+        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+
+        // then
+        assertFalse(result);
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
-        assertFalse(tableFile.storeRecordIntoDBFile(record, tempFile));
+
     }
 
     @Test
@@ -484,6 +510,99 @@ public class TestDBTableFile {
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge"));
         assertTrue(checkDBFileContainsString(tempFile, "1\tBob\t21"));
         assertTrue(checkDBFileContainsString(tempFile, "2\tSarah\t66"));
+    }
+
+    @Test
+    public void test_storeEntityIntoDBFile_nullTable_returnsFalse() throws Exception {
+        // given
+        Table table = null;
+        DBTableFile dbFile = new DBTableFile();
+        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        if(new File(tempDirName).mkdir()){
+            tempDir = new File(tempDirName);
+            tempDir.deleteOnExit();
+        }
+        tempFile = new File(dbFilePath);
+
+        // when
+        boolean result = dbFile.storeEntityIntoDBFile(table, dbFilePath);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    public void test_storeEntityIntoDBFile_noRows_headerStillStoredInDBFile() throws Exception {
+        // given
+        Table table = new Table();
+        DBTableFile dbFile = new DBTableFile();
+        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        if(new File(tempDirName).mkdir()){
+            tempDir = new File(tempDirName);
+            tempDir.deleteOnExit();
+        }
+        tempFile = new File(dbFilePath);
+
+        List<ColumnHeader> colHeadings = new ArrayList<>();
+        ColumnHeader cHead1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, 100, DBColumnType.PRIMARY_KEY);
+        ColumnHeader cHead2 = new ColumnHeader(2, "Name", DBDataType.VARCHAR, 100, DBColumnType.FIELD);
+        ColumnHeader cHead3 = new ColumnHeader(3, "Age", DBDataType.NUMBER, 100, DBColumnType.FIELD);
+        colHeadings.add(cHead1);
+        colHeadings.add(cHead2);
+        colHeadings.add(cHead3);
+        table.setColHeadings(colHeadings);
+
+        // when
+        boolean result = dbFile.storeEntityIntoDBFile(table, dbFilePath);
+
+        // then
+        assertTrue(result);
+        assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge"));
+    }
+
+    @Test
+    public void test_storeEntityIntoDBFile_noColHeaders_returnsFalse() throws Exception {
+        // given
+        Table table = new Table();
+        DBTableFile dbFile = new DBTableFile();
+        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        if(new File(tempDirName).mkdir()){
+            tempDir = new File(tempDirName);
+            tempDir.deleteOnExit();
+        }
+        tempFile = new File(dbFilePath);
+
+        List<ColumnHeader> colHeadings = new ArrayList<>();
+        table.setColHeadings(colHeadings);
+
+        List<Attribute> rowData1 = new ArrayList<>();
+        Attribute attr1 = new Attribute("1", DBDataType.NUMBER);
+        Attribute attr2 = new Attribute("Bob", DBDataType.VARCHAR);
+        Attribute attr3 = new Attribute("21", DBDataType.NUMBER);
+        rowData1.add(attr1);
+        rowData1.add(attr2);
+        rowData1.add(attr3);
+        Record row1 = new Record(rowData1);
+
+        List<Attribute> rowData2 = new ArrayList<>();
+        Attribute attr4 = new Attribute("2", DBDataType.NUMBER);
+        Attribute attr5 = new Attribute("Sarah", DBDataType.VARCHAR);
+        Attribute attr6 = new Attribute("66", DBDataType.NUMBER);
+        rowData2.add(attr4);
+        rowData2.add(attr5);
+        rowData2.add(attr6);
+        Record row2 = new Record(rowData2);
+
+        List<Record> rows = new ArrayList<>();
+        rows.add(row1);
+        rows.add(row2);
+        table.setRows(rows);
+
+        // when
+        boolean result = dbFile.storeEntityIntoDBFile(table, dbFilePath);
+
+        // then
+        assertFalse(result);
 
     }
 
