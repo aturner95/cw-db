@@ -5,7 +5,6 @@ import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
 import edu.uob.dbelements.Table;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,9 +74,9 @@ public class DBTableFile {
 
             // record.setId(Long.valueOf(tabDelimitedRow[0]));
 
-            for(int i = 0; i < tabDelimitedRow.length; i++){
+            for (String s : tabDelimitedRow) {
                 Attribute attr = new Attribute();
-                attr.setValue(tabDelimitedRow[i]);
+                attr.setValue(s);
                 listOfAttributes.add(attr);
             }
             record.setAttributes(listOfAttributes);
@@ -92,6 +91,92 @@ public class DBTableFile {
 
         fileName = dbFilePath.getName();
         return fileName.substring(0, fileName.indexOf('.'));
+    }
+
+    // TODO currently this method simply creates and writes to a new file from scratch. If file exists should we just add new rows?
+    public boolean storeEntityIntoDBFile(Table table, String dbFilePath){
+
+        File fileToOpen = new File(dbFilePath.toLowerCase(Locale.ROOT));
+
+        if(table != null) {
+
+            if(!fileToOpen.exists()){
+                try {
+                    fileToOpen.createNewFile();
+                } catch(IOException ioe){
+                    System.out.println(ioe.getMessage());
+                    return false;
+                }
+            }
+
+            if(!storeColumnHeaderIntoDBFile(table.getColHeadings(), fileToOpen)){
+                // TODO handle exception
+                System.out.println("Exception storing col headers to DB file");
+                return false;
+            }
+
+            for(Record rec: table.getRows()){
+                if(!storeRecordIntoDBFile(rec, fileToOpen)){
+                    // TODO handle exception
+                    System.out.println("Exception storing row to DB file");
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    // @TODO can #storeColomnHeaderIntoDBFile and #storeRecordIntoDBFile be factorised to use common code?
+    /* default */ boolean storeColumnHeaderIntoDBFile(List<ColumnHeader> colHeaders, File dbFile) {
+
+        if(colHeaders != null && colHeaders.size() > 0) {
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile))) {
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < colHeaders.size(); i++) {
+                    sb.append(colHeaders.get(i).getColName());
+                    if (i < colHeaders.size() - 1) {
+                        sb.append("\t");
+                    }
+                }
+
+                bw.write(sb.toString());
+                return true;
+
+            } catch (IOException ioe) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // @TODO can #storeColomnHeaderIntoDBFile and #storeRecordIntoDBFile be factorised to use common code?
+    /* default */ boolean storeRecordIntoDBFile(Record record, File dbFile){
+
+        if(record != null && record.getAttributes() != null && record.getAttributes().size() > 0) {
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, true))) {
+                List<Attribute> attributes = record.getAttributes();
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n");
+
+                for (int i = 0; i < attributes.size(); i++) {
+                    sb.append(attributes.get(i).getValue());
+                    if (i < attributes.size() - 1) {
+                        sb.append("\t");
+                    }
+                }
+
+                bw.append(sb.toString());
+                return true;
+
+            } catch (IOException ioe) {
+                return false;
+            }
+        } return false;
     }
 
 }

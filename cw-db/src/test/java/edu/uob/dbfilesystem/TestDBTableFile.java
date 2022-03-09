@@ -1,14 +1,15 @@
 package edu.uob.dbfilesystem;
 
+import edu.uob.dbelements.Attribute;
+import edu.uob.dbelements.ColumnHeader;
+import edu.uob.dbelements.Record;
 import edu.uob.dbelements.Table;
-import jdk.jfr.SettingDefinition;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +20,42 @@ public class TestDBTableFile {
     private File tempFile;
     final String tempDirName = "dbtest";
     final String fileExt = ".tab";
+
+    /* ----------------------- HELPER METHODS ----------------------- */
+
+    // @BeforeEach
+    private void createTempDBFile(String tempTableName) throws Exception {
+
+        if(new File(tempDirName).mkdir()){
+            tempDir = new File(tempDirName);
+            tempDir.deleteOnExit();
+        }
+
+        assertTrue(tempDir.exists());
+        assertTrue(tempDir.isDirectory());
+
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+        tempFile.deleteOnExit();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+    }
+
+    private boolean checkDBFileContainsString(File file, String term) throws IOException{
+        FileReader reader = new FileReader(file);
+        try(BufferedReader br = new BufferedReader(reader)){
+            String line;
+            while((line = br.readLine()) != null) {
+                if(line.contains(term)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /* ----------------------- TESTS ----------------------- */
 
     @Test
     public void test_readColumnHeadingsIntoEntity_happyPath_tableHeaderPopulated(){
@@ -160,30 +197,12 @@ public class TestDBTableFile {
         assertEquals(4, table.getRows().get(1).getAttributes().size());
     }
 
-    // @BeforeEach
-    private void createTempDBFile(String tempTableName) throws Exception {
-
-        if(new File(tempDirName).mkdir()){
-            tempDir = new File(tempDirName);
-            tempDir.deleteOnExit();
-        }
-
-        assertTrue(tempDir.exists());
-        assertTrue(tempDir.isDirectory());
-
-        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
-        tempFile.deleteOnExit();
-
-        assertTrue(tempFile.exists());
-        assertTrue(tempFile.isFile());
-    }
-
     @Test
     public void test_readDBFileIntoEntity_happyPath_tableReadIntoEntity() throws Exception{
 
         // Setting up test
         String tempTableName = "people";
-        String tempFilePath = "dbtest" + File.separator + tempTableName + fileExt;
+        String tempFilePath = tempDirName + File.separator + tempTableName + fileExt;
 
         createTempDBFile(tempTableName);
         BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
@@ -229,14 +248,13 @@ public class TestDBTableFile {
 
         // Setting up test
         String tempTableName = "people";
-        String tempFilePath = "dbtest" + File.separator + tempTableName + fileExt;
+        String tempFilePath = tempDirName + File.separator + tempTableName + fileExt;
 
         createTempDBFile(tempTableName);
         BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
-        StringBuilder sb = new StringBuilder();
-        sb.append("id\tName\tAge\tEmail\n");
+        String colHeader = "id\tName\tAge\tEmail\n";
 
-        bw.write(sb.toString());
+        bw.write(colHeader);
         bw.close();
 
         // Test
@@ -260,6 +278,213 @@ public class TestDBTableFile {
         // test row data
         assertNotNull(table.getRows());
         assertEquals(0, table.getRows().size());
+    }
+
+    @Test
+    public void test_storeColomnHeaderIntoDBFile_happyPath_fileExistsAndContainsHeaderText() throws Exception{
+
+        // given
+        String tempTableName = "people";
+        // String tempFilePath = tempDirName + File.separator + tempTableName + fileExt;
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        ColumnHeader col1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, Long.SIZE, DBColumnType.PRIMARY_KEY);
+        ColumnHeader col2 = new ColumnHeader(2, "Name", DBDataType.VARCHAR, 255, DBColumnType.FIELD);
+        ColumnHeader col3 = new ColumnHeader(3, "Age", DBDataType.VARCHAR, 255, DBColumnType.FIELD);
+        ColumnHeader col4 = new ColumnHeader(4, "Email", DBDataType.VARCHAR, 255, DBColumnType.FIELD);
+        colHeaders.add(col1);
+        colHeaders.add(col2);
+        colHeaders.add(col3);
+        colHeaders.add(col4);
+
+        DBTableFile tableFile = new DBTableFile();
+
+        // when
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+        assertTrue(tableFile.storeColumnHeaderIntoDBFile(colHeaders, tempFile));
+
+        // then
+        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
+        // assertEquals("people.tab", tempFile.getName());
+        assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge\tEmail"));
+    }
+
+    @Test
+    public void test_storeColomnHeaderIntoDBFile_nullColHeaders_returnsFalse() throws Exception{
+
+        // given
+        String tempTableName = "people";
+        // String tempFilePath = tempDirName + File.separator + tempTableName + fileExt;
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        List<ColumnHeader> colHeaders = null;
+
+        DBTableFile tableFile = new DBTableFile();
+
+        // when
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+
+
+        // then
+        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
+        // assertEquals("people.tab", tempFile.getName());
+        assertFalse(tableFile.storeColumnHeaderIntoDBFile(colHeaders, tempFile));
+    }
+
+    @Test
+    public void test_storeColomnHeaderIntoDBFile_noColHeaders_returnsFalse() throws Exception{
+
+        // given
+        String tempTableName = "people";
+        // String tempFilePath = tempDirName + File.separator + tempTableName + fileExt;
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+
+        DBTableFile tableFile = new DBTableFile();
+
+        // when
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+
+
+        // then
+        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
+        // assertEquals("people.tab", tempFile.getName());
+        assertFalse(tableFile.storeColumnHeaderIntoDBFile(colHeaders, tempFile));
+    }
+
+    @Test
+    public void test_storeRecordIntoDBFile_happyPath_fileExistsAndContainsSingleRow() throws Exception{
+
+        String tempTableName = "people";
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        Record record = new Record();
+        List<Attribute> attrs = new ArrayList<>();
+        Attribute col1 = new Attribute("1", DBDataType.NUMBER);
+        Attribute col2 = new Attribute("Bob", DBDataType.VARCHAR);
+        Attribute col3 = new Attribute("21", DBDataType.NUMBER);
+        Attribute col4 = new Attribute("bob@bob.net", DBDataType.VARCHAR);
+        attrs.add(col1);
+        attrs.add(col2);
+        attrs.add(col3);
+        attrs.add(col4);
+        record.setAttributes(attrs);
+
+        DBTableFile tableFile = new DBTableFile();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+        assertTrue(tableFile.storeRecordIntoDBFile(record, tempFile));
+        assertTrue(checkDBFileContainsString(tempFile, "1\tBob\t21\tbob@bob.net"));
+        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
+        // assertEquals("people.tab", tempFile.getName());
+    }
+
+    @Test
+    public void test_storeRecordIntoDBFile_noAttributes_returnsFalse() throws Exception{
+
+        String tempTableName = "people";
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        Record record = new Record();
+        List<Attribute> attrs = new ArrayList<>();
+        record.setAttributes(attrs);
+
+        DBTableFile tableFile = new DBTableFile();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+        assertFalse(tableFile.storeRecordIntoDBFile(record, tempFile));
+    }
+
+    @Test
+    public void test_storeRecordIntoDBFile_nullAttributes_returnsFalse() throws Exception{
+
+        String tempTableName = "people";
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        Record record = new Record();
+        record.setAttributes(null);
+
+        DBTableFile tableFile = new DBTableFile();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+        assertFalse(tableFile.storeRecordIntoDBFile(record, tempFile));
+    }
+
+    @Test
+    public void test_storeRecordIntoDBFile_nullRecord_returnsFalse() throws Exception{
+
+        String tempTableName = "people";
+        tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
+
+        Record record = null;
+
+        DBTableFile tableFile = new DBTableFile();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
+        assertFalse(tableFile.storeRecordIntoDBFile(record, tempFile));
+    }
+
+    @Test
+    public void test_storeEntityIntoDBFile_happyPath_headerAndRowsStoredInDBFile() throws Exception {
+        // given
+        Table table = new Table();
+        DBTableFile dbFile = new DBTableFile();
+        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        if(new File(tempDirName).mkdir()){
+            tempDir = new File(tempDirName);
+            tempDir.deleteOnExit();
+        }
+        tempFile = new File(dbFilePath);
+
+        List<ColumnHeader> colHeadings = new ArrayList<>();
+        ColumnHeader cHead1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, 100, DBColumnType.PRIMARY_KEY);
+        ColumnHeader cHead2 = new ColumnHeader(2, "Name", DBDataType.VARCHAR, 100, DBColumnType.FIELD);
+        ColumnHeader cHead3 = new ColumnHeader(3, "Age", DBDataType.NUMBER, 100, DBColumnType.FIELD);
+        colHeadings.add(cHead1);
+        colHeadings.add(cHead2);
+        colHeadings.add(cHead3);
+        table.setColHeadings(colHeadings);
+
+        List<Attribute> rowData1 = new ArrayList<>();
+        Attribute attr1 = new Attribute("1", DBDataType.NUMBER);
+        Attribute attr2 = new Attribute("Bob", DBDataType.VARCHAR);
+        Attribute attr3 = new Attribute("21", DBDataType.NUMBER);
+        rowData1.add(attr1);
+        rowData1.add(attr2);
+        rowData1.add(attr3);
+        Record row1 = new Record(rowData1);
+
+        List<Attribute> rowData2 = new ArrayList<>();
+        Attribute attr4 = new Attribute("2", DBDataType.NUMBER);
+        Attribute attr5 = new Attribute("Sarah", DBDataType.VARCHAR);
+        Attribute attr6 = new Attribute("66", DBDataType.NUMBER);
+        rowData2.add(attr4);
+        rowData2.add(attr5);
+        rowData2.add(attr6);
+        Record row2 = new Record(rowData2);
+
+        List<Record> rows = new ArrayList<>();
+        rows.add(row1);
+        rows.add(row2);
+        table.setRows(rows);
+
+        // when
+        assertTrue(dbFile.storeEntityIntoDBFile(table, dbFilePath));
+
+        // then
+        assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge"));
+        assertTrue(checkDBFileContainsString(tempFile, "1\tBob\t21"));
+        assertTrue(checkDBFileContainsString(tempFile, "2\tSarah\t66"));
+
     }
 
 }

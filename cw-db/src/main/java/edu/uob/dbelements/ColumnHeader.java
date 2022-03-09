@@ -2,6 +2,7 @@ package edu.uob.dbelements;
 
 import edu.uob.dbfilesystem.DBColumnType;
 import edu.uob.dbfilesystem.DBDataType;
+import edu.uob.dbfilesystem.DBTableFile;
 
 public class ColumnHeader {
 
@@ -15,6 +16,14 @@ public class ColumnHeader {
 
     public ColumnHeader(){
 
+    }
+
+    public ColumnHeader(int colNum, String colName, DBDataType dataType, int dataFieldLength, DBColumnType colType){
+        this.colNumber = colNum;
+        this.colName = colName;
+        this.dataType = dataType;
+        this.dataFieldLength = dataFieldLength;
+        this.colType = colType;
     }
 
     public int getColNumber() {
