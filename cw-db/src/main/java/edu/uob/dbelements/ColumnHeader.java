@@ -1,13 +1,13 @@
 package edu.uob.dbelements;
 
+import edu.uob.abstractelements.AbstractColumnData;
 import edu.uob.dbfilesystem.DBColumnType;
 import edu.uob.dbfilesystem.DBDataType;
-import edu.uob.dbfilesystem.DBTableFile;
 
-public class ColumnHeader {
+public class ColumnHeader extends AbstractColumnData {
 
     private int colNumber;
-    private String colName;
+    // private String colName;
     private DBDataType dataType;
     private int dataFieldLength;
     private DBColumnType colType;
@@ -20,7 +20,7 @@ public class ColumnHeader {
 
     public ColumnHeader(int colNum, String colName, DBDataType dataType, int dataFieldLength, DBColumnType colType){
         this.colNumber = colNum;
-        this.colName = colName;
+        this.data = colName;
         this.dataType = dataType;
         this.dataFieldLength = dataFieldLength;
         this.colType = colType;
@@ -35,11 +35,11 @@ public class ColumnHeader {
     }
 
     public String getColName() {
-        return colName;
+        return data;
     }
 
     public void setColName(String colName) {
-        this.colName = colName;
+        this.data = colName;
     }
 
     public DBDataType getDataType() {

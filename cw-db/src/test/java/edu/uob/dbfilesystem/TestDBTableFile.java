@@ -46,6 +46,7 @@ public class TestDBTableFile {
         try(BufferedReader br = new BufferedReader(reader)){
             String line;
             while((line = br.readLine()) != null) {
+                // System.out.println(line);
                 if(line.contains(term)){
                     return true;
                 }
@@ -207,10 +208,10 @@ public class TestDBTableFile {
         createTempDBFile(tempTableName);
         BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
         StringBuilder sb = new StringBuilder();
-        sb.append("id\tName\tAge\tEmail\n");
-        sb.append("1\tBob\t21\tbob@bob.net\n");
-        sb.append("2\tHarry\t32\tharry@harry.com\n");
-        sb.append("3\tChris\t42\tchris@chris.ac.uk");
+        sb.append("id\tName\tAge\tEmail" + System.lineSeparator());
+        sb.append("1\tBob\t21\tbob@bob.net" + System.lineSeparator());
+        sb.append("2\tHarry\t32\tharry@harry.com" + System.lineSeparator());
+        sb.append("3\tChris\t42\tchris@chris.ac.uk" + System.lineSeparator());
 
         bw.write(sb.toString());
         bw.close();
@@ -252,7 +253,7 @@ public class TestDBTableFile {
 
         createTempDBFile(tempTableName);
         BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
-        String colHeader = "id\tName\tAge\tEmail\n";
+        String colHeader = "id\tName\tAge\tEmail" + System.lineSeparator();
 
         bw.write(colHeader);
         bw.close();
@@ -309,6 +310,7 @@ public class TestDBTableFile {
         // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
         // assertEquals("people.tab", tempFile.getName());
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge\tEmail"));
+        assertTrue(!checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
 
     @Test
@@ -379,7 +381,7 @@ public class TestDBTableFile {
         DBTableFile tableFile = new DBTableFile();
 
         // when
-        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+        boolean result = tableFile.storeRecordIntoDBFile(record.getAttributes(), tempFile);
 
         // then
         assertTrue(result);
@@ -389,6 +391,8 @@ public class TestDBTableFile {
         assertTrue(checkDBFileContainsString(tempFile, "1\tBob\t21\tbob@bob.net"));
         // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
         // assertEquals("people.tab", tempFile.getName());
+        // TODO find out why a File containing a \n returns false here
+        // assertTrue(checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
 
     /*
@@ -412,7 +416,7 @@ public class TestDBTableFile {
         DBTableFile tableFile = new DBTableFile();
 
         // when
-        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+        boolean result = tableFile.storeRecordIntoDBFile(record.getAttributes(), tempFile);
 
         // then
         assertTrue(result);
@@ -432,7 +436,7 @@ public class TestDBTableFile {
         DBTableFile tableFile = new DBTableFile();
 
         // when
-        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+        boolean result = tableFile.storeRecordIntoDBFile(record.getAttributes(), tempFile);
 
         // then
         assertFalse(result);
@@ -450,7 +454,7 @@ public class TestDBTableFile {
         DBTableFile tableFile = new DBTableFile();
 
         // when
-        boolean result = tableFile.storeRecordIntoDBFile(record, tempFile);
+        boolean result = tableFile.storeRecordIntoDBFile(null, tempFile);
 
         // then
         assertFalse(result);
@@ -558,6 +562,7 @@ public class TestDBTableFile {
         // then
         assertTrue(result);
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge"));
+        assertTrue(!checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
 
     @Test

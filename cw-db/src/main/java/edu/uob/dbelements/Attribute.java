@@ -1,10 +1,11 @@
 package edu.uob.dbelements;
 
+import edu.uob.abstractelements.AbstractColumnData;
 import edu.uob.dbfilesystem.DBDataType;
 
-public class Attribute {
+public class Attribute extends AbstractColumnData {
 
-    private String value;
+    // private String value;
     private DBDataType dataType;
 
     public Attribute(){
@@ -12,16 +13,16 @@ public class Attribute {
     }
 
     public Attribute(String value, DBDataType dataType){
-        this.value = value;
+        this.data = value;
         this.dataType = dataType;
     }
 
     public String getValue() {
-        return value;
+        return data;
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.data = value;
     }
 
     public DBDataType getDataType() {

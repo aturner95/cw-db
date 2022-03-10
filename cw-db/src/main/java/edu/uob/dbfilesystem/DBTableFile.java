@@ -1,5 +1,6 @@
 package edu.uob.dbfilesystem;
 
+import edu.uob.abstractelements.AbstractColumnData;
 import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
@@ -116,7 +117,7 @@ public class DBTableFile {
             }
 
             for(Record rec: table.getRows()){
-                if(!storeRecordIntoDBFile(rec, fileToOpen)){
+                if(!storeRecordIntoDBFile(rec.getAttributes(), fileToOpen)){
                     // TODO handle exception
                     System.out.println("Exception storing row to DB file");
                     return false;
@@ -128,59 +129,63 @@ public class DBTableFile {
     }
 
 
-    // @TODO can #storeColomnHeaderIntoDBFile and #storeRecordIntoDBFile be factorised to use common code?
     /* default */ boolean storeColumnHeaderIntoDBFile(List<ColumnHeader> colHeaders, File dbFile) {
 
         if(colHeaders != null && colHeaders.size() > 0) {
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile))) {
-                StringBuilder sb = new StringBuilder();
-
-                for (int i = 0; i < colHeaders.size(); i++) {
-                    sb.append(colHeaders.get(i).getColName());
-                    if (i < colHeaders.size() - 1) {
-                        sb.append("\t");
-                    }
-                }
-
-                bw.write(sb.toString());
+            if(storeDataIntoDBFile(colHeaders, DBRowType.COLUMN_HEADER, dbFile)){
                 return true;
-
-            } catch (IOException ioe) {
-                return false;
             }
         }
         return false;
     }
 
-    // @TODO can #storeColomnHeaderIntoDBFile and #storeRecordIntoDBFile be factorised to use common code?
-    /* default */ boolean storeRecordIntoDBFile(Record record, File dbFile){
+    /* default */ boolean storeRecordIntoDBFile(List<Attribute> record, File dbFile){
 
-        if(record != null && record.getAttributes() != null) {
+        if(record != null && record != null) {
 
-            if(record.getAttributes().size() == 0){
+            if(record.size() == 0){
                 return true;
             }
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, true))) {
-                List<Attribute> attributes = record.getAttributes();
-                StringBuilder sb = new StringBuilder();
-                sb.append("\n");
-
-                for (int i = 0; i < attributes.size(); i++) {
-                    sb.append(attributes.get(i).getValue());
-                    if (i < attributes.size() - 1) {
-                        sb.append("\t");
-                    }
-                }
-
-                bw.append(sb.toString());
+            if(storeDataIntoDBFile(record, DBRowType.RECORD, dbFile)){
                 return true;
-
-            } catch (IOException ioe) {
-                return false;
             }
         } return false;
+    }
+
+    private boolean storeDataIntoDBFile(List<? extends AbstractColumnData> rowData, DBRowType rowType, File dbFile) {
+
+        boolean appendMode;
+        boolean newLine;
+        if (rowType == DBRowType.COLUMN_HEADER){
+            appendMode = false;
+            newLine = false;
+        } else if(rowType == DBRowType.RECORD){
+            appendMode = true;
+            newLine = true;
+        } else {
+            return false;
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, appendMode))) {
+            StringBuilder sb = new StringBuilder();
+            if(newLine){
+                sb.append(System.lineSeparator());
+            }
+
+            for (int i = 0; i < rowData.size(); i++) {
+                sb.append(rowData.get(i).getData());
+                if (i < rowData.size() - 1) {
+                    sb.append("\t");
+                }
+            }
+            bw.append(sb.toString());
+            return true;
+
+        } catch (IOException ioe) {
+            return false;
+        }
     }
 
 }
