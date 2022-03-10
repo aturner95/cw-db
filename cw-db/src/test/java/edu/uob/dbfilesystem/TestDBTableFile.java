@@ -1,9 +1,7 @@
 package edu.uob.dbfilesystem;
 
-import edu.uob.dbelements.Attribute;
-import edu.uob.dbelements.ColumnHeader;
+import edu.uob.dbelements.*;
 import edu.uob.dbelements.Record;
-import edu.uob.dbelements.Table;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -468,12 +466,18 @@ public class TestDBTableFile {
         // given
         Table table = new Table();
         DBTableFile dbFile = new DBTableFile();
-        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        String tempTableName = "people";
+        String dbFilePath = tempDirName + File.separator + tempTableName + fileExt;
         if(new File(tempDirName).mkdir()){
             tempDir = new File(tempDirName);
             tempDir.deleteOnExit();
         }
         tempFile = new File(dbFilePath);
+
+        TableHeader tableHeader = new TableHeader();
+        tableHeader.setTableName(tempTableName);
+        tableHeader.setFileLocation(tempFile);
+        table.setHeader(tableHeader);
 
         List<ColumnHeader> colHeadings = new ArrayList<>();
         ColumnHeader cHead1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, 100, DBColumnType.PRIMARY_KEY);
@@ -508,7 +512,7 @@ public class TestDBTableFile {
         table.setRows(rows);
 
         // when
-        assertTrue(dbFile.storeEntityIntoDBFile(table, dbFilePath));
+        assertTrue(dbFile.storeEntityIntoDBFile(table));
 
         // then
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge"));
@@ -529,7 +533,7 @@ public class TestDBTableFile {
         tempFile = new File(dbFilePath);
 
         // when
-        boolean result = dbFile.storeEntityIntoDBFile(table, dbFilePath);
+        boolean result = dbFile.storeEntityIntoDBFile(table);
 
         // then
         assertFalse(result);
@@ -540,12 +544,18 @@ public class TestDBTableFile {
         // given
         Table table = new Table();
         DBTableFile dbFile = new DBTableFile();
-        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        String tempTableName = "people";
+        String dbFilePath = tempDirName + File.separator + tempTableName + fileExt;
         if(new File(tempDirName).mkdir()){
             tempDir = new File(tempDirName);
             tempDir.deleteOnExit();
         }
         tempFile = new File(dbFilePath);
+
+        TableHeader tableHeader = new TableHeader();
+        tableHeader.setTableName(tempTableName);
+        tableHeader.setFileLocation(tempFile);
+        table.setHeader(tableHeader);
 
         List<ColumnHeader> colHeadings = new ArrayList<>();
         ColumnHeader cHead1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, 100, DBColumnType.PRIMARY_KEY);
@@ -557,7 +567,7 @@ public class TestDBTableFile {
         table.setColHeadings(colHeadings);
 
         // when
-        boolean result = dbFile.storeEntityIntoDBFile(table, dbFilePath);
+        boolean result = dbFile.storeEntityIntoDBFile(table);
 
         // then
         assertTrue(result);
@@ -569,13 +579,20 @@ public class TestDBTableFile {
     public void test_storeEntityIntoDBFile_noColHeaders_returnsFalse() throws Exception {
         // given
         Table table = new Table();
+        String tempTableName = "people";
         DBTableFile dbFile = new DBTableFile();
-        String dbFilePath = tempDirName + File.separator + "people" + fileExt;
+        String dbFilePath = tempDirName + File.separator + tempTableName + fileExt;
         if(new File(tempDirName).mkdir()){
             tempDir = new File(tempDirName);
             tempDir.deleteOnExit();
         }
         tempFile = new File(dbFilePath);
+
+        TableHeader tableHeader = new TableHeader();
+        tableHeader.setTableName(tempTableName);
+        tableHeader.setFileLocation(tempFile);
+        table.setHeader(tableHeader);
+
 
         List<ColumnHeader> colHeadings = new ArrayList<>();
         table.setColHeadings(colHeadings);
@@ -604,7 +621,7 @@ public class TestDBTableFile {
         table.setRows(rows);
 
         // when
-        boolean result = dbFile.storeEntityIntoDBFile(table, dbFilePath);
+        boolean result = dbFile.storeEntityIntoDBFile(table);
 
         // then
         assertFalse(result);

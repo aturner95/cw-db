@@ -95,29 +95,29 @@ public class DBTableFile {
     }
 
     // TODO currently this method simply creates and writes to a new file from scratch. If file exists should we just add new rows?
-    public boolean storeEntityIntoDBFile(Table table, String dbFilePath){
+    public boolean storeEntityIntoDBFile(Table table){
 
-        File fileToOpen = new File(dbFilePath.toLowerCase(Locale.ROOT));
+        if(table != null && table.getHeader() != null && table.getHeader().getFileLocation()!= null) {
+            String dbFilePath = table.getHeader().getFileLocation().getPath();
+            File fileToOpen = new File(dbFilePath.toLowerCase(Locale.ROOT));
 
-        if(table != null) {
-
-            if(!fileToOpen.exists()){
+            if (!fileToOpen.exists()) {
                 try {
                     fileToOpen.createNewFile();
-                } catch(IOException ioe){
+                } catch (IOException ioe) {
                     System.out.println(ioe.getMessage());
                     return false;
                 }
             }
 
-            if(!storeColumnHeaderIntoDBFile(table.getColHeadings(), fileToOpen)){
+            if (!storeColumnHeaderIntoDBFile(table.getColHeadings(), fileToOpen)) {
                 // TODO handle exception
                 System.out.println("Exception storing col headers to DB file");
                 return false;
             }
 
-            for(Record rec: table.getRows()){
-                if(!storeRecordIntoDBFile(rec.getAttributes(), fileToOpen)){
+            for (Record rec : table.getRows()) {
+                if (!storeRecordIntoDBFile(rec.getAttributes(), fileToOpen)) {
                     // TODO handle exception
                     System.out.println("Exception storing row to DB file");
                     return false;
