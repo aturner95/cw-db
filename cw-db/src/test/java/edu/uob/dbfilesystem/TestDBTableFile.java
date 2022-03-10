@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestDBTableFile {
 
@@ -209,7 +210,7 @@ public class TestDBTableFile {
         sb.append("id\tName\tAge\tEmail" + System.lineSeparator());
         sb.append("1\tBob\t21\tbob@bob.net" + System.lineSeparator());
         sb.append("2\tHarry\t32\tharry@harry.com" + System.lineSeparator());
-        sb.append("3\tChris\t42\tchris@chris.ac.uk" + System.lineSeparator());
+        sb.append("3\tChris\t42\tchris@chris.ac.uk").append(System.lineSeparator());
 
         bw.write(sb.toString());
         bw.close();
@@ -280,6 +281,64 @@ public class TestDBTableFile {
     }
 
     @Test
+    public void test_getTableName_happyPath_fileNameReturned(){
+        DBTableFile dbFile = new DBTableFile();
+        assertEquals("file", dbFile.getTableName(new File("folder" + File.separator + "file.txt")));
+    }
+
+    @Test
+    public void test_getTableName_noExt_fileNameReturned(){
+        DBTableFile dbFile = new DBTableFile();
+        assertEquals("file", dbFile.getTableName(new File("folder" + File.separator + "file")));
+    }
+
+    @Test
+    public void test_getTableName_noDirectory_fileNameReturned(){
+        DBTableFile dbFile = new DBTableFile();
+        assertEquals("file", dbFile.getTableName(new File("file.txt")));
+    }
+
+    @Test
+    public void test_getTableName_nullFile_returnsNull(){
+        DBTableFile dbFile = new DBTableFile();
+        assertNull(dbFile.getTableName(null));
+    }
+
+    @Test
+    public void test_getTableName_fileHasTwoExts_fileNameReturned(){
+        DBTableFile dbFile = new DBTableFile();
+        assertEquals("file", dbFile.getTableName(new File("user" + File.separator + "dir" + File.separator + "file.txt.doc")));
+    }
+
+    @Test
+    public void test_createDBFile_fileDoesNotExist_fileCreated(){
+        // given
+        DBTableFile dbFile = new DBTableFile();
+        File testFile = new File(tempDir + File.separator + "test1.txt");
+
+        // when
+        assertFalse(testFile.exists());
+        boolean result = dbFile.createDBFile(testFile);
+
+        // then
+        assertTrue(result);
+        assertTrue(testFile.exists());
+    }
+
+    @Test
+    public void test_createDBFile_nullFile_returnFalse(){
+        // given
+        DBTableFile dbFile = new DBTableFile();
+        File testFile = null;
+
+        // when
+        boolean result = dbFile.createDBFile(testFile);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
     public void test_storeColomnHeaderIntoDBFile_happyPath_fileExistsAndContainsHeaderText() throws Exception{
 
         // given
@@ -308,7 +367,7 @@ public class TestDBTableFile {
         // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
         // assertEquals("people.tab", tempFile.getName());
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge\tEmail"));
-        assertTrue(!checkDBFileContainsString(tempFile, System.lineSeparator()));
+        assertFalse(checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
 
     @Test
@@ -448,7 +507,6 @@ public class TestDBTableFile {
         // given
         String tempTableName = "people";
         tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
-        Record record = null;
         DBTableFile tableFile = new DBTableFile();
 
         // when

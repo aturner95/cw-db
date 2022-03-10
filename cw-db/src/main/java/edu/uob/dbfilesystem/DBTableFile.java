@@ -29,12 +29,14 @@ public class DBTableFile {
 
                 if((line = br.readLine()) != null) {
                     if (!readColumnHeadingsIntoEntity(table, line)) {
-                        //TODO handle error
+                        //TODO handle exception
+                        System.out.println("Exception reading col heading from DB file");
                     }
                 }
                 while((line = br.readLine()) != null){
                     if(!readRecordIntoEntity(table, line)){
-                        // TODO handle error
+                        // TODO handle exception
+                        System.out.println("Exception reading record from DB file");
                     }
                 }
 
@@ -73,8 +75,6 @@ public class DBTableFile {
             Record record = new Record();
             List<Attribute> listOfAttributes = new ArrayList<>();
 
-            // record.setId(Long.valueOf(tabDelimitedRow[0]));
-
             for (String s : tabDelimitedRow) {
                 Attribute attr = new Attribute();
                 attr.setValue(s);
@@ -88,10 +88,16 @@ public class DBTableFile {
     }
 
     /* default */ String getTableName(File dbFilePath){
-        String fileName;
 
-        fileName = dbFilePath.getName();
-        return fileName.substring(0, fileName.indexOf('.'));
+        if(dbFilePath != null) {
+            String fileName = dbFilePath.getName();
+            if (fileName.contains(".")) {
+                return fileName.substring(0, fileName.indexOf('.'));
+            } else {
+                return dbFilePath.getName();
+            }
+        }
+        return null;
     }
 
     // TODO currently this method simply creates and writes to a new file from scratch. If file exists should we just add new rows?
@@ -102,10 +108,7 @@ public class DBTableFile {
             File fileToOpen = new File(dbFilePath.toLowerCase(Locale.ROOT));
 
             if (!fileToOpen.exists()) {
-                try {
-                    fileToOpen.createNewFile();
-                } catch (IOException ioe) {
-                    System.out.println(ioe.getMessage());
+                if(!createDBFile(fileToOpen)){
                     return false;
                 }
             }
@@ -128,36 +131,46 @@ public class DBTableFile {
         return false;
     }
 
+    /* default */ boolean createDBFile(File dbFile){
+
+        if (dbFile != null) {
+            try {
+                if(!dbFile.createNewFile()){
+                    return false;
+                }
+            } catch (IOException ioe) {
+                System.out.println(ioe.getMessage());
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
 
     /* default */ boolean storeColumnHeaderIntoDBFile(List<ColumnHeader> colHeaders, File dbFile) {
 
         if(colHeaders != null && colHeaders.size() > 0) {
-
-            if(storeDataIntoDBFile(colHeaders, DBRowType.COLUMN_HEADER, dbFile)){
-                return true;
-            }
+            return storeDataIntoDBFile(colHeaders, DBRowType.COLUMN_HEADER, dbFile);
         }
         return false;
     }
 
     /* default */ boolean storeRecordIntoDBFile(List<Attribute> record, File dbFile){
 
-        if(record != null && record != null) {
-
+        if(record != null) {
             if(record.size() == 0){
                 return true;
             }
-
-            if(storeDataIntoDBFile(record, DBRowType.RECORD, dbFile)){
-                return true;
-            }
-        } return false;
+            return storeDataIntoDBFile(record, DBRowType.RECORD, dbFile);
+        }
+        return false;
     }
 
     private boolean storeDataIntoDBFile(List<? extends AbstractColumnData> rowData, DBRowType rowType, File dbFile) {
 
         boolean appendMode;
         boolean newLine;
+
         if (rowType == DBRowType.COLUMN_HEADER){
             appendMode = false;
             newLine = false;
