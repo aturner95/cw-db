@@ -8,12 +8,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /** This class implements the DB server. */
 public final class DBServer {
 
   private static final char END_OF_TRANSMISSION = 4;
+  private File databaseDirectory;
+  private static final String STATUS_OK = "[OK]";
+  private static final String STATUS_ERROR = "[ERROR]";
 
   public static void main(String[] args) throws IOException {
     new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
@@ -33,6 +39,7 @@ public final class DBServer {
    */
   public DBServer(File databaseDirectory) {
     // TODO implement your server logic here
+    this.databaseDirectory = databaseDirectory;
   }
 
   /**
@@ -42,7 +49,31 @@ public final class DBServer {
    * <p>This method handles all incoming DB commands and carry out the corresponding actions.
    */
   public String handleCommand(String command) {
-    // TODO implement your server logic here
+
+    // check database exists
+    if(!databaseDirectory.exists() || !databaseDirectory.isDirectory()){
+      return STATUS_ERROR;
+    }
+
+    // check database contains files
+    try(DirectoryStream<Path> dirStream = Files.newDirectoryStream(databaseDirectory.toPath())){
+      if(!dirStream.iterator().hasNext()){
+        return STATUS_OK;
+      }
+    } catch(IOException ioe){
+      return STATUS_ERROR;
+    }
+
+    // TODO finish implementing server logic
+    // create List<Table>
+    // for every file in database
+      // read DBFile into table
+      // add table to List<Table>
+    // create a StringBuilder
+    // for every table in List
+      // toString table and append to Sb
+    // return <response> + sb
+
     return "[OK] Thanks for your message: " + command;
   }
 

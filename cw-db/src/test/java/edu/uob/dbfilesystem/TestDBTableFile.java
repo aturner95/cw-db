@@ -2,6 +2,7 @@ package edu.uob.dbfilesystem;
 
 import edu.uob.dbelements.*;
 import edu.uob.dbelements.Record;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -52,6 +53,21 @@ public class TestDBTableFile {
             }
         }
         return false;
+    }
+
+    @AfterEach
+    void teardown(){
+        if(tempDir.exists()){
+            File[] files = tempDir.listFiles();
+            if(files != null) {
+                for (File file : files) {
+                    if(file != null && file.exists()) {
+                        assertTrue(file.delete());
+                    }
+                }
+            }
+            assertTrue(tempDir.delete());
+        }
     }
 
 
@@ -579,7 +595,7 @@ public class TestDBTableFile {
     }
 
     @Test
-    public void test_storeEntityIntoDBFile_nullTable_returnsFalse() throws Exception {
+    public void test_storeEntityIntoDBFile_nullTable_returnsFalse() {
         // given
         Table table = null;
         DBTableFile dbFile = new DBTableFile();
@@ -630,11 +646,11 @@ public class TestDBTableFile {
         // then
         assertTrue(result);
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge"));
-        assertTrue(!checkDBFileContainsString(tempFile, System.lineSeparator()));
+        assertFalse(checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
 
     @Test
-    public void test_storeEntityIntoDBFile_noColHeaders_returnsFalse() throws Exception {
+    public void test_storeEntityIntoDBFile_noColHeaders_returnsFalse() {
         // given
         Table table = new Table();
         String tempTableName = "people";
