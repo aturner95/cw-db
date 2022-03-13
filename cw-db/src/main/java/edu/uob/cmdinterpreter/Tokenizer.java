@@ -16,8 +16,28 @@ public class Tokenizer {
         tokenInfos = new LinkedList<TokenInfo>();
         tokens = new LinkedList<Token>();
 
-        // define tokens information
-        addToken("\\buse\\b|\\bcreate\\b|\\bdrop\\b|\\balter\\b|\\binsert\\b|\\bselect\\b|\\bupdate\\b|\\bdelete\\b|\\bjoin\\b", TokenType.CT);
+        /* --- define tokens information --- */
+
+        // Command type (a list of special keywords, so have just placed them all into a single regular expression)
+        addToken("\\bUSE\\b|\\bCREATE\\b|\\bDROP\\b|\\bALTER\\b|\\bINSERT\\b|\\bSELECT\\b|\\bUPDATE\\b|\\bDELETE\\b|\\bJOIN\\b", TokenType.CT);
+
+        // Keywords (Unsure how extensive this list needs to be, but for now will just keep them all in one regular expression)
+        addToken("\\bFROM\\b|\\bWHERE\\b|\\bIN\\b|\\bINTO\\b|\\bVALUES\\b", TokenType.KW);
+
+        // Operations (in a list)
+        addToken(("==|<=|>=|!=|<|>|=|\\bLIKE\\b"), TokenType.OP); // Operation
+
+        // Literals (expressions for are quite messy so separating into String, number, character and boolean)
+        addToken("\\\"([^\\\"]|\\.)*\\\"", TokenType.LIT); // String literal \\"([^\\"]|\\.)*\\"
+        addToken("[+-]?([0-9]*[.])?[0-9]+", TokenType.LIT); // Number literal
+        addToken("\\bTRUE\\b|\\bFALSE\\b", TokenType.LIT); // Boolean literal
+        addToken("\\b[a-zA-Z]\\b", TokenType.LIT); // Character literal (letters)
+        addToken("[!#$%&()*+,-\\./:;<=>?@[/]^_`{~}]", TokenType.LIT); // Character literal (special characters) "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | ">" | "=" | "<" | "?" | "@" | "[" | "\" | "]" | "^" | "_" | "`" | "{" | "}" | "~"
+
+        // Separator
+        addToken(("\\s+"), TokenType.SEP);
+        // Identifiers (Basically any word, so has the lowest precedence - expect this may change...!)
+        addToken("\\w+", TokenType.ID);
     }
 
     public LinkedList<Token> getTokens(){
@@ -33,7 +53,7 @@ public class Tokenizer {
         if(inputSequence != null && !inputSequence.isEmpty()) {
 
             String string = inputSequence.strip();
-            System.out.println("input: " + string);
+            // System.out.println("input: " + string);
             tokens.clear();
 
             while (!string.equals("")) {
@@ -60,8 +80,6 @@ public class Tokenizer {
         }
     }
 
-
-
     private class TokenInfo {
         public final Pattern regex;
         public final TokenType token;
@@ -70,30 +88,6 @@ public class Tokenizer {
             super();
             this.regex = regex;
             this.token = token;
-        }
-    }
-
-    public class Token {
-
-        private final TokenType tokenType;
-        private final String sequence;
-
-        public Token(TokenType tokenType, String sequence){
-            this.tokenType = tokenType;
-            this.sequence = sequence;
-        }
-
-        public TokenType getTokenType() {
-            return tokenType;
-        }
-
-        public String getSequence() {
-            return sequence;
-        }
-
-        @Override
-        public String toString(){
-            return "[" + tokenType.toString() +  "] : " + sequence;
         }
     }
 
