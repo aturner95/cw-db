@@ -1,6 +1,7 @@
 package edu.uob.cmdinterpreter;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,9 +48,19 @@ public class Tokenizer {
         return tokens;
     }
 
-    public void addToken(String regex, TokenType tokenType){
+    public void setTokens(List<Token> tokenList){
+        for(Token token: tokenList){
+            this.tokens.add(token);
+        }
+    }
+
+    private void addToken(String regex, TokenType tokenType){
         Pattern.compile("\\b([(a-z)(A-Z)(0-9)])+\\b");
         tokenInfos.add(new TokenInfo(Pattern.compile("^(" + regex + ")", Pattern.CASE_INSENSITIVE), tokenType));
+    }
+
+    public Token getCmdToken(){
+        return tokens.get(0);
     }
 
     public boolean tokenize(String inputSequence){
