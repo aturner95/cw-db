@@ -58,6 +58,13 @@ public final class DBServer {
     // check database contains files
     try(DirectoryStream<Path> dirStream = Files.newDirectoryStream(databaseDirectory.toPath())){
       if(!dirStream.iterator().hasNext()){
+
+        //TODO implement command
+        // 1. initialize tokenizer and pass then command
+        // 2. initialize parser, pass tokenizer and call #parse. This returns a DBCmd subtype which we
+        // then
+
+
         return STATUS_OK;
       }
     } catch(IOException ioe){
@@ -129,4 +136,13 @@ public final class DBServer {
       }
     }
   }
+
+  public File getDatabaseDirectory(){
+    return this.databaseDirectory;
+  }
+
+  public void setDatabaseDirectory(File databaseDirectory){
+    this.databaseDirectory = databaseDirectory;
+  }
+
 }

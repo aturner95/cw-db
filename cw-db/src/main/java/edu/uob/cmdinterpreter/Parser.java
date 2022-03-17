@@ -26,6 +26,22 @@ public class Parser {
         return tokens.get(currentToken);
     }
 
+    private Token getPreviousToken() {
+        if(currentToken - 1 > 0){
+            return tokens.get(currentToken - 1);
+        }
+        // TODO throw exception
+        return null;
+    }
+
+    private String getPreviousTokenSeq() {
+        if(currentToken - 1 > 0){
+            return tokens.get(currentToken - 1).getSequence();
+        }
+        // TODO throw exception
+        return null;
+    }
+
     private void incrementToken() {
         // TODO throw exception
         if(currentToken < tokens.size()){
@@ -70,7 +86,6 @@ public class Parser {
     private boolean isCommandType(){
         if(BNFConstants.USE.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isUse()) {
-                cmd = new UseCMD();
                 return true;
             }
         }
@@ -138,6 +153,7 @@ public class Parser {
      */
     private boolean isUse(){
         if(BNFConstants.USE.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new UseCMD();
             incrementToken();
             if(isDatabaseName()){
                 return true;
@@ -723,6 +739,7 @@ public class Parser {
      */
     private boolean isDatabaseName(){
         if(isPlainText()){
+            cmd.addTableName(getPreviousTokenSeq());
             return true;
         }
         return false;

@@ -6,7 +6,7 @@ import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 public class CreateCMD extends DBCmd {
 
     @Override
-    protected String query(DBServer server) {
+    public String query(DBServer server) {
         return null;
     }
 }

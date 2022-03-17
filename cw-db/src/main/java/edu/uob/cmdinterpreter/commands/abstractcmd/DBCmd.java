@@ -7,16 +7,22 @@ import java.util.List;
 public abstract class DBCmd {
 
     /* Variables */
-    protected String DBName;
-    protected String commandType;
     protected List<String> tableNames;
     protected List<String> colNames;
 
+    /* Constructors */
+    public DBCmd(){
+        super();
+    }
 
     /* Methods */
-    protected abstract String query(DBServer server);
+    public abstract String query(DBServer server);
 
-    protected boolean addTableName(String tableName){
+    public List<String> getTableNames(){
+        return tableNames;
+    }
+
+    public boolean addTableName(String tableName){
         if(tableName != null && tableName != null){
             tableNames.add(tableName);
             return true;
@@ -24,7 +30,11 @@ public abstract class DBCmd {
         return false;
     }
 
-    protected boolean addColumnName(String colName){
+    public List<String> getColNames(){
+        return colNames;
+    }
+
+    public boolean addColumnName(String colName){
         if(colNames != null && colName != null){
             colNames.add(colName);
             return true;

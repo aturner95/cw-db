@@ -6,7 +6,7 @@ import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 public class DropCMD extends DBCmd {
 
     @Override
-    protected String query(DBServer server) {
+    public String query(DBServer server) {
         return null;
     }
 }
