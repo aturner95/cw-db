@@ -1,6 +1,7 @@
 package edu.uob.cmdinterpreter;
 
-import edu.uob.cmdinterpreter.abstractcmd.DBCmd;
+import edu.uob.cmdinterpreter.commands.*;
+import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 
 import java.util.List;
 

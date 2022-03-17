@@ -1,8 +1,7 @@
-package edu.uob.cmdinterpreter;
+package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
-import edu.uob.cmdinterpreter.AlterCMD;
-import edu.uob.cmdinterpreter.abstractcmd.DBCmd;
+import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 
 public class InsertCMD extends DBCmd {
 

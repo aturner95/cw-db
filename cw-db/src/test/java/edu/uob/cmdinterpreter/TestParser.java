@@ -1,12 +1,8 @@
 package edu.uob.cmdinterpreter;
 
-import edu.uob.cmdinterpreter.abstractcmd.DBCmd;
-import edu.uob.dbfilesystem.DBDataType;
+import edu.uob.cmdinterpreter.commands.*;
+import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

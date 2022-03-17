@@ -1,4 +1,4 @@
-package edu.uob.cmdinterpreter.abstractcmd;
+package edu.uob.cmdinterpreter.commands.abstractcmd;
 
 import edu.uob.DBServer;
 
