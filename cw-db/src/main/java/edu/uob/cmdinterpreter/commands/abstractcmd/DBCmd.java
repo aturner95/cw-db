@@ -2,11 +2,13 @@ package edu.uob.cmdinterpreter.commands.abstractcmd;
 
 import edu.uob.DBServer;
 
+import java.io.File;
 import java.util.List;
 
 public abstract class DBCmd {
 
     /* Variables */
+    protected String databaseName;
     protected List<String> tableNames;
     protected List<String> colNames;
 
@@ -17,6 +19,14 @@ public abstract class DBCmd {
 
     /* Methods */
     public abstract String query(DBServer server);
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName){
+        this.databaseName = databaseName;
+    }
 
     public List<String> getTableNames(){
         return tableNames;
@@ -41,4 +51,5 @@ public abstract class DBCmd {
         }
         return false;
     }
+
 }

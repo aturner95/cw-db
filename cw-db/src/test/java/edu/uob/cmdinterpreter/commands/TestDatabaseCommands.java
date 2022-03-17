@@ -24,7 +24,7 @@ public class TestDatabaseCommands {
     @BeforeEach
     void setup(@TempDir File dbDir) {
         tempDbDir = new File(tempDbDirName);
-        dbDir.deleteOnExit();
+        tempDbDir.deleteOnExit();
         server = new DBServer(dbDir);
     }
 
@@ -87,5 +87,46 @@ public class TestDatabaseCommands {
 
         // then
         assertNotNull(resultString);
+    }
+
+    @Test
+    public void test_createCMD_databaseCreated_emptyStringReturned() throws Exception {
+        // given
+        String newTempDb = "newTempDb";
+
+        cmd = new CreateCMD();
+        cmd.setDatabaseName("newTempDb");
+
+        // given
+        String resultString = cmd.query(server);
+
+        // then
+        assertNotNull(resultString);
+        assertTrue(resultString instanceof String);
+        tempDbDir = new File(newTempDb);
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+    }
+
+    @Test
+    public void test_createCMD_tableCreated_emptyStringReturned() throws Exception {
+
+        // given
+        setup(tempDbDir);
+        Files.createDirectory(tempDbDir.toPath());
+        String newTempTable = "newTempTable";
+
+        cmd = new CreateCMD();
+        cmd.addTableName(newTempTable);
+
+        // when
+        String resultString = cmd.query(server);
+
+        // then
+        assertNotNull(resultString);
+        assertTrue(resultString instanceof String);
+        File tempFile = new File("dbtest" + File.separator + newTempTable + ".tab");
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.isFile());
     }
 }

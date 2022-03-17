@@ -91,7 +91,6 @@ public class Parser {
         }
         if(BNFConstants.CREATE.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isCreate()) {
-                cmd = new CreateCMD();
                 return true;
             }
         }
@@ -169,6 +168,7 @@ public class Parser {
      */
     private boolean isCreate(){
         if (BNFConstants.CREATE.equalsIgnoreCase(getCurrentTokenSeq())) {
+            cmd = new CreateCMD();
             incrementToken();
             if (isCreateDatabase()) {
                 return true;
@@ -715,6 +715,7 @@ public class Parser {
      */
     private boolean isTableName(){
         if(isPlainText()){
+            cmd.addTableName(getPreviousTokenSeq());
             return true;
         }
         return false;
