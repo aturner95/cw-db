@@ -48,11 +48,11 @@ public class Tokenizer {
         return tokens;
     }
 
-    public void setTokens(List<Token> tokenList){
-        for(Token token: tokenList){
-            this.tokens.add(token);
-        }
-    }
+//    public void setTokens(List<Token> tokenList){
+//        for(Token token: tokenList){
+//            this.tokens.add(token);
+//        }
+//    }
 
     private void addToken(String regex, TokenType tokenType){
         Pattern.compile("\\b([(a-z)(A-Z)(0-9)])+\\b");

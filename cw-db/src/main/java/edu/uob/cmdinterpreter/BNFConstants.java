@@ -6,6 +6,15 @@ public class BNFConstants {
     // public static final String SELECT = "SELECT";
     public static final String FROM = "FROM";
     public static final String WHERE = "WHERE";
+    public static final String DATABASE = "DATABASE";
+    public static final String TABLE = "TABLE";
+    public static final String INTO = "INTO";
+    public static final String VALUES = "VALUES";
+    public static final String NULL = "NULL";
+    public static final String SET = "SET";
+    // public static final String WHERE = "WHERE";
+    public static final String AND = "AND";
+    public static final String ON = "ON";
 
     // Command types
     public static final String USE = "USE";
@@ -69,4 +78,8 @@ public class BNFConstants {
     public static final String LESS_OR_EQUAL_TO = "<=";
     public static final String NOT_EQUAL_TO = "!=";
     public static final String LIKE ="LIKE";
+
+    private BNFConstants(){
+
+    }
 }

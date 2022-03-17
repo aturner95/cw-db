@@ -1,5 +1,6 @@
 package edu.uob.cmdinterpreter;
 
+import edu.uob.abstractelements.JoinCMD;
 import edu.uob.cmdinterpreter.abstractcmd.DBCmd;
 
 import java.util.List;
@@ -26,11 +27,19 @@ public class Parser {
     }
 
     private void incrementToken() {
-        currentToken++;
+        // TODO throw exception
+        if(currentToken < tokens.size()){
+            currentToken++;
+        }
+
+    }
+
+    private String lookAheadTokenSeq() {
+        return tokens.get(currentToken + 1).getSequence();
+
     }
 
     public DBCmd parse() {
-
         if(isCommand()) {
             return cmd;
         }
@@ -60,52 +69,219 @@ public class Parser {
      */
     private boolean isCommandType(){
         if(BNFConstants.USE.equalsIgnoreCase(getCurrentTokenSeq())){
-            return true;
+            if(isUse()) {
+                cmd = new UseCMD();
+                return true;
+            }
         }
         if(BNFConstants.CREATE.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isCreate()) {
+                cmd = new CreateCMD();
+                return true;
+            }
         }
         if(BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isDrop()) {
+                cmd = new DropCMD();
+                return true;
+            }
         }
         if(BNFConstants.ALTER.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isAlter()){
+                cmd = new AlterCMD();
+                return true;
+            }
+            return false;
         }
         if(BNFConstants.INSERT.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isInsert()){
+                cmd = new InsertCMD();
+                return true;
+            }
+            return false;
         }
         if(BNFConstants.SELECT.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isSelect()){
+                cmd = new SelectCMD();
                 return true;
             }
             return false;
         }
         if(BNFConstants.UPDATE.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isUpdate()){
+                cmd = new UpdateCMD();
+                return true;
+            }
+            return false;
         }
         if(BNFConstants.DELETE.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isDelete()){
+                cmd = new DeleteCMD();
+                return true;
+            }
+            return false;
         }
         if(BNFConstants.JOIN.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
-            return true;
+            if(isJoin()){
+                cmd = new JoinCMD();
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
-    // isUse
-    // isCreate
-    // isCreateDatabase
-    // isCreateTable
-    // isDrop
-    // isAlter
-    // isInsert
+    /**
+     * <Use> ::=  "USE " <DatabaseName>
+     *
+     * @return
+     */
+    private boolean isUse(){
+        if(BNFConstants.USE.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            if(isDatabaseName()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * <Create>  ::=  <CreateDatabase> | <CreateTable>
+     *
+     * @return
+     */
+    private boolean isCreate(){
+        if (BNFConstants.CREATE.equalsIgnoreCase(getCurrentTokenSeq())) {
+            incrementToken();
+            if (isCreateDatabase()) {
+                return true;
+            }
+            if (isCreateTable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * <CreateDatabase> ::=  "CREATE DATABASE " <DatabaseName>
+     *
+     * @return
+     */
+    private boolean isCreateDatabase(){
+        if (BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())) {
+            incrementToken();
+            if (isDatabaseName()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * <CreateTable>  ::=  "CREATE TABLE " <TableName> | "CREATE TABLE " <TableName> "(" <AttributeList> ")"
+     *
+     * @return
+     */
+    private boolean isCreateTable(){
+        if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())) {
+            incrementToken();
+            if (isTableName()) {
+                return true;
+            }
+
+            if (isTableName()) {
+                if (BNFConstants.LEFT_BRACKET.equals(getCurrentTokenSeq())) {
+                    incrementToken();
+                    if (isAttributeList()) {
+                        if (BNFConstants.RIGHT_BRACKET.equals(getCurrentTokenSeq())) {
+                            incrementToken();
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    return false;
+    }
+
+
+    /**
+     * <Drop>  ::=  "DROP DATABASE " <DatabaseName> | "DROP TABLE " <TableName>
+     *
+     * @return
+     */
+    private boolean isDrop(){
+        if(BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            if(BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())){
+                incrementToken();
+                if(isDatabaseName()){
+                    return true;
+                }
+            }
+            if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())){
+                incrementToken();
+                if(isTableName()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * <Alter> ::=  "ALTER TABLE " <TableName> " " <AlterationType> " " <AttributeName>
+     *
+     * @return
+     */
+    private boolean isAlter(){
+        if(BNFConstants.ALTER.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())){
+                incrementToken();
+                if(isTableName()){
+                    if(isAlterationType()){
+                        if(isAttributeName()){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * <Insert>  ::=  "INSERT INTO " <TableName> " VALUES(" <ValueList> ")"
+     *
+     * @return
+     */
+    private boolean isInsert() {
+        if(BNFConstants.INSERT.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            if(BNFConstants.INTO.equalsIgnoreCase(getCurrentTokenSeq())){
+                incrementToken();
+                if(isTableName()){
+                    if(BNFConstants.VALUES.equalsIgnoreCase(getCurrentTokenSeq())){
+                        incrementToken();
+                        if(BNFConstants.LEFT_BRACKET.equalsIgnoreCase(getCurrentTokenSeq())){
+                            incrementToken();
+                            if(isValueList()){
+                                if(BNFConstants.RIGHT_BRACKET.equalsIgnoreCase(getCurrentTokenSeq())){
+                                    incrementToken();
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * <Select>  ::=  "SELECT " <WildAttribList> " FROM " <TableName> | "SELECT " <WildAttribList> " FROM " <TableName> " WHERE " <Condition>
@@ -119,7 +295,6 @@ public class Parser {
                 if(BNFConstants.FROM.equalsIgnoreCase(getCurrentTokenSeq())){
                     incrementToken();
                     if(isTableName()){
-                        cmd = new SelectCMD();
                         return true;
                     }
                 }
@@ -128,41 +303,108 @@ public class Parser {
         return false;
     }
 
-    // isUpdate
-    // isDelete
-    // isJoin
-
     /**
-     * <Digit>  ::=  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+     * <Update>  ::=  "UPDATE " <TableName> " SET " <NameValueList> " WHERE " <Condition>
      *
      * @return
      */
-    private boolean isDigit() {
-        if (getCurrentToken().getSequence().length() == 1) {
-            if (Character.isDigit(getCurrentToken().getSequence().charAt(0))) {
-                return true;
+    private boolean isUpdate(){
+        if(BNFConstants.UPDATE.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            if(isTableName()){
+                if(BNFConstants.SET.equalsIgnoreCase(getCurrentTokenSeq())){
+                    incrementToken();
+                    if(isNameValueList()){
+                        if(BNFConstants.WHERE.equalsIgnoreCase(getCurrentTokenSeq())){
+                            // TODO condition
+                            return true;
+                        }
+                    }
+                }
             }
         }
         return false;
     }
+
+    /**
+     * <Delete>  ::=  "DELETE FROM " <TableName> " WHERE " <Condition>
+     *
+     * @return
+     */
+    private boolean isDelete(){
+        if(BNFConstants.DELETE.equalsIgnoreCase(getCurrentTokenSeq())){
+            if(BNFConstants.FROM.equalsIgnoreCase(getCurrentTokenSeq())){
+                if(isTableName()){
+                    // TODO where condition
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * <Join>  ::=  "JOIN " <TableName> " AND " <TableName> " ON " <AttributeName> " AND " <AttributeName>
+     *
+     * @return
+     */
+    private boolean isJoin(){
+        if(BNFConstants.JOIN.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            if(isTableName()){
+                if(BNFConstants.AND.equalsIgnoreCase(getCurrentTokenSeq())){
+                    incrementToken();
+                    if(isTableName()){
+                        if(BNFConstants.ON.equalsIgnoreCase(getCurrentTokenSeq())){
+                            incrementToken();
+                            if(isAttributeName()){
+                                if(BNFConstants.AND.equalsIgnoreCase(getCurrentTokenSeq())){
+                                    incrementToken();
+                                    if(isAttributeName()){
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+//    /**
+//     * <Digit>  ::=  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+//     *
+//     * @return
+//     */
+//    private boolean isDigit() {
+//        if (getCurrentToken().getSequence().length() == 1) {
+//            if (Character.isDigit(getCurrentToken().getSequence().charAt(0))) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     // isUppercase
     // isLowercase
 
 
-    /**
-     * <Letter>  ::=  <Uppercase> | <Lowercase>
-     *
-     * @return
-     */
-    private boolean isLetter(){
-        if(getCurrentToken().getSequence().length() == 1) {
-            if(Character.isLetter(getCurrentToken().getSequence().charAt(0))){
-                return true;
-            }
-        }
-        return false;
-    }
+//    /**
+//     * <Letter>  ::=  <Uppercase> | <Lowercase>
+//     *
+//     * @return
+//     */
+//    private boolean isLetter(){
+//        if(getCurrentToken().getSequence().length() == 1) {
+//            if(Character.isLetter(getCurrentToken().getSequence().charAt(0))){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * <PlainText>  ::=  <Letter> | <Digit> | <Letter> <PlainText> | <Digit> <PlainText>
@@ -178,7 +420,6 @@ public class Parser {
         }
         incrementToken();
         return true;
-
     }
 
     /**
@@ -252,21 +493,56 @@ public class Parser {
         return false;
     }
 
+//    /**
+//     * <Space> ::=  " "
+//     *
+//     * @return
+//     */
+//    private boolean isSpace(){
+//        if(getCurrentToken().getSequence().length() == 1) {
+//            if(Character.isSpaceChar(getCurrentToken().getSequence().charAt(0))){
+//                incrementToken();
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
     /**
-     * <Space> ::=  " "
+     * <NameValueList>  ::=  <NameValuePair> | <NameValuePair> "," <NameValueList>
      *
      * @return
      */
-    private boolean isSpace(){
-        if(getCurrentToken().getSequence().length() == 1) {
-            if(Character.isSpaceChar(getCurrentToken().getSequence().charAt(0))){
-                return true;
+    private boolean isNameValueList(){
+        if(isNameValuePair()){
+            if(BNFConstants.COMMA.equals(getCurrentToken())){
+                incrementToken();
+                if(isValueList()){
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * <NameValuePair>  ::=  <AttributeName> "=" <Value>
+     *
+     * @return
+     */
+    private boolean isNameValuePair(){
+        if(isAttributeName()){
+            if(BNFConstants.EQUALS_SYMBOL.equals(getCurrentToken())){
+                incrementToken();
+                if(isValue()){
+                    return true;
+                }
             }
         }
         return false;
     }
-    // isNameValueList
-    // isNameValuePair
 
     /**
      * <AlterationType> ::=  "ADD" | "DROP"s
@@ -275,13 +551,32 @@ public class Parser {
      */
     private boolean isAlterationType(){
         if(BNFConstants.ADD.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
             return true;
         } else if (BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
             return true;
         } return false;
     }
 
-    // isValueList
+    /**
+     * <ValueList>  ::=  <Value> | <Value> "," <ValueList>
+     *
+     * @return
+     */
+    private boolean isValueList(){
+        if(isValue()){
+            if(BNFConstants.COMMA.equalsIgnoreCase(getCurrentTokenSeq())) {
+                incrementToken();
+                if(isValueList()) {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
     // isDigitSequence
 
     /**
@@ -295,6 +590,7 @@ public class Parser {
         } catch (NumberFormatException nfe) {
             return false;
         }
+        incrementToken();
         return true;
 
     }
@@ -312,6 +608,7 @@ public class Parser {
         } catch(NumberFormatException nfe){
             return false;
         }
+        incrementToken();
         return true;
     }
 
@@ -322,8 +619,10 @@ public class Parser {
      */
     private boolean isBooleanLiteral(){
         if(BNFConstants.TRUE.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
             return true;
         } else if (BNFConstants.FALSE.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
             return true;
         } return false;
     }
@@ -336,12 +635,15 @@ public class Parser {
     private boolean isCharLiteral() {
         if(getCurrentToken().getSequence().length() == 1) {
             if(Character.isSpaceChar(getCurrentToken().getSequence().charAt(0))){
+                incrementToken();
                 return true;
             }
             if(Character.isLetter(getCurrentToken().getSequence().charAt(0))){
+                incrementToken();
                 return true;
             }
             if(isSymbol()){
+                incrementToken();
                 return true;
             }
         }
@@ -356,12 +658,39 @@ public class Parser {
         String openingQuotation = String.valueOf(getCurrentToken().getSequence().charAt(0));
         String closingQuotation = String.valueOf(getCurrentToken().getSequence().charAt(getCurrentToken().getSequence().length() - 1));
         if(BNFConstants.SINGLE_QUOTATION.equals(openingQuotation) && BNFConstants.SINGLE_QUOTATION.equals(closingQuotation)){
+            incrementToken();
             return true;
         }
         return false;
     }
 
-    // isValue
+    /**
+     * <Value>  ::=  "'" <StringLiteral> "'" | <BooleanLiteral> | <FloatLiteral> | <IntegerLiteral> | "NULL"
+     *
+     * @return
+     */
+    private boolean isValue(){
+        if(isStringLiteral()){
+            return true;
+        }
+        if(isBooleanLiteral()){
+            return true;
+        }
+        if(isFloatLiteral()){
+            return true;
+        }
+        if(isIntegerLiteral()){
+            return true;
+        }
+        if(isCharLiteral()){
+            return true;
+        }
+        if(BNFConstants.NULL.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            return true;
+        }
+        return false;
+    }
 
     /**
      * <TableName>  ::=  <PlainText>
