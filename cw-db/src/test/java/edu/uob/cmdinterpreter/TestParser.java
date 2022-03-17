@@ -195,6 +195,7 @@ public class TestParser {
         DBCmd cmd = parser.parse();
 
         // then
+        // assertNull(cmd);
         assertTrue(cmd instanceof JoinCMD);
     }
 }

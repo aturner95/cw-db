@@ -1,6 +1,5 @@
 package edu.uob.cmdinterpreter;
 
-import edu.uob.abstractelements.JoinCMD;
 import edu.uob.cmdinterpreter.abstractcmd.DBCmd;
 
 import java.util.List;
