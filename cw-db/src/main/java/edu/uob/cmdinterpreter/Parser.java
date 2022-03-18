@@ -96,7 +96,6 @@ public class Parser {
         }
         if(BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isDrop()) {
-                cmd = new DropCMD();
                 return true;
             }
         }
@@ -231,6 +230,7 @@ public class Parser {
      */
     private boolean isDrop(){
         if(BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new DropCMD();
             incrementToken();
             if(BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())){
                 incrementToken();
