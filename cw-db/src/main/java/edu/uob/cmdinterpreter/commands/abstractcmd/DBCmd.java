@@ -52,4 +52,20 @@ public abstract class DBCmd {
         return false;
     }
 
+    public boolean hasDatabase(DBServer server){
+        return (server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory());
+    }
+
+    public boolean hasTable(DBServer server, String tableName){
+        File db = new File(server.getDatabaseDirectory().getName());
+        File [] tables = db.listFiles();
+        for(File table: tables){
+            int indexOfFileExt = table.getName().length() - 4;
+            if(tableName.equalsIgnoreCase(table.getName().substring(0, indexOfFileExt))){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

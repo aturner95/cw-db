@@ -26,6 +26,10 @@ public class ColumnHeader extends AbstractColumnData {
         this.colType = colType;
     }
 
+    public ColumnHeader(String colName){
+        this.data = colName;
+    }
+
     public int getColNumber() {
         return colNumber;
     }

@@ -17,6 +17,10 @@ public class Attribute extends AbstractColumnData {
         this.dataType = dataType;
     }
 
+    public Attribute(String value){
+        this.data = value;
+    }
+
     public String getValue() {
         return data;
     }

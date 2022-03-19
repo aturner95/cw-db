@@ -101,7 +101,6 @@ public class Parser {
         }
         if(BNFConstants.ALTER.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isAlter()){
-                cmd = new AlterCMD();
                 return true;
             }
             return false;
@@ -255,6 +254,7 @@ public class Parser {
      */
     private boolean isAlter(){
         if(BNFConstants.ALTER.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new AlterCMD();
             incrementToken();
             if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())){
                 incrementToken();
@@ -728,6 +728,7 @@ public class Parser {
      */
     private boolean isAttributeName(){
         if(isPlainText()){
+            cmd.addColumnName(getPreviousTokenSeq());
             return true;
         }
         return false;
