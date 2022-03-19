@@ -107,7 +107,6 @@ public class Parser {
         }
         if(BNFConstants.INSERT.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isInsert()){
-                cmd = new InsertCMD();
                 return true;
             }
             return false;
@@ -277,6 +276,7 @@ public class Parser {
      */
     private boolean isInsert() {
         if(BNFConstants.INSERT.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new InsertCMD();
             incrementToken();
             if(BNFConstants.INTO.equalsIgnoreCase(getCurrentTokenSeq())){
                 incrementToken();
@@ -686,23 +686,9 @@ public class Parser {
      * @return
      */
     private boolean isValue(){
-        if(isStringLiteral()){
-            return true;
-        }
-        if(isBooleanLiteral()){
-            return true;
-        }
-        if(isFloatLiteral()){
-            return true;
-        }
-        if(isIntegerLiteral()){
-            return true;
-        }
-        if(isCharLiteral()){
-            return true;
-        }
-        if(BNFConstants.NULL.equalsIgnoreCase(getCurrentTokenSeq())){
-            incrementToken();
+        if(isStringLiteral() || isBooleanLiteral() || isFloatLiteral() || isIntegerLiteral() || isCharLiteral()
+                || BNFConstants.NULL.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd.addVariable(getPreviousTokenSeq());
             return true;
         }
         return false;

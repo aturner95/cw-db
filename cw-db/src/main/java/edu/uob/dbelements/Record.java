@@ -15,8 +15,8 @@ public class Record {
         this.attributes = attributes;
     }
 
-    public long getId() {
-        return Long.valueOf(attributes.get(0).getValue());
+    public String getId() {
+        return attributes.get(0).getValue();
     }
 
     public List<Attribute> getAttributes() {

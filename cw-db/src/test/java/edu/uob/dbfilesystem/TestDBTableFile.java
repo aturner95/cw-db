@@ -164,7 +164,7 @@ public class TestDBTableFile {
 
         assertTrue(tableFile.readRecordIntoEntity(table, row));
         assertEquals(1, table.getRows().size());
-        assertEquals(139, table.getRows().get(0).getId());
+        assertEquals("139", table.getRows().get(0).getId());
         assertEquals(4, table.getRows().get(0).getAttributes().size());
         assertEquals("139", table.getRows().get(0).getAttributes().get(0).getValue());
         assertEquals("Dorchester", table.getRows().get(0).getAttributes().get(1).getValue());
@@ -253,7 +253,7 @@ public class TestDBTableFile {
         assertNotNull(table.getRows());
         assertEquals(3, table.getRows().size());
         assertEquals(4, table.getRows().get(0).getAttributes().size());
-        assertEquals(1, table.getRows().get(0).getId());
+        assertEquals("1", table.getRows().get(0).getId());
         assertEquals("1", table.getRows().get(0).getAttributes().get(0).getValue());
         assertEquals("harry@harry.com", table.getRows().get(1).getAttributes().get(3).getValue());
         assertEquals("42", table.getRows().get(2).getAttributes().get(2).getValue());

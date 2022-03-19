@@ -1,8 +1,12 @@
 package edu.uob.cmdinterpreter.commands.abstractcmd;
 
 import edu.uob.DBServer;
+import edu.uob.dbelements.Table;
+import edu.uob.dbfilesystem.DBTableFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DBCmd {
@@ -11,10 +15,14 @@ public abstract class DBCmd {
     protected String databaseName;
     protected List<String> tableNames;
     protected List<String> colNames;
+    protected List<String> variables;
 
     /* Constructors */
     public DBCmd(){
         super();
+        tableNames = new ArrayList<>();
+        colNames = new ArrayList<>();
+        variables = new ArrayList<>();
     }
 
     /* Methods */
@@ -52,6 +60,18 @@ public abstract class DBCmd {
         return false;
     }
 
+    public List<String> getVariables(){
+        return variables;
+    }
+
+    public boolean addVariable(String variable){
+        if(variables != null && variable != null){
+            variables.add(variable);
+            return true;
+        }
+        return false;
+    }
+
     public boolean hasDatabase(DBServer server){
         return (server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory());
     }
@@ -66,6 +86,13 @@ public abstract class DBCmd {
             }
         }
         return false;
+    }
+
+    public Table readTableFromFile(DBServer server, String tableName) throws IOException {
+        DBTableFile dbFile = new DBTableFile();
+        File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
+        Table table;
+        return dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
     }
 
 }
