@@ -711,4 +711,277 @@ public class TestDatabaseCommands {
         // then
         assertNull(result);
     }
+
+    @Test
+    public void test_joinCmd_tablesJoins_resultReturned() throws Exception {
+        // ------------- given -------------
+        // create dir and files
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableNameA = "PERSON";
+        String tableNameB = "PET";
+        String attributeNameA = "ID";
+        String attributeNameB = "OWNERID";
+        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        File tempDBFileA = new File(fullPathA);
+        assertTrue(tempDBFileA.createNewFile());
+        assertTrue(tempDBFileA.exists());
+        assertTrue(tempDBFileA.isFile());
+        File tempDBFileB = new File(fullPathB);
+        assertTrue(tempDBFileB.createNewFile());
+        assertTrue(tempDBFileB.exists());
+        assertTrue(tempDBFileB.isFile());
+
+        // set up command
+        cmd = new JoinCMD();
+        cmd.addTableName(tableNameA);
+        cmd.addTableName(tableNameB);
+        cmd.addColumnName(attributeNameA);
+        cmd.addColumnName(attributeNameB);
+
+
+        // set up table and header
+        Table tableA = new Table();
+        TableHeader headerA = new TableHeader();
+        headerA.setFileLocation(tempDBFileA);
+        headerA.setTableName(tableNameA);
+        tableA.setHeader(headerA);
+        Table tableB = new Table();
+        TableHeader headerB = new TableHeader();
+        headerB.setFileLocation(tempDBFileB);
+        headerB.setTableName(tableNameB);
+        tableB.setHeader(headerB);
+
+        // set up column headers
+        List<ColumnHeader> colHeadersA = new ArrayList<>();
+        colHeadersA.add(new ColumnHeader("ID"));
+        colHeadersA.add(new ColumnHeader("NAME"));
+        colHeadersA.add(new ColumnHeader("LOCATION"));
+        tableA.setColHeadings(colHeadersA);
+        List<ColumnHeader> colHeadersB = new ArrayList<>();
+        colHeadersB.add(new ColumnHeader("ID"));
+        colHeadersB.add(new ColumnHeader("NAME"));
+        colHeadersB.add(new ColumnHeader("OWNERID"));
+        tableB.setColHeadings(colHeadersB);
+
+        // set up row data
+        List<Record> rows1 = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("Swindon"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("Cardiff"));
+        Record row2 = new Record(attr2);
+        rows1.add(row1);
+        rows1.add(row2);
+        tableA.setRows(rows1);
+
+        List<Record> rows2 = new ArrayList<>();
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("1"));
+        attr3.add(new Attribute("Scratch"));
+        attr3.add(new Attribute("1"));
+        Record row3 = new Record(attr3);
+
+        List<Attribute> attr4 = new ArrayList<>();
+        attr4.add(new Attribute("2"));
+        attr4.add(new Attribute("Fluffy"));
+        attr4.add(new Attribute("2"));
+        Record row4 = new Record(attr4);
+        rows2.add(row3);
+        rows2.add(row4);
+        tableB.setRows(rows2);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(tableA);
+        file.storeEntityIntoDBFile(tableB);
+
+        // ------------- when -------------
+        String result = cmd.query(server);
+        tableA = file.readDBFileIntoEntity(fullPathA);
+        tableB = file.readDBFileIntoEntity(fullPathB);
+
+        // ------------- then -------------
+        assertTrue(result instanceof String);
+    }
+
+    @Test
+    public void test_joinCmd_tableBDoesNotExist_exceptionThrown() throws Exception{
+
+        // ------------- given -------------
+        // create dir and files
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableNameA = "PERSON";
+        String tableNameB = "PET";
+        String attributeNameA = "ID";
+        String attributeNameB = "OWNERID";
+        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        File tempDBFileA = new File(fullPathA);
+        assertTrue(tempDBFileA.createNewFile());
+        assertTrue(tempDBFileA.exists());
+        assertTrue(tempDBFileA.isFile());
+        // table B does not exist!
+
+        // set up command
+        cmd = new JoinCMD();
+        cmd.addTableName(tableNameA);
+        cmd.addTableName(tableNameB);
+        cmd.addColumnName(attributeNameA);
+        cmd.addColumnName(attributeNameB);
+
+
+        // set up table and header
+        Table tableA = new Table();
+        TableHeader headerA = new TableHeader();
+        headerA.setFileLocation(tempDBFileA);
+        headerA.setTableName(tableNameA);
+        tableA.setHeader(headerA);
+
+        // set up column headers
+        List<ColumnHeader> colHeadersA = new ArrayList<>();
+        colHeadersA.add(new ColumnHeader("ID"));
+        colHeadersA.add(new ColumnHeader("NAME"));
+        colHeadersA.add(new ColumnHeader("LOCATION"));
+        tableA.setColHeadings(colHeadersA);
+
+        // set up row data
+        List<Record> rows1 = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("Swindon"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("Cardiff"));
+        Record row2 = new Record(attr2);
+        rows1.add(row1);
+        rows1.add(row2);
+        tableA.setRows(rows1);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(tableA);
+
+        // ------------- when -------------
+        String result = cmd.query(server);
+        tableA = file.readDBFileIntoEntity(fullPathA);
+
+        // ------------- then -------------
+        assertNull(result);
+
+    }
+
+    @Test
+    public void test_joinCmd_attributeBDoesNotExist_exceptionThrown() throws Exception{
+        // ------------- given -------------
+        // create dir and files
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableNameA = "PERSON";
+        String tableNameB = "PET";
+        String attributeNameA = "ID";
+        String attributeNameB = "DOESNOTEXIST";
+        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        File tempDBFileA = new File(fullPathA);
+        assertTrue(tempDBFileA.createNewFile());
+        assertTrue(tempDBFileA.exists());
+        assertTrue(tempDBFileA.isFile());
+        File tempDBFileB = new File(fullPathB);
+        assertTrue(tempDBFileB.createNewFile());
+        assertTrue(tempDBFileB.exists());
+        assertTrue(tempDBFileB.isFile());
+
+        // set up command
+        cmd = new JoinCMD();
+        cmd.addTableName(tableNameA);
+        cmd.addTableName(tableNameB);
+        cmd.addColumnName(attributeNameA);
+        cmd.addColumnName(attributeNameB);
+
+
+        // set up table and header
+        Table tableA = new Table();
+        TableHeader headerA = new TableHeader();
+        headerA.setFileLocation(tempDBFileA);
+        headerA.setTableName(tableNameA);
+        tableA.setHeader(headerA);
+        Table tableB = new Table();
+        TableHeader headerB = new TableHeader();
+        headerB.setFileLocation(tempDBFileB);
+        headerB.setTableName(tableNameB);
+        tableB.setHeader(headerB);
+
+        // set up column headers
+        List<ColumnHeader> colHeadersA = new ArrayList<>();
+        colHeadersA.add(new ColumnHeader("ID"));
+        colHeadersA.add(new ColumnHeader("NAME"));
+        colHeadersA.add(new ColumnHeader("LOCATION"));
+        tableA.setColHeadings(colHeadersA);
+        List<ColumnHeader> colHeadersB = new ArrayList<>();
+        colHeadersB.add(new ColumnHeader("ID"));
+        colHeadersB.add(new ColumnHeader("NAME"));
+        colHeadersB.add(new ColumnHeader("OWNERID"));
+        tableB.setColHeadings(colHeadersB);
+
+        // set up row data
+        List<Record> rows1 = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("Swindon"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("Cardiff"));
+        Record row2 = new Record(attr2);
+        rows1.add(row1);
+        rows1.add(row2);
+        tableA.setRows(rows1);
+
+        List<Record> rows2 = new ArrayList<>();
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("1"));
+        attr3.add(new Attribute("Scratch"));
+        attr3.add(new Attribute("1"));
+        Record row3 = new Record(attr3);
+
+        List<Attribute> attr4 = new ArrayList<>();
+        attr4.add(new Attribute("2"));
+        attr4.add(new Attribute("Fluffy"));
+        attr4.add(new Attribute("2"));
+        Record row4 = new Record(attr4);
+        rows2.add(row3);
+        rows2.add(row4);
+        tableB.setRows(rows2);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(tableA);
+        file.storeEntityIntoDBFile(tableB);
+
+        // ------------- when -------------
+        String result = cmd.query(server);
+        tableA = file.readDBFileIntoEntity(fullPathA);
+        tableB = file.readDBFileIntoEntity(fullPathB);
+
+        // ------------- then -------------
+        assertNull(result);
+    }
 }

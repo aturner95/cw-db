@@ -1,6 +1,7 @@
 package edu.uob.cmdinterpreter.commands.abstractcmd;
 
 import edu.uob.DBServer;
+import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbfilesystem.DBTableFile;
 
@@ -82,6 +83,16 @@ public abstract class DBCmd {
         for(File table: tables){
             int indexOfFileExt = table.getName().length() - 4;
             if(tableName.equalsIgnoreCase(table.getName().substring(0, indexOfFileExt))){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasAttribute(Table table, String attributeName){
+        List<ColumnHeader> colHeads = table.getColHeadings();
+        for(ColumnHeader header: colHeads){
+            if(attributeName.equalsIgnoreCase(header.getColName())){
                 return true;
             }
         }

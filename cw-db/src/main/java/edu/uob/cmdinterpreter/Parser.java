@@ -134,7 +134,6 @@ public class Parser {
         }
         if(BNFConstants.JOIN.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isJoin()){
-                cmd = new JoinCMD();
                 return true;
             }
             return false;
@@ -367,6 +366,7 @@ public class Parser {
      */
     private boolean isJoin(){
         if(BNFConstants.JOIN.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new JoinCMD();
             incrementToken();
             if(isTableName()){
                 if(BNFConstants.AND.equalsIgnoreCase(getCurrentTokenSeq())){

@@ -91,16 +91,6 @@ public class AlterCMD extends DBCmd {
         return -1;
     }
 
-    private boolean hasAttribute(Table table, String attributeName){
-        List<ColumnHeader> colHeads = table.getColHeadings();
-        for(ColumnHeader header: colHeads){
-            if(attributeName.equalsIgnoreCase(header.getColName())){
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void populateNewData(List<Record> data){
         for(Record row: data){
             row.addDefaultAttribute();
