@@ -8,8 +8,6 @@ import edu.uob.dbelements.Record;
 import edu.uob.dbfilesystem.DBTableFile;
 import edu.uob.exceptions.DBException.*;
 
-import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

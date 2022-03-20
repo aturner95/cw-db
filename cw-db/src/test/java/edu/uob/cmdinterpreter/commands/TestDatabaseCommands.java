@@ -5,8 +5,6 @@ import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.*;
 import edu.uob.dbelements.Record;
 import edu.uob.dbfilesystem.DBTableFile;
-import edu.uob.exceptions.DBException.*;
-import edu.uob.exceptions.ParsingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestDatabaseCommands {
 
@@ -104,7 +101,7 @@ public class TestDatabaseCommands {
         // given
         String newTempDb = "newTempDb";
 
-        cmd = new CreateCMD();
+        cmd = new CreateCMD("DATABASE");
         cmd.setDatabaseName("newTempDb");
 
         // given
@@ -125,7 +122,7 @@ public class TestDatabaseCommands {
         Files.createDirectory(tempDbDir.toPath());
         String newTempTable = "newTempTable";
 
-        cmd = new CreateCMD();
+        cmd = new CreateCMD("TABLE");
         cmd.addTableName(newTempTable);
 
         // given
@@ -147,7 +144,7 @@ public class TestDatabaseCommands {
         String newTempTable = "marks";
         String fullPath = tempDbDirName + File.separator + newTempTable + fileExt;
 
-        cmd = new CreateCMD();
+        cmd = new CreateCMD("TABLE");
         cmd.addTableName(newTempTable);
         cmd.addColumnName("name");
         cmd.addColumnName("mark");
@@ -176,7 +173,7 @@ public class TestDatabaseCommands {
         // given
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
-        cmd = new DropCMD();
+        cmd = new DropCMD("DATABASE");
         cmd.setDatabaseName(tempDbDirName);
 
         // when
@@ -186,7 +183,7 @@ public class TestDatabaseCommands {
 
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
-        assertTrue(!tempDbDir.exists());
+        assertFalse(tempDbDir.exists());
     }
 
     @Test
@@ -195,8 +192,9 @@ public class TestDatabaseCommands {
         // given
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
-        cmd = new DropCMD();
+        cmd = new DropCMD("TABLE");
         cmd.setDatabaseName(tempDbDirName);
+        cmd.addTableName("table");
         File tempDBFile = new File(tempDbDirName + File.separator + "table.tab");
         assertTrue(tempDBFile.createNewFile());
 
@@ -207,13 +205,13 @@ public class TestDatabaseCommands {
 
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
-        assertTrue(!tempDBFile.exists());
+        assertFalse(tempDBFile.exists());
     }
 
     @Test
     public void test_dropCMD_databaseDoesNotExist_statusCodeError() throws Exception {
         // given
-        cmd = new DropCMD();
+        cmd = new DropCMD("DATABASE");
         cmd.setDatabaseName("doesNotExist");
         File tempDBFile = new File("doesNotExist" + File.separator + "table.tab");
 
@@ -232,9 +230,9 @@ public class TestDatabaseCommands {
         // given
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
-        cmd = new DropCMD();
+        cmd = new DropCMD("TABLE");
         cmd.addTableName(tempDbDirName);
-        File tempDBFile = new File(tempDbDirName + File.separator + "table.tab");
+        // File tempDBFile = new File(tempDbDirName + File.separator + "table.tab");
 
         // when
         assertTrue(tempDbDir.exists());
@@ -820,7 +818,7 @@ public class TestDatabaseCommands {
         String tableName = "doesNotExist";
         String fullPath = tempDbDirName + File.separator + tableName + fileExt;
         File tempDBFile = new File(fullPath);
-        assertTrue(!tempDBFile.exists());
+        assertFalse(tempDBFile.exists());
 
         cmd = new InsertCMD();
         cmd.addTableName(tableName);

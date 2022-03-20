@@ -4,7 +4,6 @@ import edu.uob.cmdinterpreter.commands.*;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.exceptions.ParsingException;
 import edu.uob.exceptions.ParsingException.*;
-import edu.uob.exceptions.TokenizerException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,9 +25,6 @@ public class TestParser {
         assertEquals(5, tokenizer.getTokens().size());
     }
 
-    // TODO test SELECT with WHERE once conditions have been sorted
-
-
 
     // @Test TODO this input sequence should not be tokenized as no token types start with special characters
     public void test_tokenize_basicSelectStatementSyntaxError_ParsingExceptionThrown() throws Exception {
@@ -37,7 +33,7 @@ public class TestParser {
         tokenizer.tokenize("select *from people;");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(ParsingException.class, ()-> parser.parse());
+        assertThrows(ParsingException.class, parser::parse);
 
     }
 
@@ -48,7 +44,7 @@ public class TestParser {
         tokenizer.tokenize("select * from people");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
+        assertThrows(InvalidGrammarException.class, parser::parse);
 
     }
 
@@ -75,7 +71,7 @@ public class TestParser {
         tokenizer.tokenize("USE from DB;");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
+        assertThrows(InvalidGrammarException.class, parser::parse);
     }
 
     @Test
@@ -91,6 +87,8 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
+        assertEquals("dummyDb", cmd.getDatabaseName());
+        assertEquals("DATABASE", ((CreateCMD) cmd).getCreateType());
     }
 
     @Test
@@ -106,6 +104,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
+        assertEquals("dummyTable", cmd.getTableNames().get(0));
     }
 
     @Test
@@ -121,10 +120,14 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("name", cmd.getColNames().get(0));
+        assertEquals("mark", cmd.getColNames().get(1));
+        assertEquals("pass", cmd.getColNames().get(2));
     }
 
     @Test
-    public void test_parse_basicDropDatabase_cmdIsDrop() throws Exception{
+    public void test_parse_basicDropDatabase_dropCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -136,10 +139,12 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DropCMD);
+        assertEquals("testDb", cmd.getDatabaseName());
+        assertEquals("DATABASE", ((DropCMD) cmd).getDropType());
     }
 
     @Test
-    public void test_parse_basicDropTable_cmdIsDrop() throws Exception{
+    public void test_parse_basicDropTable_dropCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -151,10 +156,12 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DropCMD);
+        assertEquals("TABLENAME", cmd.getTableNames().get(0));
+        assertEquals("TABLE", ((DropCMD) cmd).getDropType());
     }
 
     @Test
-    public void test_parse_basicAlter_cmdIsAlter() throws Exception{
+    public void test_parse_basicAlter_alterCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -166,10 +173,13 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof AlterCMD);
+        assertEquals("Country", cmd.getTableNames().get(0));
+        assertEquals("DROP", ((AlterCMD) cmd).getAlterationType());
+        assertEquals("Id", cmd.getColNames().get(0));
     }
 
     @Test
-    public void test_parse_basicInsert_cmdIsInsert() throws Exception{
+    public void test_parse_basicInsert_insertCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -181,10 +191,14 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof InsertCMD);
+        assertEquals("tablename", cmd.getTableNames().get(0));
+        assertEquals("1", cmd.getVariables().get(0));
+        assertEquals("Bob", cmd.getVariables().get(1));
+        assertEquals("Bob@email.com", cmd.getVariables().get(2));
     }
 
     @Test
-    public void test_parse_basicInsert2_cmdIsInsert() throws Exception{
+    public void test_parse_basicInsert2_insertCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -196,14 +210,18 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof InsertCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("Steve", cmd.getVariables().get(0));
+        assertEquals("65", cmd.getVariables().get(1));
+        assertEquals("TRUE", cmd.getVariables().get(2));
     }
 
     @Test
-    public void test_parse_basicJoin_cmdIsJoin() throws Exception{
+    public void test_parse_basicJoin_joinCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
-        tokenizer.tokenize("join table1 and table1 on id and id;");
+        tokenizer.tokenize("join Marks and Students on studentId and id;");
         Parser parser = new Parser(tokenizer);
 
         // when
@@ -211,11 +229,15 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof JoinCMD);
+        assertEquals("Marks", cmd.getTableNames().get(0));
+        assertEquals("Students", cmd.getTableNames().get(1));
+        assertEquals("studentId", cmd.getColNames().get(0));
+        assertEquals("id", cmd.getColNames().get(1));
     }
 
 
     @Test
-    public void test_parse_basicSelect1_cmdIsSelect() throws Exception{
+    public void test_parse_basicSelect1_selectCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -227,10 +249,18 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof SelectCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("*", cmd.getColNames().get(0));
+        assertEquals("pass", cmd.getConditions().get(0).getAttribute());
+        assertEquals("==", cmd.getConditions().get(0).getOperator());
+        assertEquals("FALSE", cmd.getConditions().get(0).getValue());
+        assertEquals("mark", cmd.getConditions().get(1).getAttribute());
+        assertEquals(">", cmd.getConditions().get(1).getOperator());
+        assertEquals("35", cmd.getConditions().get(1).getValue());
     }
 
     @Test
-    public void test_parse_basicSelect2_cmdIsSelect() throws Exception{
+    public void test_parse_basicSelect2_selectCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -242,10 +272,15 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof SelectCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("*", cmd.getColNames().get(0));
+        assertEquals("name", cmd.getConditions().get(0).getAttribute());
+        assertEquals("LIKE", cmd.getConditions().get(0).getOperator());
+        assertEquals("ve", cmd.getConditions().get(0).getValue());
     }
 
     @Test
-    public void test_parse_basicDelete1_cmdIsDelete() throws Exception{
+    public void test_parse_basicDelete1_deleteCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -257,10 +292,14 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DeleteCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("mark", cmd.getConditions().get(0).getAttribute());
+        assertEquals("<", cmd.getConditions().get(0).getOperator());
+        assertEquals("40", cmd.getConditions().get(0).getValue());
     }
 
     @Test
-    public void test_parse_basicDelete2_cmdIsDelete() throws Exception{
+    public void test_parse_basicDelete2_deleteCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -272,10 +311,14 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DeleteCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("name", cmd.getConditions().get(0).getAttribute());
+        assertEquals("==", cmd.getConditions().get(0).getOperator());
+        assertEquals("Dave", cmd.getConditions().get(0).getValue());
     }
 
     @Test
-    public void test_parse_basicUpdate1_cmdIsUpdate() throws Exception{
+    public void test_parse_basicUpdate1_updateCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -287,6 +330,11 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof UpdateCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("mark", cmd.getColNames().get(0));
+        assertEquals("name", cmd.getConditions().get(0).getAttribute());
+        assertEquals("==", cmd.getConditions().get(0).getOperator());
+        assertEquals("Clive", cmd.getConditions().get(0).getValue());
     }
 
     @Test
@@ -297,7 +345,7 @@ public class TestParser {
         tokenizer.tokenize("UPDATE marks SET mark = 38 WHERE name = 'Clive';");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
+        assertThrows(InvalidGrammarException.class, parser::parse);
     }
 
     @Test
@@ -308,7 +356,7 @@ public class TestParser {
         tokenizer.tokenize("UPDATE marks SET mark == 38 WHERE name = 'Clive';");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
+        assertThrows(InvalidGrammarException.class, parser::parse);
     }
 
 }

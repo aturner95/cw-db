@@ -1,6 +1,7 @@
 package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
+import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
@@ -16,38 +17,41 @@ import java.util.List;
 
 public class CreateCMD extends DBCmd {
 
-    public CreateCMD(){
-        this.tableNames = new ArrayList<>();
-        this.colNames = new ArrayList<>();
+    public CreateCMD(String createType){
+        super(createType);
+    }
+
+    public String getCreateType() {
+        return commandParameter;
     }
 
     @Override
     public String query(DBServer server) throws DBException, IOException {
 
         try {
-            if (getDatabaseName() != null && getTableNames().size() == 0) {
+            if (BNFConstants.DATABASE.equalsIgnoreCase(commandParameter)) {
                 createDatabase();
                 return STATUS_OK;
             }
 
-            else if (getDatabaseName() == null && getTableNames().size() == 1) {
+            if(BNFConstants.TABLE.equalsIgnoreCase(commandParameter)) {
                 createTable(server);
                 return STATUS_OK;
-
-            } else {
-                throw new DBException();
             }
+            throw new DBException();
 
         } catch(Exception e){
             return STATUS_ERROR + e.getMessage();
         }
     }
 
-    private void createDatabase() throws DBTableExistsException{
+    private void createDatabase() throws DBException{
         File database = new File(getDatabaseName());
         if(!database.exists() && !database.isDirectory()){
-            database.mkdir();
-            return;
+            if(database.mkdir()){
+                return;
+            }
+            throw new DBException();
         }
         throw new DBTableExistsException(getDatabaseName());
     }

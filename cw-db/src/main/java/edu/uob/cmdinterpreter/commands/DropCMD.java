@@ -1,18 +1,21 @@
 package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
+import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.exceptions.DBException;
 import edu.uob.exceptions.DBException.*;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class DropCMD extends DBCmd {
 
-    public DropCMD(){
-        this.tableNames = new ArrayList<>();
-        this.colNames = new ArrayList<>();
+    public DropCMD(String dropType){
+        super(dropType);
+    }
+
+    public String getDropType(){
+        return commandParameter;
     }
 
     @Override
@@ -20,11 +23,11 @@ public class DropCMD extends DBCmd {
 
         try {
             if(hasDatabase(server)) {
-                if (getDatabaseName() != null && getTableNames().size() == 0) {
+                if (BNFConstants.DATABASE.equalsIgnoreCase(commandParameter)) {
                     dropDatabase();
                     return STATUS_OK;
 
-                } if (getDatabaseName() == null && getTableNames().size() == 1) {
+                } if (BNFConstants.TABLE.equalsIgnoreCase(commandParameter)) {
                     dropTable(server.getDatabaseDirectory());
                     return STATUS_OK;
                 }

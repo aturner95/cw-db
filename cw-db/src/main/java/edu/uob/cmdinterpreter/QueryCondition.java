@@ -4,9 +4,9 @@ import edu.uob.dbelements.ColumnHeader;
 
 public class QueryCondition {
 
-    ColumnHeader attribute;
-    String operator;
-    String value;
+    private ColumnHeader attribute;
+    private String operator;
+    private String value;
 
     public QueryCondition() {
         super();
@@ -18,5 +18,16 @@ public class QueryCondition {
         this.value = value;
     }
 
+    public String getAttribute() {
+        return attribute.getColName();
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
 

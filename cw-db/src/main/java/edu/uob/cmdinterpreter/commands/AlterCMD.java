@@ -19,19 +19,21 @@ import java.util.List;
 
 public class AlterCMD extends DBCmd {
 
-    private String alterationType;
-
-
     public AlterCMD(){
-        this.tableNames = new ArrayList<>();
-        this.colNames = new ArrayList<>();
+        super();
     }
 
     public AlterCMD(String alterationType){
-        this();
-        this.alterationType = alterationType;
+        super(alterationType);
     }
 
+    public String getAlterationType() {
+        return commandParameter;
+    }
+
+    public void setAlterationType(String alterationType){
+        this.commandParameter = alterationType;
+    }
 
     @Override
     public String query(DBServer server) {
@@ -49,7 +51,7 @@ public class AlterCMD extends DBCmd {
 
                     try {
                         table = readTableFromFile(server, tableName);
-                        alterTable(table, attributeName, alterationType);
+                        alterTable(table, attributeName, commandParameter);
                         dbFile.storeEntityIntoDBFile(table);
                         // TODO populate result string
                         return STATUS_OK;

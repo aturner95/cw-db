@@ -10,11 +10,6 @@ import java.util.ArrayList;
 
 public class UseCMD extends DBCmd {
 
-    public UseCMD() {
-        this.tableNames = new ArrayList<>();
-        this.colNames = new ArrayList<>();
-    }
-
     @Override
     public String query(DBServer server) {
 

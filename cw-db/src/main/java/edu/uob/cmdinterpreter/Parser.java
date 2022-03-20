@@ -172,7 +172,6 @@ public class Parser {
      */
     private boolean isCreate() throws ParsingException {
         if (BNFConstants.CREATE.equalsIgnoreCase(getCurrentTokenSeq())) {
-            cmd = new CreateCMD();
             incrementToken();
             if (isCreateDatabase()) {
                 return true;
@@ -191,6 +190,7 @@ public class Parser {
      */
     private boolean isCreateDatabase() throws TokenIndexOutOfBoundsException {
         if (BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())) {
+            cmd = new CreateCMD(BNFConstants.DATABASE);
             incrementToken();
             if (isDatabaseName()) {
                 return true;
@@ -207,13 +207,9 @@ public class Parser {
      */
     private boolean isCreateTable() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())) {
+            cmd = new CreateCMD(BNFConstants.TABLE);
             incrementToken();
             if (isTableName()) {
-//                return true;
-//            }
-//
-//            if (isTableName()) {
-
                 if (BNFConstants.SEMI_COLON.equalsIgnoreCase(getCurrentTokenSeq())) {
                     return true;
                 }
@@ -241,15 +237,16 @@ public class Parser {
      */
     private boolean isDrop() throws ParsingException {
         if(BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
-            cmd = new DropCMD();
             incrementToken();
             if(BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())){
+                cmd = new DropCMD(BNFConstants.DATABASE);
                 incrementToken();
                 if(isDatabaseName()){
                     return true;
                 }
             }
             if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())){
+                cmd = new DropCMD(BNFConstants.TABLE);
                 incrementToken();
                 if(isTableName()){
                     return true;
@@ -554,9 +551,11 @@ public class Parser {
      */
     private boolean isAlterationType() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.ADD.equalsIgnoreCase(getCurrentTokenSeq())){
+            ((AlterCMD) cmd).setAlterationType(BNFConstants.ADD);
             incrementToken();
             return true;
         } else if (BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
+            ((AlterCMD) cmd).setAlterationType(BNFConstants.DROP);
             incrementToken();
             return true;
         } return false;
@@ -726,6 +725,7 @@ public class Parser {
             return true;
         }
         if(BNFConstants.STAR_SYMBOL.equals(getCurrentTokenSeq())){
+            cmd.addColumnName(BNFConstants.STAR_SYMBOL);
             incrementToken();
             return true;
         }

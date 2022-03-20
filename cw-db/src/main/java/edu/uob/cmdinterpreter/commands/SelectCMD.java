@@ -7,11 +7,6 @@ import java.util.ArrayList;
 
 public class SelectCMD extends DBCmd {
 
-    public SelectCMD(){
-        this.tableNames = new ArrayList<>();
-        this.colNames = new ArrayList<>();
-    }
-
     @Override
     public String query(DBServer server) {
         return null;

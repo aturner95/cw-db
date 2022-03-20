@@ -14,6 +14,7 @@ import java.util.List;
 public abstract class DBCmd {
 
     /* Variables */
+    protected String commandParameter;
     protected String databaseName;
     protected List<String> tableNames;
     protected List<String> colNames;
@@ -31,6 +32,11 @@ public abstract class DBCmd {
         colNames = new ArrayList<>();
         variables = new ArrayList<>();
         conditions = new ArrayList<>();
+    }
+
+    public DBCmd(String commandParameter){
+        this();
+        this.commandParameter = commandParameter;
     }
 
     /* Methods */
@@ -122,6 +128,10 @@ public abstract class DBCmd {
             return true;
         }
         return false;
+    }
+
+    public List<QueryCondition> getConditions(){
+        return conditions;
     }
 
 }

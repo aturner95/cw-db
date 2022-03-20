@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
-import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,7 +85,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_validCreateDbCommand_statusOk() throws Exception {
+  public void test_handleCommand_validCreateDbCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
     setup(db);
@@ -96,7 +95,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_validUseCommand_statusOk() throws Exception {
+  public void test_handleCommand_validUseCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
     setup(db);
@@ -106,7 +105,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_validCreateTableCommand_statusOk() throws Exception {
+  public void test_handleCommand_validCreateTableCommand_statusOk() {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
@@ -124,7 +123,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_insertCommand_serverStillRunningAfterErrors() throws Exception {
+  public void test_handleCommand_insertCommand_serverStillRunningAfterErrors() {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
@@ -148,7 +147,7 @@ final class DBTests {
 
 
   @Test
-  public void test_handleCommand_validDropTableCommand_statusOk() throws Exception {
+  public void test_handleCommand_validDropTableCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
     setup(db);
@@ -163,17 +162,17 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_validDropDbCommand_statusOk() throws Exception {
+  public void test_handleCommand_validDropDbCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
     setup(db);
     assertTrue(server.handleCommand("DROP DATABASE markbook;").startsWith("[OK]"));
-    assertTrue(!db.exists());
+    assertFalse(db.exists());
     teardown(db);
   }
 
   @Test
-  public void test_handleCommand_validDropDbWithTableCommand_statusOk() throws Exception {
+  public void test_handleCommand_validDropDbWithTableCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
     setup(db);
@@ -184,13 +183,13 @@ final class DBTests {
     assertTrue(table.isFile());
 
     assertTrue(server.handleCommand("DROP DATABASE markbook;").startsWith("[OK]"));
-    assertTrue(!db.exists());
-    assertTrue(!table.exists());
+    assertFalse(db.exists());
+    assertFalse(table.exists());
     teardown(db);
   }
 
   @Test
-  public void test_handleCommand_validJoinCommand_statusOk() throws Exception {
+  public void test_handleCommand_validJoinCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
     setup(db);
