@@ -7,6 +7,10 @@ import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbelements.Record;
 import edu.uob.dbfilesystem.DBTableFile;
+import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.DBException.*;
+import edu.uob.exceptions.ParsingException;
+import edu.uob.exceptions.ParsingException.InvalidGrammarException;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +20,7 @@ import java.util.List;
 public class AlterCMD extends DBCmd {
 
     private String alterationType;
+
 
     public AlterCMD(){
         this.tableNames = new ArrayList<>();
@@ -28,43 +33,38 @@ public class AlterCMD extends DBCmd {
     }
 
 
-
     @Override
     public String query(DBServer server) {
-
         byte indexOfTableName = 0, indexOfAttributeName = 0;
         String tableName = getTableNames().get(indexOfTableName);
         String attributeName = getColNames().get(indexOfAttributeName);
 
-        if(hasDatabase(server)){
-            if(hasTable(server, tableName)){
-                DBTableFile dbFile = new DBTableFile();
-                File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
-                Table table;
-                try {
-                    table = dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
-                    if (BNFConstants.ADD.equalsIgnoreCase(alterationType)) {
-                        if(!hasAttribute(table, attributeName)){
-                            addAttribute(table, attributeName);
-                        }
+        try {
+            if (hasDatabase(server)) {
+                if (hasTable(server, tableName)) {
+                    DBTableFile dbFile = new DBTableFile();
+                    File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
+                    Table table;
+                    String filepath = file.getPath() + ".tab";
 
-                    } else if (BNFConstants.DROP.equalsIgnoreCase(alterationType)) {
-                        if(hasAttribute(table, attributeName)){
-                            removeAttribute(table, attributeName);
-                        }
-                    } else {
-                        // TODO throw exception
-                        return null;
+                    try {
+                        table = readTableFromFile(server, tableName);
+                        alterTable(table, attributeName, alterationType);
+                        dbFile.storeEntityIntoDBFile(table);
+                        // TODO populate result string
+                        return STATUS_OK;
+
+                    } catch (IOException ioe) {
+                        throw new IOException("Unable to read file: " + filepath);
                     }
-                    dbFile.storeEntityIntoDBFile(table);
-                    return new String();
-
-                } catch(IOException ioe){
-                    return null;
                 }
+                throw new DBTableDoesNotExistException(tableName);
             }
+            throw new DBDoesNotExistException(server.getDatabaseDirectory().getName());
+
+        }catch(Exception e){
+            return STATUS_ERROR + e.getMessage();
         }
-        return null;
     }
 
     private void addAttribute(Table table, String attributeName){
@@ -72,9 +72,12 @@ public class AlterCMD extends DBCmd {
         populateNewData(table.getRows());
     }
 
-    private void removeAttribute(Table table, String attributeName){
+    private void removeAttribute(Table table, String attributeName) throws DBAttributeDoesNotExistException{
         List<ColumnHeader> headers = table.getColHeadings();
         int indexOf = getAttributeIndex(table.getColHeadings(), attributeName);
+        if(indexOf < 0){
+            throw new DBAttributeDoesNotExistException(attributeName);
+        }
         headers.remove(indexOf);
         List<Record> rows = table.getRows();
         deleteExistingData(rows, indexOf);
@@ -102,4 +105,24 @@ public class AlterCMD extends DBCmd {
             row.getAttributes().remove(index);
         }
     }
+
+    private void alterTable(Table table, String attributeName, String alterationType) throws DBException, ParsingException {
+        if (BNFConstants.ADD.equalsIgnoreCase(alterationType)) {
+            if (!hasAttribute(table, attributeName)) {
+                addAttribute(table, attributeName);
+                return;
+            } else {
+                throw new DBAttributeExistsException(attributeName);
+            }
+        } else if (BNFConstants.DROP.equalsIgnoreCase(alterationType)) {
+            if (hasAttribute(table, attributeName)) {
+                removeAttribute(table, attributeName);
+                return;
+            } else {
+                throw new DBAttributeDoesNotExistException(attributeName);
+            }
+        }
+        throw new InvalidGrammarException("<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
+    }
+
 }

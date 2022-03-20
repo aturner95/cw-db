@@ -2,6 +2,8 @@ package edu.uob.cmdinterpreter;
 
 import edu.uob.cmdinterpreter.commands.*;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.exceptions.ParsingException;
+import edu.uob.exceptions.ParsingException.*;
 
 import java.util.List;
 
@@ -34,28 +36,29 @@ public class Parser {
         return null;
     }
 
-    private String getPreviousTokenSeq() {
+    private String getPreviousTokenSeq() throws TokenIndexOutOfBoundsException {
         if(currentToken - 1 > 0){
             return tokens.get(currentToken - 1).getSequence();
         }
-        // TODO throw exception
-        return null;
+        throw new TokenIndexOutOfBoundsException((currentToken - 1), tokens.size());
     }
 
-    private void incrementToken() {
-        // TODO throw exception
+    private void incrementToken() throws TokenIndexOutOfBoundsException {
         if(currentToken < tokens.size()){
             currentToken++;
+            return;
         }
-
+        throw new TokenIndexOutOfBoundsException(currentToken, tokens.size());
     }
 
-    private String lookAheadTokenSeq() {
-        return tokens.get(currentToken + 1).getSequence();
-
+    private String lookAheadTokenSeq() throws TokenIndexOutOfBoundsException {
+        if(currentToken + 1 < tokens.size()){
+            return tokens.get(currentToken + 1).getSequence();
+        }
+        throw new TokenIndexOutOfBoundsException(currentToken + 1, tokens.size());
     }
 
-    public DBCmd parse() {
+    public DBCmd parse() throws ParsingException {
         if(isCommand()) {
             return cmd;
         }
@@ -69,11 +72,14 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCommand() {
+    private boolean isCommand() throws ParsingException {
         if (isCommandType()) {
-            if (BNFConstants.SEMI_COLON.equals(getCurrentTokenSeq())) {
-                return true;
+            if(currentToken < tokens.size()) {
+                if (BNFConstants.SEMI_COLON.equals(getCurrentTokenSeq())) {
+                    return true;
+                }
             }
+            throw new InvalidGrammarException("<Command>  ::=  <CommandType> \";\"");
         }
         return false;
     }
@@ -83,7 +89,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCommandType(){
+    private boolean isCommandType() throws ParsingException {
         if(BNFConstants.USE.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isUse()) {
                 return true;
@@ -113,7 +119,7 @@ public class Parser {
         }
         if(BNFConstants.SELECT.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isSelect()){
-                cmd = new SelectCMD();
+                // cmd = new SelectCMD();
                 return true;
             }
             return false;
@@ -138,7 +144,8 @@ public class Parser {
             }
             return false;
         }
-        return false;
+        throw new InvalidGrammarException("<CommandType> ::= <Use> | <Create> | <Drop> | <Alter> | <Insert> | <Select> " +
+                "| <Update> | <Delete> | <Join>");
     }
 
     /**
@@ -146,7 +153,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isUse(){
+    private boolean isUse() throws ParsingException {
         if(BNFConstants.USE.equalsIgnoreCase(getCurrentTokenSeq())){
             cmd = new UseCMD();
             incrementToken();
@@ -154,7 +161,7 @@ public class Parser {
                 return true;
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Use> ::=  \"USE \" <DatabaseName> ;");
     }
 
     /**
@@ -162,7 +169,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreate(){
+    private boolean isCreate() throws ParsingException {
         if (BNFConstants.CREATE.equalsIgnoreCase(getCurrentTokenSeq())) {
             cmd = new CreateCMD();
             incrementToken();
@@ -173,7 +180,7 @@ public class Parser {
                 return true;
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Create>  ::=  <CreateDatabase> | <CreateTable> ;");
     }
 
     /**
@@ -181,7 +188,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreateDatabase(){
+    private boolean isCreateDatabase() throws TokenIndexOutOfBoundsException {
         if (BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())) {
             incrementToken();
             if (isDatabaseName()) {
@@ -197,7 +204,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreateTable(){
+    private boolean isCreateTable() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())) {
             incrementToken();
             if (isTableName()) {
@@ -225,7 +232,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isDrop(){
+    private boolean isDrop() throws ParsingException {
         if(BNFConstants.DROP.equalsIgnoreCase(getCurrentTokenSeq())){
             cmd = new DropCMD();
             incrementToken();
@@ -242,7 +249,7 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Drop>  ::=  \"DROP DATABASE \" <DatabaseName> | \"DROP TABLE \" <TableName> ;");
     }
 
     /**
@@ -250,7 +257,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isAlter(){
+    private boolean isAlter() throws ParsingException {
         if(BNFConstants.ALTER.equalsIgnoreCase(getCurrentTokenSeq())){
             cmd = new AlterCMD();
             incrementToken();
@@ -265,7 +272,7 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
     }
 
     /**
@@ -273,7 +280,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isInsert() {
+    private boolean isInsert() throws ParsingException {
         if(BNFConstants.INSERT.equalsIgnoreCase(getCurrentTokenSeq())){
             cmd = new InsertCMD();
             incrementToken();
@@ -295,7 +302,7 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Insert>  ::=  \"INSERT INTO \" <TableName> \" VALUES(\" <ValueList> \")\" ;");
     }
 
     /**
@@ -303,8 +310,9 @@ public class Parser {
      *
      * @return
      */
-    private boolean isSelect(){
+    private boolean isSelect() throws ParsingException {
         if(BNFConstants.SELECT.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new SelectCMD();
             incrementToken();
             if(isWildAttribList()){
                 if(BNFConstants.FROM.equalsIgnoreCase(getCurrentTokenSeq())){
@@ -315,7 +323,8 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("\"SELECT \" <WildAttribList> \" FROM \" <TableName> | \"SELECT \" " +
+                "<WildAttribList> \" FROM \" <TableName> \" WHERE \" <Condition> ;");
     }
 
     /**
@@ -323,7 +332,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isUpdate(){
+    private boolean isUpdate() throws ParsingException {
         if(BNFConstants.UPDATE.equalsIgnoreCase(getCurrentTokenSeq())){
             incrementToken();
             if(isTableName()){
@@ -338,7 +347,7 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Update>  ::=  \" UPDATE \" <TableName> \" SET \" <NameValueList> \" WHERE \" <Condition>");
     }
 
     /**
@@ -346,7 +355,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isDelete(){
+    private boolean isDelete() throws ParsingException {
         if(BNFConstants.DELETE.equalsIgnoreCase(getCurrentTokenSeq())){
             if(BNFConstants.FROM.equalsIgnoreCase(getCurrentTokenSeq())){
                 if(isTableName()){
@@ -355,7 +364,7 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Delete>  ::=  \"DELETE FROM \" <TableName> \" WHERE \" <Condition>");
     }
 
 
@@ -364,7 +373,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isJoin(){
+    private boolean isJoin() throws ParsingException {
         if(BNFConstants.JOIN.equalsIgnoreCase(getCurrentTokenSeq())){
             cmd = new JoinCMD();
             incrementToken();
@@ -387,47 +396,16 @@ public class Parser {
                 }
             }
         }
-        return false;
+        throw new InvalidGrammarException("<Join>  ::=  \"JOIN \" <TableName> \" AND \" <TableName> \" ON \" <AttributeName> \" AND \" <AttributeName>");
     }
 
-//    /**
-//     * <Digit>  ::=  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-//     *
-//     * @return
-//     */
-//    private boolean isDigit() {
-//        if (getCurrentToken().getSequence().length() == 1) {
-//            if (Character.isDigit(getCurrentToken().getSequence().charAt(0))) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-    // isUppercase
-    // isLowercase
-
-
-//    /**
-//     * <Letter>  ::=  <Uppercase> | <Lowercase>
-//     *
-//     * @return
-//     */
-//    private boolean isLetter(){
-//        if(getCurrentToken().getSequence().length() == 1) {
-//            if(Character.isLetter(getCurrentToken().getSequence().charAt(0))){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
     /**
      * <PlainText>  ::=  <Letter> | <Digit> | <Letter> <PlainText> | <Digit> <PlainText>
      *
      * @return
      */
-    private boolean isPlainText(){
+    private boolean isPlainText() throws TokenIndexOutOfBoundsException {
         char [] charSeq = getCurrentToken().getSequence().toCharArray();
         for(int i = 0; i < charSeq.length; i++){
             if(!Character.isLetterOrDigit(charSeq[i])){
@@ -509,27 +487,12 @@ public class Parser {
         return false;
     }
 
-//    /**
-//     * <Space> ::=  " "
-//     *
-//     * @return
-//     */
-//    private boolean isSpace(){
-//        if(getCurrentToken().getSequence().length() == 1) {
-//            if(Character.isSpaceChar(getCurrentToken().getSequence().charAt(0))){
-//                incrementToken();
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     /**
      * <NameValueList>  ::=  <NameValuePair> | <NameValuePair> "," <NameValueList>
      *
      * @return
      */
-    private boolean isNameValueList(){
+    private boolean isNameValueList() throws TokenIndexOutOfBoundsException {
         if(isNameValuePair()){
             if(BNFConstants.COMMA.equals(getCurrentToken())){
                 incrementToken();
@@ -548,7 +511,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isNameValuePair(){
+    private boolean isNameValuePair() throws TokenIndexOutOfBoundsException {
         if(isAttributeName()){
             if(BNFConstants.EQUALS_SYMBOL.equals(getCurrentToken())){
                 incrementToken();
@@ -565,7 +528,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isAlterationType(){
+    private boolean isAlterationType() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.ADD.equalsIgnoreCase(getCurrentTokenSeq())){
             incrementToken();
             return true;
@@ -580,7 +543,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isValueList(){
+    private boolean isValueList() throws TokenIndexOutOfBoundsException {
         if(isValue()){
             if(BNFConstants.COMMA.equalsIgnoreCase(getCurrentTokenSeq())) {
                 incrementToken();
@@ -593,14 +556,12 @@ public class Parser {
         return true;
     }
 
-    // isDigitSequence
-
     /**
      * <IntegerLiteral> ::=  <DigitSequence> | "-" <DigitSequence> | "+" <DigitSequence>
      *
      * @return
      */
-    private boolean isIntegerLiteral() {
+    private boolean isIntegerLiteral() throws TokenIndexOutOfBoundsException {
         try {
             Integer.valueOf(getCurrentToken().getSequence());
         } catch (NumberFormatException nfe) {
@@ -618,7 +579,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isFloatLiteral(){
+    private boolean isFloatLiteral() throws TokenIndexOutOfBoundsException {
         try {
           Float.valueOf(getCurrentToken().getSequence());
         } catch(NumberFormatException nfe){
@@ -633,7 +594,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isBooleanLiteral(){
+    private boolean isBooleanLiteral() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.TRUE.equalsIgnoreCase(getCurrentTokenSeq())){
             incrementToken();
             return true;
@@ -648,7 +609,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCharLiteral() {
+    private boolean isCharLiteral() throws TokenIndexOutOfBoundsException {
         if(getCurrentToken().getSequence().length() == 1) {
             if(Character.isSpaceChar(getCurrentToken().getSequence().charAt(0))){
                 incrementToken();
@@ -670,7 +631,7 @@ public class Parser {
      * <StringLiteral>  ::=  "" | <CharLiteral> | <CharLiteral> <StringLiteral>
      *
      */
-    private boolean isStringLiteral() {
+    private boolean isStringLiteral() throws TokenIndexOutOfBoundsException {
         String openingQuotation = String.valueOf(getCurrentToken().getSequence().charAt(0));
         String closingQuotation = String.valueOf(getCurrentToken().getSequence().charAt(getCurrentToken().getSequence().length() - 1));
         if(BNFConstants.SINGLE_QUOTATION.equals(openingQuotation) && BNFConstants.SINGLE_QUOTATION.equals(closingQuotation)){
@@ -685,7 +646,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isValue(){
+    private boolean isValue() throws TokenIndexOutOfBoundsException {
         if(isStringLiteral() || isBooleanLiteral() || isFloatLiteral() || isIntegerLiteral() || isCharLiteral()
                 || BNFConstants.NULL.equalsIgnoreCase(getCurrentTokenSeq())){
             cmd.addVariable(getPreviousTokenSeq());
@@ -699,7 +660,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isTableName(){
+    private boolean isTableName() throws TokenIndexOutOfBoundsException {
         if(isPlainText()){
             cmd.addTableName(getPreviousTokenSeq());
             return true;
@@ -712,7 +673,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isAttributeName(){
+    private boolean isAttributeName() throws TokenIndexOutOfBoundsException {
         if(isPlainText()){
             cmd.addColumnName(getPreviousTokenSeq());
             return true;
@@ -725,7 +686,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isDatabaseName(){
+    private boolean isDatabaseName() throws TokenIndexOutOfBoundsException {
         if(isPlainText()){
             cmd.addTableName(getPreviousTokenSeq());
             return true;
@@ -738,7 +699,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isWildAttribList(){
+    private boolean isWildAttribList() throws TokenIndexOutOfBoundsException {
         if(isAttributeList()){
             return true;
         }
@@ -754,7 +715,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isAttributeList(){
+    private boolean isAttributeList() throws TokenIndexOutOfBoundsException {
         if(isAttributeName()){
             return true;
         }
@@ -776,7 +737,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isOperator(){
+    private boolean isOperator() throws InvalidGrammarException {
         if(BNFConstants.ASSIGNMENT.equals(getCurrentToken())){
             return true;
         } if(BNFConstants.EQUAL_TO.equals(getCurrentToken())){
@@ -794,7 +755,7 @@ public class Parser {
         } if(BNFConstants.LIKE.equals(getCurrentToken())){
             return true;
         }
-        return false;
+        throw new InvalidGrammarException("<Operator>  ::=  \"==\" | \">\" | \"<\" | \">=\" | \"<=\" | \"!=\" | \" LIKE \"");
     }
 
 }

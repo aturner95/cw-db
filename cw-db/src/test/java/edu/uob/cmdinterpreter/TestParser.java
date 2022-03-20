@@ -2,14 +2,17 @@ package edu.uob.cmdinterpreter;
 
 import edu.uob.cmdinterpreter.commands.*;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.exceptions.ParsingException;
+import edu.uob.exceptions.ParsingException.*;
+import edu.uob.exceptions.TokenizerException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestParser {
 
-    // @Test
-    public void test_parse_basicSelectStatement_returnsSelectCMD(){
+    @Test
+    public void test_parse_basicSelectStatement_returnsSelectCMD() throws Exception {
         // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("select * from people;");
@@ -26,37 +29,31 @@ public class TestParser {
     // TODO test SELECT with WHERE once conditions have been sorted
 
 
-    // @Test // TODO this is a tokenizer exception
-    public void test_parse_basicSelectStatementSyntaxErr0r_cmdIsNull(){
+
+    // @Test TODO this input sequence should not be tokenized as no token types start with special characters
+    public void test_tokenize_basicSelectStatementSyntaxError_ParsingExceptionThrown() throws Exception {
         // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("select *from people;");
         Parser parser = new Parser(tokenizer);
 
-        // when
-        DBCmd cmd = parser.parse();
+        assertThrows(ParsingException.class, ()-> parser.parse());
 
-        // then
-        assertNull(cmd);
     }
 
-    // @Test
-    public void test_parse_basicSelectStatementMissingSemiColon_cmdIsNull(){
+    @Test
+    public void test_parse_basicSelectStatementMissingSemiColon_InvalidGrammarExceptionThrown() throws Exception {
         // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("select * from people");
         Parser parser = new Parser(tokenizer);
 
-        // when
-        DBCmd cmd = parser.parse();
+        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
 
-        // then
-        assertNull(cmd);
-        // TODO this is a parsing exception
     }
 
     @Test
-    public void test_parse_basicUseStatement_returnsUseCMD(){
+    public void test_parse_basicUseStatement_returnsUseCMD() throws Exception{
         // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("USE DB;");
@@ -72,22 +69,17 @@ public class TestParser {
     }
 
     @Test
-    public void test_parse_basicUseStatementSyntaxError_cmdIsNull(){
+    public void test_parse_basicUseStatementSyntaxError_InvalidGrammarExceptionThrown() throws Exception {
 
-        // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("USE from DB;");
         Parser parser = new Parser(tokenizer);
 
-        // when
-        DBCmd cmd = parser.parse();
-
-        // then
-        assertNull(cmd);
+        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
     }
 
-    // @Test
-    public void test_parse_basicCreateDatabase_cmdIsCreate(){
+    @Test
+    public void test_parse_basicCreateDatabase_cmdIsCreate() throws Exception {
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -101,8 +93,8 @@ public class TestParser {
         assertTrue(cmd instanceof CreateCMD);
     }
 
-    // @Test
-    public void test_parse_basicCreateTable_cmdIsCreate(){
+    @Test
+    public void test_parse_basicCreateTable_cmdIsCreate() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -116,8 +108,8 @@ public class TestParser {
         assertTrue(cmd instanceof CreateCMD);
     }
 
-    // @Test
-    public void test_parse_basicDropDatabase_cmdIsDrop(){
+    @Test
+    public void test_parse_basicDropDatabase_cmdIsDrop() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -131,8 +123,8 @@ public class TestParser {
         assertTrue(cmd instanceof DropCMD);
     }
 
-    // @Test
-    public void test_parse_basicDropTable_cmdIsDrop(){
+    @Test
+    public void test_parse_basicDropTable_cmdIsDrop() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -146,8 +138,8 @@ public class TestParser {
         assertTrue(cmd instanceof DropCMD);
     }
 
-    // @Test
-    public void test_parse_basicAlter_cmdIsAlter(){
+    @Test
+    public void test_parse_basicAlter_cmdIsAlter() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -161,8 +153,8 @@ public class TestParser {
         assertTrue(cmd instanceof AlterCMD);
     }
 
-    // @Test
-    public void test_parse_basicInsert_cmdIsInsert(){
+    @Test
+    public void test_parse_basicInsert_cmdIsInsert() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -180,8 +172,8 @@ public class TestParser {
 
     // TODO test DELETE once conditions have been sorted
 
-    // @Test
-    public void test_parse_basicJoin_cmdIsJoin(){
+    @Test
+    public void test_parse_basicJoin_cmdIsJoin() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -192,7 +184,6 @@ public class TestParser {
         DBCmd cmd = parser.parse();
 
         // then
-        // assertNull(cmd);
         assertTrue(cmd instanceof JoinCMD);
     }
 }

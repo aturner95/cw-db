@@ -6,6 +6,7 @@ import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.Table;
 import edu.uob.dbelements.Record;
 import edu.uob.dbfilesystem.DBTableFile;
+import edu.uob.exceptions.DBException.*;
 
 import java.awt.*;
 import java.io.IOException;
@@ -21,22 +22,29 @@ public class InsertCMD extends DBCmd {
         String tableName = getTableNames().get(indexOfTable);
         String id = getVariables().get(indexOfPrimaryKey);
 
-        if(hasDatabase(server) && hasTable(server, tableName)){
-            try {
-                DBTableFile dbFile = new DBTableFile();
-                Table table = readTableFromFile(server, tableName);
-                List<Record> data = table.getRows();
-                if(!hasEntityId(data, id)){
-                    insertEntity(data, getVariables());
-                    dbFile.storeEntityIntoDBFile(table);
-                    return new String();
-                }
+        try {
+            if (hasDatabase(server)) {
+                if (hasTable(server, tableName)) {
+                    DBTableFile dbFile = new DBTableFile();
+                    Table table = readTableFromFile(server, tableName);
+                    List<Record> data = table.getRows();
 
-            } catch(IOException ioe){
-                return null;
+                    if (!hasEntityId(data, id)) {
+                        insertEntity(data, getVariables());
+                        dbFile.storeEntityIntoDBFile(table);
+                        return STATUS_OK;
+
+                    } else {
+                        throw new DBEntityExistsException(id);
+                    }
+                }
+                throw new DBTableDoesNotExistException(tableName);
             }
+            throw new DBDoesNotExistException(getDatabaseName());
+
+        } catch(Exception e){
+            return STATUS_ERROR + e.getMessage();
         }
-        return null;
     }
 
     private boolean hasEntityId(List<Record> data, String id){

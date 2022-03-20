@@ -4,6 +4,7 @@ import edu.uob.DBServer;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbfilesystem.DBTableFile;
+import edu.uob.exceptions.DBException.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,10 @@ public abstract class DBCmd {
     protected List<String> colNames;
     protected List<String> variables;
 
+    public static final String STATUS_OK = "[OK]";
+    public static final String STATUS_ERROR = "[ERROR] ";
+    public static final String SPACE = " ";
+
     /* Constructors */
     public DBCmd(){
         super();
@@ -27,7 +32,7 @@ public abstract class DBCmd {
     }
 
     /* Methods */
-    public abstract String query(DBServer server);
+    public abstract String query(DBServer server) throws Exception;
 
     public String getDatabaseName() {
         return databaseName;
@@ -73,11 +78,14 @@ public abstract class DBCmd {
         return false;
     }
 
-    public boolean hasDatabase(DBServer server){
-        return (server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory());
+    public boolean hasDatabase(DBServer server) {
+        if(server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory()){
+            return true;
+        }
+        return false;
     }
 
-    public boolean hasTable(DBServer server, String tableName){
+    public boolean hasTable(DBServer server, String tableName) {
         File db = new File(server.getDatabaseDirectory().getName());
         File [] tables = db.listFiles();
         for(File table: tables){
@@ -89,7 +97,7 @@ public abstract class DBCmd {
         return false;
     }
 
-    public boolean hasAttribute(Table table, String attributeName){
+    public boolean hasAttribute(Table table, String attributeName) {
         List<ColumnHeader> colHeads = table.getColHeadings();
         for(ColumnHeader header: colHeads){
             if(attributeName.equalsIgnoreCase(header.getColName())){

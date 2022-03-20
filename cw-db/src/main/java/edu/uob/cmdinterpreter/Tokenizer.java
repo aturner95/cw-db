@@ -1,5 +1,7 @@
 package edu.uob.cmdinterpreter;
 
+import edu.uob.exceptions.TokenizerException;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -48,22 +50,13 @@ public class Tokenizer {
         return tokens;
     }
 
-//    public void setTokens(List<Token> tokenList){
-//        for(Token token: tokenList){
-//            this.tokens.add(token);
-//        }
-//    }
 
     private void addToken(String regex, TokenType tokenType){
         Pattern.compile("\\b([(a-z)(A-Z)(0-9)])+\\b");
         tokenInfos.add(new TokenInfo(Pattern.compile("^(" + regex + ")", Pattern.CASE_INSENSITIVE), tokenType));
     }
 
-    public Token getCmdToken(){
-        return tokens.get(0);
-    }
-
-    public boolean tokenize(String inputSequence){
+    public boolean tokenize(String inputSequence) throws TokenizerException {
 
         if(inputSequence != null && !inputSequence.isEmpty()) {
             String string = inputSequence.strip();
@@ -87,14 +80,12 @@ public class Tokenizer {
                 }
 
                 if(!match) {
-                    // TODO throw ParserException
-                    System.out.println("Unable to tokenise input:" + string);
-                    return false;
+                    throw new TokenizerException("Invalid token within input sequence: " + inputSequence);
                 }
             }
             return true;
         }
-        return false;
+        throw new TokenizerException("Input sequence is empty");
     }
 
     private class TokenInfo {

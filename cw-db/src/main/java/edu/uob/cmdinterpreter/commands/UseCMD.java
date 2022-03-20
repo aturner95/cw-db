@@ -2,14 +2,15 @@ package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.DBException.DBDoesNotExistException;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class UseCMD extends DBCmd {
 
-    public UseCMD(){
+    public UseCMD() {
         this.tableNames = new ArrayList<>();
         this.colNames = new ArrayList<>();
     }
@@ -17,15 +18,20 @@ public class UseCMD extends DBCmd {
     @Override
     public String query(DBServer server) {
 
-        if(server != null && tableNames.size() == 1 && colNames.size() == 0) {
-            byte databaseIndex = 0;
-            File dbDir = new File(tableNames.get(databaseIndex));
-            if (dbDir.exists() && dbDir.isDirectory()) {
-                server.setDatabaseDirectory(dbDir);
-                return new String();
+        try {
+            if (getDatabaseName() != null && !getDatabaseName().isEmpty()) {
+                // byte databaseIndex = 0;
+                File dbDir = new File(getDatabaseName());
+                if (dbDir.exists() && dbDir.isDirectory()) {
+                    server.setDatabaseDirectory(dbDir);
+                    return STATUS_OK;
+                }
+                throw new DBDoesNotExistException(getDatabaseName());
             }
+            throw new DBException();
+
+        } catch (Exception e) {
+            return STATUS_ERROR + e.getMessage();
         }
-        // TODO throw exception
-        return null;
     }
 }

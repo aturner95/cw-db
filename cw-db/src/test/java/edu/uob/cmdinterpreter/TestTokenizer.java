@@ -1,5 +1,6 @@
 package edu.uob.cmdinterpreter;
 
+import edu.uob.exceptions.TokenizerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validCommandTypeTokens_nineCommandTypeTokensAdded(){
+    public void test_tokenize_validCommandTypeTokens_nineCommandTypeTokensAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("use CREATE Drop aLter inseRT select      Update delete JOIN "));
 
@@ -27,7 +28,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_invalidCommandTypeTokens_misspelt_tokenAddedButIsNotCT(){
+    public void test_tokenize_invalidCommandTypeTokens_misspelt_tokenAddedButIsNotCT() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("user"));
 
@@ -36,7 +37,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_invalidCommandTypeTokens_noSpaces_tokenAddedButIsNotCT(){
+    public void test_tokenize_invalidCommandTypeTokens_noSpaces_tokenAddedButIsNotCT() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("deletejoin"));
 
@@ -46,7 +47,7 @@ public class TestTokenizer {
 
 
     @Test
-    public void test_tokenize_validKeyword_threeTokensAdded(){
+    public void test_tokenize_validKeyword_threeTokensAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("from Where IN   "));
 
@@ -60,7 +61,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_invalidKeyword_tokenAddedButIsNotKW(){
+    public void test_tokenize_invalidKeyword_tokenAddedButIsNotKW() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("fromm"));
         assertEquals(1, tokenizer.getTokens().size());
@@ -68,7 +69,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validIdentifier_tokenAdded(){
+    public void test_tokenize_validIdentifier_tokenAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("id"));
         assertEquals(1, tokenizer.getTokens().size());
@@ -77,7 +78,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validIdentifierWithDigit_tokenAdded(){
+    public void test_tokenize_validIdentifierWithDigit_tokenAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("table4"));
         assertEquals(1, tokenizer.getTokens().size());
@@ -95,15 +96,15 @@ public class TestTokenizer {
      */
     // @Test TODO currently, the Matcher is finding the pattern for id_person, however is not replacing the term with
     // an empty string. Therefore, code enters into an infinite loop.
-    public void test_tokenize_invalidIdentifierWithSpecCar_noTokenAdded(){
+    public void test_tokenize_invalidIdentifierWithSpecCar_noTokenAdded() throws Exception {
         tokenizer = new Tokenizer();
-        assertFalse(tokenizer.tokenize("id_person"));
+        assertThrows(TokenizerException.class, ()-> tokenizer.tokenize("id_person"));
         System.out.println((tokenizer.getTokens().get(0).getTokenType()));
         assertEquals(0, tokenizer.getTokens().size());
     }
 
     @Test
-    public void test_tokenize_validLiteralStrings_twoStringLiteralsAdded(){
+    public void test_tokenize_validLiteralStrings_twoStringLiteralsAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("'this is a String''    This is another    string    '"));
 
@@ -115,7 +116,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validLiteralStringsAmongstWords_twoStringLiteralsAdded2(){
+    public void test_tokenize_validLiteralStringsAmongstWords_twoStringLiteralsAdded2() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("'this is a String' these are not string literals '    This is another    string    '"));
 
@@ -132,7 +133,7 @@ public class TestTokenizer {
      * <CharLiteral>    ::=  <Space> | <Letter> | <Symbol>
      */
     @Test
-    public void test_tokenize_validStringLiteralWithSpecialChar_literalTokenAdded(){
+    public void test_tokenize_validStringLiteralWithSpecialChar_literalTokenAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("'Hello world!'"));
         assertEquals(1, tokenizer.getTokens().size());
@@ -141,7 +142,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validPositiveLiteralInteger_integerLiteralAdded(){
+    public void test_tokenize_validPositiveLiteralInteger_integerLiteralAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize(" 77  "));
 
@@ -151,7 +152,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validNegativeLiteralFloat_floatLiteralAdded(){
+    public void test_tokenize_validNegativeLiteralFloat_floatLiteralAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize(" -0.5  "));
 
@@ -161,7 +162,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validLiteralBoolean_trueLiteralAdded(){
+    public void test_tokenize_validLiteralBoolean_trueLiteralAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize(" TRUE  "));
 
@@ -171,7 +172,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validLiteralChar_letterLiteralAdded(){
+    public void test_tokenize_validLiteralChar_letterLiteralAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("F"));
 
@@ -181,7 +182,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validLiteralNULL_nullLiteralAdded(){
+    public void test_tokenize_validLiteralNULL_nullLiteralAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("=NULL;"));
 
@@ -191,7 +192,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_invalidLiteralNULLAdjacentTerm_noLiteralAdded(){
+    public void test_tokenize_invalidLiteralNULLAdjacentTerm_tokenizedAsIdentifier() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("=NULLAND"));
 
@@ -203,7 +204,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_validOperators_sevenOperationTokensAdded(){
+    public void test_tokenize_validOperators_sevenOperationTokensAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("== >= <=!= <>  LIKE"));
 
@@ -221,7 +222,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_invalidOperatorNoSpaceAfterLike_noOperatorAdded(){
+    public void test_tokenize_invalidOperatorNoSpaceAfterLike_tokenizedAsIdentifier() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("where id LIKE2;"));
 
@@ -237,22 +238,22 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_invalidTokens_emptyStringInput_tokenNotAdded(){
+    public void test_tokenize_invalidTokens_emptyStringInput_TokenizerExceptionThrown() {
         tokenizer = new Tokenizer();
-        assertFalse(tokenizer.tokenize(""));
+        assertThrows(TokenizerException.class, ()-> tokenizer.tokenize(""));
         assertEquals(0, tokenizer.getTokens().size());
 
     }
 
     @Test
-    public void test_tokenize_invalidTokens_nullStringInput_tokenNotAdded(){
+    public void test_tokenize_invalidTokens_nullStringInput_TokenizerExceptionThrown() {
         tokenizer = new Tokenizer();
-        assertFalse(tokenizer.tokenize(null));
+        assertThrows(TokenizerException.class, ()-> tokenizer.tokenize(null));
         assertEquals(0, tokenizer.getTokens().size());
     }
 
     @Test
-    public void test_tokenize_basicSelectStatement_sevenTokensAdded(){
+    public void test_tokenize_basicSelectStatement_sevenTokensAdded()throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("select * from people where id=3;"));
 
@@ -287,7 +288,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_basicInsertStatement_nineteenTokensAdded(){
+    public void test_tokenize_basicInsertStatement_nineteenTokensAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("insert into People(Id, name, age) values(2, 'Bob', 23);"));
 
@@ -353,7 +354,7 @@ public class TestTokenizer {
     }
 
     @Test
-    public void test_tokenize_basicJoinStatement_nineTokensAdded(){
+    public void test_tokenize_basicJoinStatement_nineTokensAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("JOIN people AND employee ON Id AND Id;"));
 

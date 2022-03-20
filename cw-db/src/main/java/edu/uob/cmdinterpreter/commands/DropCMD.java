@@ -2,6 +2,8 @@ package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.DBException.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,35 +18,38 @@ public class DropCMD extends DBCmd {
     @Override
     public String query(DBServer server) {
 
-        if(server != null && getDatabaseName() != null && getTableNames().size() == 0){
-            return dropDatabase();
-        }
-        if(server != null && getDatabaseName() == null && getTableNames().size() == 1){
-            return dropTable();
-        }
+        try {
+            if(hasDatabase(server)) {
+                if (getDatabaseName() != null && getTableNames().size() == 0) {
+                    dropDatabase();
+                    return STATUS_OK;
 
-        // TODO throw exception
-        return null;
+                } if (getDatabaseName() == null && getTableNames().size() == 1) {
+                    dropTable();
+                    return STATUS_OK;
+                }
+                throw new DBException();
+            }
+            throw new DBDoesNotExistException(getDatabaseName());
+
+        }catch(Exception e){
+            return STATUS_ERROR + e.getMessage();
+        }
     }
 
-    private String dropDatabase(){
+    private void dropDatabase() {
         File database = new File(getDatabaseName());
-        if(database.exists() && database.isDirectory()){
-            deleteDirectory(database);
-            return new String();
-        }
-        // TODO throw exception
-        return null;
+        deleteDirectory(database);
     }
 
-    private String dropTable(){
+    private void dropTable() throws DBTableDoesNotExistException {
         byte indexOfTable = 0;
         File table = new File(getTableNames().get(indexOfTable));
         if(table.exists() && table.isFile()){
             table.delete();
-            return new String();
+            return;
         }
-        return null;
+        throw new DBTableDoesNotExistException(table.getName());
     }
 
     private void deleteDirectory(File dir){

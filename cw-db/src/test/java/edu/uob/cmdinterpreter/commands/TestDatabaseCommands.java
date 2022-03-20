@@ -5,6 +5,8 @@ import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.*;
 import edu.uob.dbelements.Record;
 import edu.uob.dbfilesystem.DBTableFile;
+import edu.uob.exceptions.DBException.*;
+import edu.uob.exceptions.ParsingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,9 @@ public class TestDatabaseCommands {
     private static final String tempDbDirName = "dbtest";
     private static final String fileExt = ".tab";
     DBCmd cmd;
+
+    public static final String STATUS_OK = "[OK]";
+    public static final String STATUS_ERROR = "[ERROR]";
 
     @BeforeEach
     void setup(@TempDir File dbDir) {
@@ -50,52 +55,52 @@ public class TestDatabaseCommands {
     }
 
     @Test
-    public void test_useCMD_databaseExists_stringReturned() throws Exception {
+    public void test_useCMD_databaseExists_statusCodeOK() throws Exception {
         // given
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
         cmd = new UseCMD();
-        cmd.addTableName(tempDbDirName);
+        cmd.setDatabaseName(tempDbDirName);
 
-        // given
-        Object resultString = cmd.query(server);
+        // when
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNotNull(resultString);
-        assertTrue(resultString instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
     }
 
     @Test
-    public void test_useCMD_databaseDoesNotExists_nullReturned() throws Exception {
+    public void test_useCMD_databaseDoesNotExists_statusCodeError() throws Exception {
         // given
         setup(new File("someDirThatDoesNotExist"));
         cmd = new UseCMD();
         cmd.addTableName(tempDbDirName);
 
-        // given
-        Object resultString = cmd.query(server);
+        // when
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNull(resultString);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
+
     }
 
     @Test
-    public void test_useCMD_noTableNamesInTree_nullReturned() throws Exception {
+    public void test_useCMD_noTableNamesInTree_statusCodeError() throws Exception {
         // given
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
         cmd = new UseCMD();
         cmd.addTableName(tempDbDirName);
 
-        // given
-        Object resultString = cmd.query(server);
+        // when
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNotNull(resultString);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
     }
 
     @Test
-    public void test_createCMD_databaseCreated_emptyStringReturned() throws Exception {
+    public void test_createCMD_databaseCreated_statusCodeOK() throws Exception {
         // given
         String newTempDb = "newTempDb";
 
@@ -103,18 +108,17 @@ public class TestDatabaseCommands {
         cmd.setDatabaseName("newTempDb");
 
         // given
-        Object resultString = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNotNull(resultString);
-        assertTrue(resultString instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         tempDbDir = new File(newTempDb);
         assertTrue(tempDbDir.exists());
         assertTrue(tempDbDir.isDirectory());
     }
 
     @Test
-    public void test_createCMD_tableCreated_emptyStringReturned() throws Exception {
+    public void test_createCMD_tableCreated_statusCodeOK() throws Exception {
 
         // given
         setup(tempDbDir);
@@ -124,19 +128,18 @@ public class TestDatabaseCommands {
         cmd = new CreateCMD();
         cmd.addTableName(newTempTable);
 
-        // when
-        Object resultString = cmd.query(server);
+        // given
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNotNull(resultString);
-        assertTrue(resultString instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         File tempFile = new File("dbtest" + File.separator + newTempTable + ".tab");
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
     }
 
     @Test
-    public void test_dropCMD_databaseDropped_emptyStringReturned() throws Exception {
+    public void test_dropCMD_databaseDropped_statusCodeOK() throws Exception {
 
         // given
         Files.createDirectory(tempDbDir.toPath());
@@ -144,19 +147,18 @@ public class TestDatabaseCommands {
         cmd = new DropCMD();
         cmd.setDatabaseName(tempDbDirName);
 
-        // given
+        // when
         assertTrue(tempDbDir.exists());
         assertTrue(tempDbDir.isDirectory());
-        String resultString = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNotNull(resultString);
-        assertTrue(resultString instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         assertTrue(!tempDbDir.exists());
     }
 
     @Test
-    public void test_dropCMD_tableDropped_emptyStringReturned() throws Exception {
+    public void test_dropCMD_tableDropped_statusCodeOK() throws Exception {
 
         // given
         Files.createDirectory(tempDbDir.toPath());
@@ -166,19 +168,18 @@ public class TestDatabaseCommands {
         File tempDBFile = new File(tempDbDirName + File.separator + "table.tab");
         assertTrue(tempDBFile.createNewFile());
 
-        // when
+        // given
         assertTrue(tempDBFile.exists());
         assertTrue(tempDBFile.isFile());
-        Object resultString = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNotNull(resultString);
-        assertTrue(resultString instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         assertTrue(!tempDBFile.exists());
     }
 
     @Test
-    public void test_dropCMD_databaseDoesNotExist_nullReturned() throws Exception {
+    public void test_dropCMD_databaseDoesNotExist_statusCodeError() throws Exception {
         // given
         cmd = new DropCMD();
         cmd.setDatabaseName("doesNotExist");
@@ -186,15 +187,15 @@ public class TestDatabaseCommands {
 
         // when
         assertFalse(tempDBFile.exists());
-        Object resultString = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNull(resultString);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
         assertFalse(tempDBFile.exists());
     }
 
     @Test
-    public void test_dropCMD_tableDoesNotExist_nullReturned() throws Exception {
+    public void test_dropCMD_tableDoesNotExist_statusCodeERROR() throws Exception {
 
         // given
         Files.createDirectory(tempDbDir.toPath());
@@ -206,16 +207,14 @@ public class TestDatabaseCommands {
         // when
         assertTrue(tempDbDir.exists());
         assertTrue(tempDbDir.isDirectory());
-        assertFalse(tempDBFile.exists());
-
-        Object resultString = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNull(resultString);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
     }
 
     @Test
-    public void test_alterCMD_addedColumnFour_headersAndRowsHaveSizeFour() throws Exception {
+    public void test_alterCMD_addedColumnFour_StatusCodeOK_headersAndRowsHaveSizeFour() throws Exception {
 
         // ------------- given -------------
         // create dir and file
@@ -271,17 +270,19 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(table);
 
         // ------------- when -------------
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
         table = file.readDBFileIntoEntity(fullPath);
+
+
         // ------------- then -------------
-        assertTrue(result instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         assertEquals(4, table.getColHeadings().size());
         assertEquals(4, table.getRows().get(0).getAttributes().size());
         assertEquals(4, table.getRows().get(1).getAttributes().size());
     }
 
     @Test
-    public void test_alterCMD_dropColumnThree_tableHasTwoCols() throws Exception {
+    public void test_alterCMD_dropColumnThree_statusCodeOK_tableHasTwoCols() throws Exception {
 
         // ------------- given -------------
         // create dir and file
@@ -337,10 +338,12 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(table);
 
         // ------------- when -------------
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
         table = file.readDBFileIntoEntity(fullPath);
+
+
         // ------------- then -------------
-        assertTrue(result instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         assertEquals(2, table.getColHeadings().size());
         assertEquals("id", table.getColHeadings().get(0).getColName());
         assertEquals("name", table.getColHeadings().get(1).getColName());
@@ -354,7 +357,7 @@ public class TestDatabaseCommands {
 
 
     @Test
-    public void test_alterCMD_dropColumn_tableDoesNotExist_nullReturned() throws Exception {
+    public void test_alterCMD_dropColumn_tableDoesNotExist_statusCodeError() throws Exception {
 
         // given
         Files.createDirectory(tempDbDir.toPath());
@@ -372,14 +375,14 @@ public class TestDatabaseCommands {
         cmd.addColumnName(attrName);
 
         // when
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
     }
 
     @Test
-    public void test_alterCMD_addAttribute_attributeAlreadyExists_tableUnchanged() throws Exception {
+    public void test_alterCMD_addAttribute_attributeAlreadyExists_errorStatusError_tableUnchanged() throws Exception {
         // ------------- given -------------
         // create dir and file
         Files.createDirectory(tempDbDir.toPath());
@@ -434,10 +437,12 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(table);
 
         // ------------- when -------------
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
         table = file.readDBFileIntoEntity(fullPath);
+
+
         // ------------- then -------------
-       //  assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
         assertEquals(3, table.getColHeadings().size());
         assertEquals("id", table.getColHeadings().get(0).getColName());
         assertEquals("name", table.getColHeadings().get(1).getColName());
@@ -453,7 +458,7 @@ public class TestDatabaseCommands {
     }
 
     @Test
-    public void test_alterCMD_dropColumn_columnDoesNotExist_tableUnchanged() throws Exception {
+    public void test_alterCMD_dropColumn_columnDoesNotExist_statusCodeError_tableUnchanged() throws Exception {
         // ------------- given -------------
         // create dir and file
         Files.createDirectory(tempDbDir.toPath());
@@ -508,10 +513,11 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(table);
 
         // ------------- when -------------
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
         table = file.readDBFileIntoEntity(fullPath);
+
         // ------------- then -------------
-        // assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
         assertEquals(3, table.getColHeadings().size());
         assertEquals("id", table.getColHeadings().get(0).getColName());
         assertEquals("name", table.getColHeadings().get(1).getColName());
@@ -527,7 +533,7 @@ public class TestDatabaseCommands {
     }
 
     @Test
-    public void test_insertCMD_insertedNewEntity_tableContainsNewRecord() throws Exception {
+    public void test_insertCMD_insertedNewEntity_statusCodeOK_tableContainsNewRecord() throws Exception {
 
         // ------------- given -------------
         // create dir and file
@@ -585,10 +591,11 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(table);
 
         // ------------- when -------------
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
         table = file.readDBFileIntoEntity(fullPath);
+
         // ------------- then -------------
-        assertTrue(result instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
         assertEquals(3, table.getColHeadings().size());
         assertEquals("Id", table.getColHeadings().get(0).getColName());
         assertEquals("Name", table.getColHeadings().get(1).getColName());
@@ -610,7 +617,7 @@ public class TestDatabaseCommands {
     }
 
     @Test
-    public void test_insertCMD_entityAlreadyExists_tableUnchanged() throws Exception{
+    public void test_insertCMD_entityAlreadyExists_statusCodeError_tableUnchanged() throws Exception{
         // ------------- given -------------
         // create dir and file
         Files.createDirectory(tempDbDir.toPath());
@@ -667,10 +674,12 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(table);
 
         // ------------- when -------------
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
         table = file.readDBFileIntoEntity(fullPath);
+
+
         // ------------- then -------------
-        assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
         assertEquals(3, table.getColHeadings().size());
         assertEquals("Id", table.getColHeadings().get(0).getColName());
         assertEquals("Name", table.getColHeadings().get(1).getColName());
@@ -688,7 +697,7 @@ public class TestDatabaseCommands {
     }
 
     @Test
-    public void test_insertCMD_tableDoesNotExist_nullReturned() throws Exception{
+    public void test_insertCMD_tableDoesNotExist_statusCodeError() throws Exception{
         // given
         Files.createDirectory(tempDbDir.toPath());
         assertTrue(tempDbDir.exists());
@@ -706,14 +715,14 @@ public class TestDatabaseCommands {
         cmd.addVariable("Paris");
 
         // when
-        String result = cmd.query(server);
+        String resultMessage = cmd.query(server);
 
         // then
-        assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
     }
 
     @Test
-    public void test_joinCmd_tablesJoins_resultReturned() throws Exception {
+    public void test_joinCmd_tablesJoins_statusCodeOK() throws Exception {
         // ------------- given -------------
         // create dir and files
         Files.createDirectory(tempDbDir.toPath());
@@ -805,16 +814,14 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(tableB);
 
         // ------------- when -------------
-        String result = cmd.query(server);
-        tableA = file.readDBFileIntoEntity(fullPathA);
-        tableB = file.readDBFileIntoEntity(fullPathB);
+        String resultMessage = cmd.query(server);
 
         // ------------- then -------------
-        assertTrue(result instanceof String);
+        assertTrue(resultMessage.contains(STATUS_OK));
     }
 
     @Test
-    public void test_joinCmd_tableBDoesNotExist_exceptionThrown() throws Exception{
+    public void test_joinCmd_tableBDoesNotExist_statusCodeError() throws Exception{
 
         // ------------- given -------------
         // create dir and files
@@ -876,16 +883,15 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(tableA);
 
         // ------------- when -------------
-        String result = cmd.query(server);
-        tableA = file.readDBFileIntoEntity(fullPathA);
+        String resultMessage = cmd.query(server);
 
         // ------------- then -------------
-        assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
 
     }
 
     @Test
-    public void test_joinCmd_attributeBDoesNotExist_exceptionThrown() throws Exception{
+    public void test_joinCmd_attributeBDoesNotExist_statusCodeError() throws Exception{
         // ------------- given -------------
         // create dir and files
         Files.createDirectory(tempDbDir.toPath());
@@ -977,11 +983,9 @@ public class TestDatabaseCommands {
         file.storeEntityIntoDBFile(tableB);
 
         // ------------- when -------------
-        String result = cmd.query(server);
-        tableA = file.readDBFileIntoEntity(fullPathA);
-        tableB = file.readDBFileIntoEntity(fullPathB);
+        String resultMessage = cmd.query(server);
 
         // ------------- then -------------
-        assertNull(result);
+        assertTrue(resultMessage.contains(STATUS_ERROR));
     }
 }

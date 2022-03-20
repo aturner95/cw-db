@@ -2,10 +2,11 @@ package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.DBException.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class CreateCMD extends DBCmd {
@@ -16,51 +17,55 @@ public class CreateCMD extends DBCmd {
     }
 
     @Override
-    public String query(DBServer server) {
+    public String query(DBServer server) throws DBException, IOException {
 
-        if(server != null && getDatabaseName() != null && getTableNames().size() == 0 && getColNames().size() == 0){
-            return createDatabase();
+        try {
+            if (getDatabaseName() != null && getTableNames().size() == 0) {
+                createDatabase();
+                return STATUS_OK;
+            }
+
+            else if (getDatabaseName() == null && getTableNames().size() == 1) {
+                createTable(server);
+                return STATUS_OK;
+
+            } else {
+                throw new DBException();
+            }
+
+        } catch(Exception e){
+            return STATUS_ERROR + e.getMessage();
         }
-
-        if(server != null && getDatabaseName() == null && getTableNames().size() == 1 && getColNames().size() == 0){
-            return createTable(server);
-        }
-
-        return null;
     }
 
-    private String createDatabase(){
+    private void createDatabase() throws DBTableExistsException{
         File database = new File(getDatabaseName());
         if(!database.exists() && !database.isDirectory()){
             database.mkdir();
-            return new String();
-
-        } else {
-            // TODO throw exception
-            return null;
+            return;
         }
+        throw new DBTableExistsException(getDatabaseName());
     }
 
-    private String createTable(DBServer server){
+    private void createTable(DBServer server) throws DBException, IOException{
 
-        // check if database exists
-        if(server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory()){
-
+        if(hasDatabase(server)){
             String tableName = getTableNames().get(0);
             File table = new File(tableName);
-            // check if table exists
+
             if(!table.exists()){
                 try {
                     table = new File (server.getDatabaseDirectory() + File.separator + tableName + ".tab");
                     if(table.createNewFile()){
-                        return new String();
+                        return;
                     }
                 } catch(IOException ioe){
-                    // TODO handle exception
-                    return null;
+                    throw new IOException("Unable to write to table:" + tableName);
                 }
             }
+            throw new DBTableExistsException(tableName);
         }
-        return null;
+        throw new DBDoesNotExistException(server.getDatabaseDirectory().getName());
     }
+
 }
