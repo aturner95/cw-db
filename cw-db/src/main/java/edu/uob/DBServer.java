@@ -1,5 +1,12 @@
 package edu.uob;
 
+import edu.uob.cmdinterpreter.Parser;
+import edu.uob.cmdinterpreter.Tokenizer;
+import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.dbelements.TableHeader;
+import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.DBException.DBDoesNotExistException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +19,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /** This class implements the DB server. */
 public final class DBServer {
@@ -19,7 +27,8 @@ public final class DBServer {
   private static final char END_OF_TRANSMISSION = 4;
   private File databaseDirectory;
   private static final String STATUS_OK = "[OK]";
-  private static final String STATUS_ERROR = "[ERROR]";
+  private static final String STATUS_ERROR = "[ERROR] ";
+
 
   public static void main(String[] args) throws IOException {
     new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
@@ -51,37 +60,31 @@ public final class DBServer {
   public String handleCommand(String command) {
 
     // check database exists
-    if(!databaseDirectory.exists() || !databaseDirectory.isDirectory()){
-      return STATUS_ERROR;
-    }
+    try {
+//      if(!databaseDirectory.exists() || !databaseDirectory.isDirectory()){
+//        throw new DBDoesNotExistException(databaseDirectory.getName());
+//      }
 
-    // check database contains files
-    try(DirectoryStream<Path> dirStream = Files.newDirectoryStream(databaseDirectory.toPath())){
-      if(!dirStream.iterator().hasNext()){
+      // check database contains files
+      // DirectoryStream<Path> dirStream = Files.newDirectoryStream(databaseDirectory.toPath()) ;
+      // if (!dirStream.iterator().hasNext()) {
 
         //TODO implement command
         // 1. initialize tokenizer and pass then command
-        // 2. initialize parser, pass tokenizer and call #parse. This returns a DBCmd subtype which we
-        // then
+        Tokenizer tokenizer = new Tokenizer();
+        if(tokenizer.tokenize(command)){
+          // 2. initialize parser, pass tokenizer and call #parse. This returns a DBCmd subtype which has built the query
+          Parser parser = new Parser(tokenizer);
+          DBCmd cmd = parser.parse();
+          // 3. call #query calling an instance of itself, which returns the result string.
+          return cmd.query(this);
+        }
 
-
-        return STATUS_OK;
-      }
-    } catch(IOException ioe){
-      return STATUS_ERROR;
+        throw new DBException();
+      //}
+    } catch(Exception e){
+      return STATUS_ERROR + e.getMessage();
     }
-
-    // TODO finish implementing server logic
-    // create List<Table>
-    // for every file in database
-      // read DBFile into table
-      // add table to List<Table>
-    // create a StringBuilder
-    // for every table in List
-      // toString table and append to Sb
-    // return <response> + sb
-
-    return "[OK] Thanks for your message: " + command;
   }
 
   //  === Methods below are there to facilitate server related operations. ===

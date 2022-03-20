@@ -208,10 +208,15 @@ public class Parser {
         if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())) {
             incrementToken();
             if (isTableName()) {
-                return true;
-            }
+//                return true;
+//            }
+//
+//            if (isTableName()) {
 
-            if (isTableName()) {
+                if (BNFConstants.SEMI_COLON.equalsIgnoreCase(getCurrentTokenSeq())) {
+                    return true;
+                }
+
                 if (BNFConstants.LEFT_BRACKET.equals(getCurrentTokenSeq())) {
                     incrementToken();
                     if (isAttributeList()) {
@@ -223,6 +228,7 @@ public class Parser {
                 }
             }
         }
+
     return false;
     }
 
@@ -632,9 +638,7 @@ public class Parser {
      *
      */
     private boolean isStringLiteral() throws TokenIndexOutOfBoundsException {
-        String openingQuotation = String.valueOf(getCurrentToken().getSequence().charAt(0));
-        String closingQuotation = String.valueOf(getCurrentToken().getSequence().charAt(getCurrentToken().getSequence().length() - 1));
-        if(BNFConstants.SINGLE_QUOTATION.equals(openingQuotation) && BNFConstants.SINGLE_QUOTATION.equals(closingQuotation)){
+        if(getCurrentToken().isStringLiteral()){
             incrementToken();
             return true;
         }
@@ -688,7 +692,7 @@ public class Parser {
      */
     private boolean isDatabaseName() throws TokenIndexOutOfBoundsException {
         if(isPlainText()){
-            cmd.addTableName(getPreviousTokenSeq());
+            cmd.setDatabaseName(getPreviousTokenSeq());
             return true;
         }
         return false;
@@ -716,16 +720,14 @@ public class Parser {
      * @return
      */
     private boolean isAttributeList() throws TokenIndexOutOfBoundsException {
-        if(isAttributeName()){
-            return true;
-        }
-        if(isAttributeName()){
-            if(BNFConstants.COMMA.equals(getCurrentTokenSeq())){
+        if(isAttributeName()) {
+            if (BNFConstants.COMMA.equals(getCurrentTokenSeq())) {
                 incrementToken();
-                if(isAttributeList()){
+                if (isAttributeList()) {
                     return true;
                 }
             }
+            return true;
         }
         return false;
     }

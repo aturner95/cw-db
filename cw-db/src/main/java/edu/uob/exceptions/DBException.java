@@ -64,6 +64,15 @@ public class DBException extends Exception {
         }
     }
 
+    public static class DBInvalidAttributeListException extends DBException {
+
+        private static final long serialVersionUID = 124354098763454L;
+
+        public DBInvalidAttributeListException(int expectedSize, int actualSize) {
+            super("Expected attribute list:" + expectedSize + ", but got: " + actualSize);
+        }
+    }
+
     public static class DBEntityExistsException extends DBException {
 
         private static final long serialVersionUID = -2346384723865437534L;

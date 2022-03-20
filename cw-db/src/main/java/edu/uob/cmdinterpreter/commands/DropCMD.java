@@ -25,7 +25,7 @@ public class DropCMD extends DBCmd {
                     return STATUS_OK;
 
                 } if (getDatabaseName() == null && getTableNames().size() == 1) {
-                    dropTable();
+                    dropTable(server.getDatabaseDirectory());
                     return STATUS_OK;
                 }
                 throw new DBException();
@@ -42,9 +42,9 @@ public class DropCMD extends DBCmd {
         deleteDirectory(database);
     }
 
-    private void dropTable() throws DBTableDoesNotExistException {
+    private void dropTable(File db) throws DBTableDoesNotExistException {
         byte indexOfTable = 0;
-        File table = new File(getTableNames().get(indexOfTable));
+        File table = new File( db.getName() + File.separator + getTableNames().get(indexOfTable) + ".tab");
         if(table.exists() && table.isFile()){
             table.delete();
             return;

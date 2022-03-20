@@ -65,7 +65,7 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof UseCMD);
         assertEquals(3, tokenizer.getTokens().size());
-        assertEquals("DB", cmd.getTableNames().get(0));
+        assertEquals("DB", cmd.getDatabaseName());
     }
 
     @Test
@@ -99,6 +99,21 @@ public class TestParser {
         // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("create table dummyTable;");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof CreateCMD);
+    }
+
+    @Test
+    public void test_parse_createTableWithAttributeList_cmdIsCreate() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("CREATE TABLE marks (name, mark, pass);");
         Parser parser = new Parser(tokenizer);
 
         // when
@@ -168,6 +183,20 @@ public class TestParser {
         assertTrue(cmd instanceof InsertCMD);
     }
 
+    @Test
+    public void test_parse_basicInsert2_cmdIsInsert() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof InsertCMD);
+    }
     // TODO test UPDATE once conditions have been sorted
 
     // TODO test DELETE once conditions have been sorted

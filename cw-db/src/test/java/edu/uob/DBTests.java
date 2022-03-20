@@ -53,9 +53,24 @@ final class DBTests {
     }
   }
 
+  @AfterEach
+  void teardown(@TempDir File tempDbDir){
+    if(tempDbDir.exists()){
+      File[] files = tempDbDir.listFiles();
+      if(files != null) {
+        for (File file : files) {
+          if(file != null && file.exists()) {
+            assertTrue(file.delete());
+          }
+        }
+      }
+      assertTrue(tempDbDir.delete());
+    }
+  }
+
   // Here's a basic test for spawning a new server and sending an invalid command,
   // the spec dictates that the server respond with something that starts with `[ERROR]`
-  // @Test
+  @Test
   public void test_invalidCommand_isAnError() {
     assertTrue(server.handleCommand("foo").startsWith("[ERROR]"));
   }
@@ -66,35 +81,130 @@ final class DBTests {
   // rows are actually inserted)
 
   @Test
-  public void test_handleCommand_databaseDirectoryDoesNotExist_responseStatusIsError() {
-    File testDir = new File(tempDbDirName);
-    setup(testDir);
-    assertFalse(tempDbDir.exists());
-    assertFalse(tempDbDir.isDirectory());
+  public void test_handleCommand_invalidCommand_responseStatusIsError() {
     assertTrue(server.handleCommand("foo").startsWith("[ERROR]"));
   }
 
   @Test
-  public void test_handleCommand_databaseDirectoryExistsButNotDirectory_responseStatusIsError () throws Exception {
-    File testDir = new File(tempDbDirName);
-    assertTrue(testDir.createNewFile());
-    setup(testDir);
-    assertTrue(tempDbDir.exists());
-    assertFalse(tempDbDir.isDirectory());
-    assertTrue(server.handleCommand("foo").startsWith("[ERROR]"));
+  public void test_handleCommand_validCreateDbCommand_statusOk() throws Exception {
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+    assertTrue(db.exists());
+    assertTrue(db.isDirectory());
+    teardown(db);
   }
 
-  /*
-   * This is a test specific to Task 5: Communication. I will assume that it will fail
-   * at some point down the line...
-   */
   @Test
-  public void test_handleCommand_emptyDatabaseDirectoryExistsContains_responseStatusIsOK() throws Exception {
-    Files.createDirectory(tempDbDir.toPath());
-    setup(tempDbDir);
-    assertTrue(tempDbDir.exists());
-    assertTrue(tempDbDir.isDirectory());
-    assertTrue(server.handleCommand("foo").startsWith("[OK]"));
+  public void test_handleCommand_validUseCommand_statusOk() throws Exception {
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertEquals("markbook", server.getDatabaseDirectory().getName());
+    teardown(db);
+  }
+
+  @Test
+  public void test_handleCommand_validCreateTableCommand_statusOk() throws Exception {
+    // create database
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+
+    // use Db and create table
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
+
+    // assert file exists, then teardown
+    File table = new File("markbook" + File.separator + "marks.tab");
+    assertTrue(table.exists());
+    assertTrue(table.isFile());
+    teardown(db);
+  }
+
+  @Test
+  public void test_handleCommand_insertCommand_serverStillRunningAfterErrors() throws Exception {
+    // create database
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+
+    // set up table
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
+
+    // insert data, some will be OK some will ERROR, but Server should still run in either case
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Steve', 65, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Dave', 55, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Bob', 35, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Clive', 20, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES (8, 'Paul', 23, FALSE);").startsWith("[ERROR]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES (Laura, 33, False);").startsWith("[ERROR]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Amir', 24, TRUE);").startsWith("[OK]"));
+    teardown(db);
+  }
+
+
+
+  @Test
+  public void test_handleCommand_validDropTableCommand_statusOk() throws Exception {
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks;").startsWith("[OK]"));
+    File table = new File("markbook" + File.separator + "marks.tab");
+    assertTrue(table.exists());
+    assertTrue(table.isFile());
+
+    assertTrue(server.handleCommand("DROP TABLE marks;").startsWith("[OK]"));
+    teardown(db);
+  }
+
+  @Test
+  public void test_handleCommand_validDropDbCommand_statusOk() throws Exception {
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+    assertTrue(server.handleCommand("DROP DATABASE markbook;").startsWith("[OK]"));
+    assertTrue(!db.exists());
+    teardown(db);
+  }
+
+  @Test
+  public void test_handleCommand_validDropDbWithTableCommand_statusOk() throws Exception {
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
+    File table = new File("markbook" + File.separator + "marks.tab");
+    assertTrue(table.exists());
+    assertTrue(table.isFile());
+
+    assertTrue(server.handleCommand("DROP DATABASE markbook;").startsWith("[OK]"));
+    assertTrue(!db.exists());
+    assertTrue(!table.exists());
+    teardown(db);
+  }
+
+  @Test
+  public void test_handleCommand_validJoinCommand_statusOk() throws Exception {
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File("markbook");
+    setup(db);
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks (studentId, mark, pass);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES (1, 33, False);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES (2, 66, TRUE);").startsWith("[OK]"));
+
+    assertTrue(server.handleCommand("CREATE TABLE students (name, course, year);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO students VALUES ('Amir', 'MSc', 3);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO students VALUES ('Donte', 'MSc', 2);").startsWith("[OK]"));
+
+    assertTrue(server.handleCommand("JOIN students AND marks on id AND studentId;").startsWith("[OK]"));
+    teardown(db);
   }
 
 }

@@ -110,9 +110,9 @@ public class TestTokenizer {
 
         assertEquals(2, tokenizer.getTokens().size());
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
-        assertEquals("'this is a String'", tokenizer.getTokens().get(0).getSequence());
+        assertEquals("this is a String", tokenizer.getTokens().get(0).getSequence());
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(1).getTokenType());
-        assertEquals("'    This is another    string    '", tokenizer.getTokens().get(1).getSequence());
+        assertEquals("    This is another    string    ", tokenizer.getTokens().get(1).getSequence());
     }
 
     @Test
@@ -122,9 +122,9 @@ public class TestTokenizer {
 
         assertEquals(7, tokenizer.getTokens().size());
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
-        assertEquals("'this is a String'", tokenizer.getTokens().get(0).getSequence());
+        assertEquals("this is a String", tokenizer.getTokens().get(0).getSequence());
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(6).getTokenType());
-        assertEquals("'    This is another    string    '", tokenizer.getTokens().get(6).getSequence());
+        assertEquals("    This is another    string    ", tokenizer.getTokens().get(6).getSequence());
     }
 
     /** According to the grammar, String literals are allowed special characters (symbols):
@@ -138,7 +138,7 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize("'Hello world!'"));
         assertEquals(1, tokenizer.getTokens().size());
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
-        assertEquals("'Hello world!'", tokenizer.getTokens().get(0).getSequence());
+        assertEquals("Hello world!", tokenizer.getTokens().get(0).getSequence());
     }
 
     @Test
@@ -338,7 +338,7 @@ public class TestTokenizer {
         assertEquals(",", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
-        assertEquals("'Bob'", tokenizer.getTokens().get(tokenIndex++).getSequence());
+        assertEquals("Bob", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
         assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(",", tokenizer.getTokens().get(tokenIndex++).getSequence());
