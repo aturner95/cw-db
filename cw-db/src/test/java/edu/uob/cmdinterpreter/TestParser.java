@@ -197,9 +197,6 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof InsertCMD);
     }
-    // TODO test UPDATE once conditions have been sorted
-
-    // TODO test DELETE once conditions have been sorted
 
     @Test
     public void test_parse_basicJoin_cmdIsJoin() throws Exception{
@@ -215,4 +212,103 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof JoinCMD);
     }
+
+
+    @Test
+    public void test_parse_basicSelect1_cmdIsSelect() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("SELECT * FROM marks WHERE (pass == FALSE) AND (mark > 35);");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof SelectCMD);
+    }
+
+    @Test
+    public void test_parse_basicSelect2_cmdIsSelect() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("SELECT * FROM marks WHERE name LIKE 've';");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof SelectCMD);
+    }
+
+    @Test
+    public void test_parse_basicDelete1_cmdIsDelete() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("DELETE FROM marks WHERE mark<40;");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof DeleteCMD);
+    }
+
+    @Test
+    public void test_parse_basicDelete2_cmdIsDelete() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("DELETE FROM marks WHERE name == 'Dave';");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof DeleteCMD);
+    }
+
+    @Test
+    public void test_parse_basicUpdate1_cmdIsUpdate() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("UPDATE marks SET mark = 38 WHERE name == 'Clive';");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof UpdateCMD);
+    }
+
+    @Test
+    public void test_parse_invalidUpdate1_throwsInvalidGrammarException() throws Exception{
+
+        Tokenizer tokenizer = new Tokenizer();
+        // conditions require "==" operator, not "="
+        tokenizer.tokenize("UPDATE marks SET mark = 38 WHERE name = 'Clive';");
+        Parser parser = new Parser(tokenizer);
+
+        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
+    }
+
+    @Test
+    public void test_parse_invalidUpdate2_throwsInvalidGrammarException() throws Exception{
+
+        Tokenizer tokenizer = new Tokenizer();
+        // UPDATE assignment requires "=" operator, not "=="
+        tokenizer.tokenize("UPDATE marks SET mark == 38 WHERE name = 'Clive';");
+        Parser parser = new Parser(tokenizer);
+
+        assertThrows(InvalidGrammarException.class, ()-> parser.parse());
+    }
+
 }

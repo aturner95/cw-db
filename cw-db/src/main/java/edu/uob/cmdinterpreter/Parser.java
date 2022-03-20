@@ -2,6 +2,7 @@ package edu.uob.cmdinterpreter;
 
 import edu.uob.cmdinterpreter.commands.*;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
+import edu.uob.dbelements.ColumnHeader;
 import edu.uob.exceptions.ParsingException;
 import edu.uob.exceptions.ParsingException.*;
 
@@ -20,20 +21,19 @@ public class Parser {
         this.currentToken = 0;
     }
 
-    private String getCurrentTokenSeq() {
-        return tokens.get(currentToken).getSequence();
+    private String getCurrentTokenSeq() throws TokenIndexOutOfBoundsException {
+        return getCurrentToken().getSequence();
     }
 
-    private Token getCurrentToken() {
+    private Token getCurrentToken() throws TokenIndexOutOfBoundsException {
         return tokens.get(currentToken);
     }
 
-    private Token getPreviousToken() {
+    private Token getPreviousToken() throws TokenIndexOutOfBoundsException {
         if(currentToken - 1 > 0){
             return tokens.get(currentToken - 1);
         }
-        // TODO throw exception
-        return null;
+        throw new TokenIndexOutOfBoundsException(currentToken-1, tokens.size());
     }
 
     private String getPreviousTokenSeq() throws TokenIndexOutOfBoundsException {
@@ -44,7 +44,7 @@ public class Parser {
     }
 
     private void incrementToken() throws TokenIndexOutOfBoundsException {
-        if(currentToken < tokens.size()){
+        if(currentToken < tokens.size()-1){
             currentToken++;
             return;
         }
@@ -73,15 +73,19 @@ public class Parser {
      * @return
      */
     private boolean isCommand() throws ParsingException {
-        if (isCommandType()) {
-            if(currentToken < tokens.size()) {
-                if (BNFConstants.SEMI_COLON.equals(getCurrentTokenSeq())) {
-                    return true;
+
+        int indexOfExpectedSemiColon = tokens.size() - 1;
+        if(BNFConstants.SEMI_COLON.equals((tokens.get(indexOfExpectedSemiColon)).getSequence())) {
+            if (isCommandType()) {
+                if (currentToken < tokens.size()) {
+                    if (BNFConstants.SEMI_COLON.equals(getCurrentTokenSeq())) {
+                        return true;
+                    }
                 }
+
             }
-            throw new InvalidGrammarException("<Command>  ::=  <CommandType> \";\"");
         }
-        return false;
+        throw new InvalidGrammarException("<Command>  ::=  <CommandType> \";\"");
     }
 
     /**
@@ -119,21 +123,18 @@ public class Parser {
         }
         if(BNFConstants.SELECT.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isSelect()){
-                // cmd = new SelectCMD();
                 return true;
             }
             return false;
         }
         if(BNFConstants.UPDATE.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isUpdate()){
-                cmd = new UpdateCMD();
                 return true;
             }
             return false;
         }
         if(BNFConstants.DELETE.equalsIgnoreCase(getCurrentTokenSeq())){
             if(isDelete()){
-                cmd = new DeleteCMD();
                 return true;
             }
             return false;
@@ -324,6 +325,13 @@ public class Parser {
                 if(BNFConstants.FROM.equalsIgnoreCase(getCurrentTokenSeq())){
                     incrementToken();
                     if(isTableName()){
+                        if(BNFConstants.WHERE.equalsIgnoreCase(getCurrentTokenSeq())){
+                            incrementToken();
+                            if(isCondition()){
+                                return true;
+                            }
+                            return false;
+                        }
                         return true;
                     }
                 }
@@ -340,14 +348,17 @@ public class Parser {
      */
     private boolean isUpdate() throws ParsingException {
         if(BNFConstants.UPDATE.equalsIgnoreCase(getCurrentTokenSeq())){
+            cmd = new UpdateCMD();
             incrementToken();
             if(isTableName()){
                 if(BNFConstants.SET.equalsIgnoreCase(getCurrentTokenSeq())){
                     incrementToken();
                     if(isNameValueList()){
                         if(BNFConstants.WHERE.equalsIgnoreCase(getCurrentTokenSeq())){
-                            // TODO condition
-                            return true;
+                            incrementToken();
+                            if(isCondition()){
+                                return true;
+                            }
                         }
                     }
                 }
@@ -363,10 +374,17 @@ public class Parser {
      */
     private boolean isDelete() throws ParsingException {
         if(BNFConstants.DELETE.equalsIgnoreCase(getCurrentTokenSeq())){
+            incrementToken();
+            cmd = new DeleteCMD();
             if(BNFConstants.FROM.equalsIgnoreCase(getCurrentTokenSeq())){
+                incrementToken();
                 if(isTableName()){
-                    // TODO where condition
-                    return true;
+                    if(BNFConstants.WHERE.equalsIgnoreCase(getCurrentTokenSeq())){
+                        incrementToken();
+                        if(isCondition()){
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -412,7 +430,7 @@ public class Parser {
      * @return
      */
     private boolean isPlainText() throws TokenIndexOutOfBoundsException {
-        char [] charSeq = getCurrentToken().getSequence().toCharArray();
+        char [] charSeq = getCurrentTokenSeq().toCharArray();
         for(int i = 0; i < charSeq.length; i++){
             if(!Character.isLetterOrDigit(charSeq[i])){
                 return false;
@@ -428,7 +446,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isSymbol(){
+    private boolean isSymbol() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.EXCLAMATION_MARK.equalsIgnoreCase(getCurrentTokenSeq())){
             return true;
         } else if (BNFConstants.HASH_SYMBOL.equalsIgnoreCase(getCurrentTokenSeq())){
@@ -500,7 +518,7 @@ public class Parser {
      */
     private boolean isNameValueList() throws TokenIndexOutOfBoundsException {
         if(isNameValuePair()){
-            if(BNFConstants.COMMA.equals(getCurrentToken())){
+            if(BNFConstants.COMMA.equals(getCurrentTokenSeq())){
                 incrementToken();
                 if(isValueList()){
                     return true;
@@ -519,7 +537,7 @@ public class Parser {
      */
     private boolean isNameValuePair() throws TokenIndexOutOfBoundsException {
         if(isAttributeName()){
-            if(BNFConstants.EQUALS_SYMBOL.equals(getCurrentToken())){
+            if(BNFConstants.EQUALS_SYMBOL.equals(getCurrentTokenSeq())){
                 incrementToken();
                 if(isValue()){
                     return true;
@@ -569,7 +587,7 @@ public class Parser {
      */
     private boolean isIntegerLiteral() throws TokenIndexOutOfBoundsException {
         try {
-            Integer.valueOf(getCurrentToken().getSequence());
+            Integer.valueOf(getCurrentTokenSeq());
         } catch (NumberFormatException nfe) {
             return false;
         }
@@ -587,7 +605,7 @@ public class Parser {
      */
     private boolean isFloatLiteral() throws TokenIndexOutOfBoundsException {
         try {
-          Float.valueOf(getCurrentToken().getSequence());
+          Float.valueOf(getCurrentTokenSeq());
         } catch(NumberFormatException nfe){
             return false;
         }
@@ -616,12 +634,12 @@ public class Parser {
      * @return
      */
     private boolean isCharLiteral() throws TokenIndexOutOfBoundsException {
-        if(getCurrentToken().getSequence().length() == 1) {
-            if(Character.isSpaceChar(getCurrentToken().getSequence().charAt(0))){
+        if(getCurrentTokenSeq().length() == 1) {
+            if(Character.isSpaceChar(getCurrentTokenSeq().charAt(0))){
                 incrementToken();
                 return true;
             }
-            if(Character.isLetter(getCurrentToken().getSequence().charAt(0))){
+            if(Character.isLetter(getCurrentTokenSeq().charAt(0))){
                 incrementToken();
                 return true;
             }
@@ -732,29 +750,71 @@ public class Parser {
         return false;
     }
 
-    // isCondition
+    /**
+     * <Condition>      ::=  "(" <Condition> ")AND(" <Condition> ")" | "(" <Condition> ")OR(" <Condition> ")" | <AttributeName> <Operator> <Value>
+     *
+     * @return
+     */
+    private boolean isCondition() throws ParsingException {
+        if(isBracketedCondition()){
+            if(BNFConstants.AND.equals(getCurrentTokenSeq()) || BNFConstants.OR.equals(getCurrentTokenSeq())){
+                incrementToken();
+                if(isBracketedCondition()){
+                    return true;
+                }
+            }
+        }
+        ColumnHeader attribute;
+        String operator, value;
+        if(isAttributeName()){
+            attribute = new ColumnHeader(getPreviousTokenSeq());
+            if(isOperator()){
+                operator =  getCurrentTokenSeq();
+                incrementToken();
+                if(isValue()){
+                    value = getPreviousTokenSeq();
+                    cmd.addCondition(attribute, operator, value);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isBracketedCondition() throws ParsingException {
+        if(BNFConstants.LEFT_BRACKET.equals(getCurrentTokenSeq())){
+            incrementToken();
+            if(isCondition()){
+                if(BNFConstants.RIGHT_BRACKET.equals(getCurrentTokenSeq())){
+                    incrementToken();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * <Operator>  ::=  "==" | ">" | "<" | ">=" | "<=" | "!=" | " LIKE "
      *
      * @return
      */
-    private boolean isOperator() throws InvalidGrammarException {
-        if(BNFConstants.ASSIGNMENT.equals(getCurrentToken())){
+    private boolean isOperator() throws InvalidGrammarException, TokenIndexOutOfBoundsException {
+//        if(BNFConstants.ASSIGNMENT.equals(getCurrentTokenSeq())){
+//            return true; }
+        if(BNFConstants.EQUAL_TO.equals(getCurrentTokenSeq())){
             return true;
-        } if(BNFConstants.EQUAL_TO.equals(getCurrentToken())){
+        } if(BNFConstants.GREATER_THAN.equals(getCurrentTokenSeq())){
             return true;
-        } if(BNFConstants.GREATER_THAN.equals(getCurrentToken())){
+        } if(BNFConstants.LESS_THAN.equals(getCurrentTokenSeq())){
             return true;
-        } if(BNFConstants.LESS_THAN.equals(getCurrentToken())){
+        } if(BNFConstants.GREATER_OR_EQUAL_TO.equals(getCurrentTokenSeq())){
             return true;
-        } if(BNFConstants.GREATER_OR_EQUAL_TO.equals(getCurrentToken())){
+        } if(BNFConstants.LESS_OR_EQUAL_TO.equals(getCurrentTokenSeq())){
             return true;
-        } if(BNFConstants.LESS_OR_EQUAL_TO.equals(getCurrentToken())){
+        } if(BNFConstants.NOT_EQUAL_TO.equals(getCurrentTokenSeq())){
             return true;
-        } if(BNFConstants.NOT_EQUAL_TO.equals(getCurrentToken())){
-            return true;
-        } if(BNFConstants.LIKE.equals(getCurrentToken())){
+        } if(BNFConstants.LIKE.equals(getCurrentTokenSeq())){
             return true;
         }
         throw new InvalidGrammarException("<Operator>  ::=  \"==\" | \">\" | \"<\" | \">=\" | \"<=\" | \"!=\" | \" LIKE \"");

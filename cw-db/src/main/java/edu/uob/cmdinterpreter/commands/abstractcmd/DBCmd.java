@@ -1,10 +1,10 @@
 package edu.uob.cmdinterpreter.commands.abstractcmd;
 
 import edu.uob.DBServer;
+import edu.uob.cmdinterpreter.QueryCondition;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbfilesystem.DBTableFile;
-import edu.uob.exceptions.DBException.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +18,7 @@ public abstract class DBCmd {
     protected List<String> tableNames;
     protected List<String> colNames;
     protected List<String> variables;
+    protected List<QueryCondition> conditions;
 
     public static final String STATUS_OK = "[OK]";
     public static final String STATUS_ERROR = "[ERROR] ";
@@ -29,6 +30,7 @@ public abstract class DBCmd {
         tableNames = new ArrayList<>();
         colNames = new ArrayList<>();
         variables = new ArrayList<>();
+        conditions = new ArrayList<>();
     }
 
     /* Methods */
@@ -112,6 +114,14 @@ public abstract class DBCmd {
         File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
         Table table;
         return dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
+    }
+
+    public boolean addCondition(ColumnHeader attribute, String operator, String value){
+        if(conditions != null){
+            conditions.add(new QueryCondition(attribute, operator, value));
+            return true;
+        }
+        return false;
     }
 
 }
