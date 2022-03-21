@@ -363,10 +363,10 @@ public class TestDBTableFile {
         tempFile = File.createTempFile(tempTableName, fileExt, tempDir);
 
         List<ColumnHeader> colHeaders = new ArrayList<>();
-        ColumnHeader col1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, Long.SIZE, DBColumnType.PRIMARY_KEY);
-        ColumnHeader col2 = new ColumnHeader(2, "Name", DBDataType.VARCHAR, 255, DBColumnType.FIELD);
-        ColumnHeader col3 = new ColumnHeader(3, "Age", DBDataType.VARCHAR, 255, DBColumnType.FIELD);
-        ColumnHeader col4 = new ColumnHeader(4, "Email", DBDataType.VARCHAR, 255, DBColumnType.FIELD);
+        ColumnHeader col1 = new ColumnHeader("Id");
+        ColumnHeader col2 = new ColumnHeader("Name");
+        ColumnHeader col3 = new ColumnHeader("Age");
+        ColumnHeader col4 = new ColumnHeader("Email");
         colHeaders.add(col1);
         colHeaders.add(col2);
         colHeaders.add(col3);
@@ -441,10 +441,10 @@ public class TestDBTableFile {
 
         Record record = new Record();
         List<Attribute> attrs = new ArrayList<>();
-        Attribute col1 = new Attribute("1", DBDataType.NUMBER);
-        Attribute col2 = new Attribute("Bob", DBDataType.VARCHAR);
-        Attribute col3 = new Attribute("21", DBDataType.NUMBER);
-        Attribute col4 = new Attribute("bob@bob.net", DBDataType.VARCHAR);
+        Attribute col1 = new Attribute("1");
+        Attribute col2 = new Attribute("Bob");
+        Attribute col3 = new Attribute("21");
+        Attribute col4 = new Attribute("bob@bob.net");
         attrs.add(col1);
         attrs.add(col2);
         attrs.add(col3);
@@ -554,27 +554,27 @@ public class TestDBTableFile {
         table.setHeader(tableHeader);
 
         List<ColumnHeader> colHeadings = new ArrayList<>();
-        ColumnHeader cHead1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, 100, DBColumnType.PRIMARY_KEY);
-        ColumnHeader cHead2 = new ColumnHeader(2, "Name", DBDataType.VARCHAR, 100, DBColumnType.FIELD);
-        ColumnHeader cHead3 = new ColumnHeader(3, "Age", DBDataType.NUMBER, 100, DBColumnType.FIELD);
+        ColumnHeader cHead1 = new ColumnHeader("Id");
+        ColumnHeader cHead2 = new ColumnHeader("Name");
+        ColumnHeader cHead3 = new ColumnHeader("Age");
         colHeadings.add(cHead1);
         colHeadings.add(cHead2);
         colHeadings.add(cHead3);
         table.setColHeadings(colHeadings);
 
         List<Attribute> rowData1 = new ArrayList<>();
-        Attribute attr1 = new Attribute("1", DBDataType.NUMBER);
-        Attribute attr2 = new Attribute("Bob", DBDataType.VARCHAR);
-        Attribute attr3 = new Attribute("21", DBDataType.NUMBER);
+        Attribute attr1 = new Attribute("1");
+        Attribute attr2 = new Attribute("Bob");
+        Attribute attr3 = new Attribute("21");
         rowData1.add(attr1);
         rowData1.add(attr2);
         rowData1.add(attr3);
         Record row1 = new Record(rowData1);
 
         List<Attribute> rowData2 = new ArrayList<>();
-        Attribute attr4 = new Attribute("2", DBDataType.NUMBER);
-        Attribute attr5 = new Attribute("Sarah", DBDataType.VARCHAR);
-        Attribute attr6 = new Attribute("66", DBDataType.NUMBER);
+        Attribute attr4 = new Attribute("2");
+        Attribute attr5 = new Attribute("Sarah");
+        Attribute attr6 = new Attribute("66");
         rowData2.add(attr4);
         rowData2.add(attr5);
         rowData2.add(attr6);
@@ -632,9 +632,9 @@ public class TestDBTableFile {
         table.setHeader(tableHeader);
 
         List<ColumnHeader> colHeadings = new ArrayList<>();
-        ColumnHeader cHead1 = new ColumnHeader(1, "Id", DBDataType.NUMBER, 100, DBColumnType.PRIMARY_KEY);
-        ColumnHeader cHead2 = new ColumnHeader(2, "Name", DBDataType.VARCHAR, 100, DBColumnType.FIELD);
-        ColumnHeader cHead3 = new ColumnHeader(3, "Age", DBDataType.NUMBER, 100, DBColumnType.FIELD);
+        ColumnHeader cHead1 = new ColumnHeader("Id");
+        ColumnHeader cHead2 = new ColumnHeader("Name");
+        ColumnHeader cHead3 = new ColumnHeader("Age");
         colHeadings.add(cHead1);
         colHeadings.add(cHead2);
         colHeadings.add(cHead3);
@@ -672,18 +672,18 @@ public class TestDBTableFile {
         table.setColHeadings(colHeadings);
 
         List<Attribute> rowData1 = new ArrayList<>();
-        Attribute attr1 = new Attribute("1", DBDataType.NUMBER);
-        Attribute attr2 = new Attribute("Bob", DBDataType.VARCHAR);
-        Attribute attr3 = new Attribute("21", DBDataType.NUMBER);
+        Attribute attr1 = new Attribute("1");
+        Attribute attr2 = new Attribute("Bob");
+        Attribute attr3 = new Attribute("21");
         rowData1.add(attr1);
         rowData1.add(attr2);
         rowData1.add(attr3);
         Record row1 = new Record(rowData1);
 
         List<Attribute> rowData2 = new ArrayList<>();
-        Attribute attr4 = new Attribute("2", DBDataType.NUMBER);
-        Attribute attr5 = new Attribute("Sarah", DBDataType.VARCHAR);
-        Attribute attr6 = new Attribute("66", DBDataType.NUMBER);
+        Attribute attr4 = new Attribute("2");
+        Attribute attr5 = new Attribute("Sarah");
+        Attribute attr6 = new Attribute("66");
         rowData2.add(attr4);
         rowData2.add(attr5);
         rowData2.add(attr6);

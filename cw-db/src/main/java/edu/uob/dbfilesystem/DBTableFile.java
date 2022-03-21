@@ -51,14 +51,14 @@ public class DBTableFile {
         if (table != null && header != null && header.length() > 0) {
             String[] tabDelimitedCols = header.split("\t");
             List<ColumnHeader> columns = new ArrayList<>();
-            int colCounter = 0;
+            // int colCounter = 0;
 
             for (String colAsString : tabDelimitedCols) {
                 if (!colAsString.isEmpty()) {
                     colAsString = colAsString.trim();
-                    ColumnHeader tableCol = new ColumnHeader();
-                    tableCol.setColNumber(colCounter++);
-                    tableCol.setColName(colAsString);
+                    ColumnHeader tableCol = new ColumnHeader(colAsString);
+                    // tableCol.setColNumber(colCounter++);
+                    // tableCol.setColName();
                     columns.add(tableCol);
                 }
             }
@@ -76,8 +76,8 @@ public class DBTableFile {
             List<Attribute> listOfAttributes = new ArrayList<>();
 
             for (String s : tabDelimitedRow) {
-                Attribute attr = new Attribute();
-                attr.setValue(s);
+                Attribute attr = new Attribute(s);
+                // attr.setValue(s);
                 listOfAttributes.add(attr);
             }
             record.setAttributes(listOfAttributes);

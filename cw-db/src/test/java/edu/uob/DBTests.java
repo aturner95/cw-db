@@ -1,5 +1,7 @@
 package edu.uob;
 
+import edu.uob.dbelements.Table;
+import edu.uob.dbfilesystem.DBTableFile;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,7 +125,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_insertCommand_serverStillRunningAfterErrors() {
+  public void test_handleCommand_insertCommand_fiveRowsInserted() throws Exception {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File("markbook");
@@ -141,6 +143,10 @@ final class DBTests {
     assertTrue(server.handleCommand("INSERT INTO marks VALUES (8, 'Paul', 23, FALSE);").startsWith("[ERROR]"));
     assertTrue(server.handleCommand("INSERT INTO marks VALUES (Laura, 33, False);").startsWith("[ERROR]"));
     assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Amir', 24, TRUE);").startsWith("[OK]"));
+
+    Table marks = new DBTableFile().readDBFileIntoEntity("markbook" + File.separator + "marks.tab");
+    assertEquals(5, marks.getRows().size());
+
     teardown(db);
   }
 

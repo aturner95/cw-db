@@ -6,6 +6,7 @@ import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbelements.TableHeader;
+import edu.uob.dbfilesystem.DBFileConstants;
 import edu.uob.dbfilesystem.DBTableFile;
 import edu.uob.exceptions.DBException;
 import edu.uob.exceptions.DBException.*;
@@ -64,7 +65,7 @@ public class CreateCMD extends DBCmd {
 
             if(!file.exists()){
                 try {
-                    String path = server.getDatabaseDirectory() + File.separator + tableName + ".tab";
+                    String path = server.getDatabaseDirectory() + File.separator + tableName + DBFileConstants.TABLE_EXT;
                     file = new File (path);
                     if(file.createNewFile()){
                         Table table = new Table();

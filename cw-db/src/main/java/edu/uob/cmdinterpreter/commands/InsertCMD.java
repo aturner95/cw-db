@@ -16,9 +16,8 @@ public class InsertCMD extends DBCmd {
     @Override
     public String query(DBServer server) {
 
-        byte indexOfTable = 0, indexOfPrimaryKey = 0;
+        byte indexOfTable = 0;
         String tableName = getTableNames().get(indexOfTable);
-        // String id = getVariables().get(indexOfPrimaryKey);
 
         try {
             if (hasDatabase(server)) {
@@ -32,14 +31,9 @@ public class InsertCMD extends DBCmd {
 
                     List<Record> data = table.getRows();
 
-                    // if (!hasEntityId(data, id)) {
-                        insertEntity(data, getVariables());
-                        dbFile.storeEntityIntoDBFile(table);
-                        return STATUS_OK;
-
-                    // } else {
-                    //     throw new DBEntityExistsException(id);
-                    // }
+                    insertEntity(data, getVariables());
+                    dbFile.storeEntityIntoDBFile(table);
+                    return STATUS_OK;
                 }
                 throw new DBTableDoesNotExistException(tableName);
             }
@@ -49,21 +43,6 @@ public class InsertCMD extends DBCmd {
             return STATUS_ERROR + e.getMessage();
         }
     }
-
-//    private boolean hasEntityId(List<Record> data, String id){
-//        try{
-//            if(Long.valueOf(id) instanceof Long) {
-//                for (Record row : data) {
-//                    if (id.equals(row.getId())) {
-//                        return true;
-//                    }
-//                }
-//            }
-//        } catch(NumberFormatException nfe) {
-//            return false;
-//        }
-//        return false;
-//    }
 
     private boolean hasCorrectAttributeList(Table table, List<String> variables){
         return table.getColHeadings().size() == variables.size() + 1;

@@ -6,6 +6,7 @@ import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbelements.Record;
+import edu.uob.dbfilesystem.DBFileConstants;
 import edu.uob.dbfilesystem.DBTableFile;
 import edu.uob.exceptions.DBException;
 import edu.uob.exceptions.DBException.*;
@@ -14,7 +15,6 @@ import edu.uob.exceptions.ParsingException.InvalidGrammarException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AlterCMD extends DBCmd {
@@ -47,7 +47,7 @@ public class AlterCMD extends DBCmd {
                     DBTableFile dbFile = new DBTableFile();
                     File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
                     Table table;
-                    String filepath = file.getPath() + ".tab";
+                    String filepath = file.getPath() + DBFileConstants.TABLE_EXT;
 
                     try {
                         table = readTableFromFile(server, tableName);
