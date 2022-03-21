@@ -2,6 +2,8 @@ package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
 import edu.uob.cmdinterpreter.BNFConstants;
+import edu.uob.cmdinterpreter.Token;
+import edu.uob.cmdinterpreter.TokenType;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
@@ -15,6 +17,7 @@ import edu.uob.exceptions.ParsingException.InvalidGrammarException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AlterCMD extends DBCmd {
@@ -70,6 +73,9 @@ public class AlterCMD extends DBCmd {
     }
 
     private void addAttribute(Table table, String attributeName){
+        if(table.getColHeadings().size() == 0){
+            table.getColHeadings().add(new ColumnHeader("id"));
+        }
         table.getColHeadings().add(new ColumnHeader(attributeName));
         populateNewData(table.getRows());
     }
@@ -124,7 +130,7 @@ public class AlterCMD extends DBCmd {
                 throw new DBAttributeDoesNotExistException(attributeName);
             }
         }
-        throw new InvalidGrammarException("<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
+        throw new InvalidGrammarException(new Token(TokenType.KW, getAlterationType()), "<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
     }
 
 }

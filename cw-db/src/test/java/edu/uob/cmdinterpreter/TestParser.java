@@ -6,6 +6,9 @@ import edu.uob.exceptions.ParsingException;
 import edu.uob.exceptions.ParsingException.*;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
+import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestParser {
@@ -61,7 +64,7 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof UseCMD);
         assertEquals(3, tokenizer.getTokens().size());
-        assertEquals("DB", cmd.getDatabaseName());
+        assertEquals(ROOT_DB_DIR + File.separator + "DB", cmd.getDatabaseName());
     }
 
     @Test
@@ -87,7 +90,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
-        assertEquals("dummyDb", cmd.getDatabaseName());
+        assertEquals("databases/dummyDb", cmd.getDatabaseName());
         assertEquals("DATABASE", ((CreateCMD) cmd).getCreateType());
     }
 
@@ -139,7 +142,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DropCMD);
-        assertEquals("testDb", cmd.getDatabaseName());
+        assertEquals("databases/testDb", cmd.getDatabaseName());
         assertEquals("DATABASE", ((DropCMD) cmd).getDropType());
     }
 
@@ -357,6 +360,35 @@ public class TestParser {
         Parser parser = new Parser(tokenizer);
 
         assertThrows(InvalidGrammarException.class, parser::parse);
+    }
+
+    @Test
+    public void test_parse_trickyCondition_selectCmdBuilt() throws Exception {
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("select id, name from Marks where (pass==TRUE) OR ((course=='MSc') AND (grade>50));");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof SelectCMD);
+        assertEquals("Marks", cmd.getTableNames().get(0));
+        assertEquals("id", cmd.getColNames().get(0));
+        assertEquals("name", cmd.getColNames().get(1));
+
+        assertEquals("pass", cmd.getConditions().get(0).getAttribute());
+        assertEquals("==", cmd.getConditions().get(0).getOperator());
+        assertEquals("TRUE", cmd.getConditions().get(0).getValue());
+
+        assertEquals("course", cmd.getConditions().get(1).getAttribute());
+        assertEquals("==", cmd.getConditions().get(1).getOperator());
+        assertEquals("MSc", cmd.getConditions().get(1).getValue());
+
+        assertEquals("grade", cmd.getConditions().get(2).getAttribute());
+        assertEquals(">", cmd.getConditions().get(2).getOperator());
+        assertEquals("50", cmd.getConditions().get(2).getValue());
     }
 
 }

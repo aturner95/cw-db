@@ -1,10 +1,11 @@
 package edu.uob.dbfilesystem;
 
-import edu.uob.abstractelements.AbstractColumnData;
+import edu.uob.dbelements.abstractelements.AbstractColumnData;
 import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
 import edu.uob.dbelements.Table;
+import edu.uob.exceptions.DBException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Locale;
 
 public class DBTableFile {
 
-    public Table readDBFileIntoEntity(String dbFilePath) throws IOException {
+    public Table readDBFileIntoEntity(String dbFilePath) throws IOException, DBException {
 
         File fileToOpen = new File(dbFilePath.toLowerCase(Locale.ROOT));
         String tableName = getTableName(fileToOpen);
@@ -29,14 +30,12 @@ public class DBTableFile {
 
                 if((line = br.readLine()) != null) {
                     if (!readColumnHeadingsIntoEntity(table, line)) {
-                        //TODO handle exception
-                        System.out.println("Exception reading col heading from DB file");
+                        throw new DBException("Unable to read column headers from DB file");
                     }
                 }
                 while((line = br.readLine()) != null){
                     if(!readRecordIntoEntity(table, line)){
-                        // TODO handle exception
-                        System.out.println("Exception reading record from DB file");
+                        throw new DBException("Unable to read rows from DB file");
                     }
                 }
 
@@ -101,7 +100,7 @@ public class DBTableFile {
     }
 
     // TODO currently this method simply creates and writes to a new file from scratch. If file exists should we just add new rows?
-    public boolean storeEntityIntoDBFile(Table table){
+    public boolean storeEntityIntoDBFile(Table table) throws DBException {
 
         if(table != null && table.getHeader() != null && table.getHeader().getFileLocation()!= null) {
             String dbFilePath = table.getHeader().getFileLocation().getPath();
@@ -109,26 +108,22 @@ public class DBTableFile {
 
             if (!fileToOpen.exists()) {
                 if(!createDBFile(fileToOpen)){
-                    return false;
+                    throw new DBException("Unable to read file: " + fileToOpen.getName());
                 }
             }
 
             if (!storeColumnHeaderIntoDBFile(table.getColHeadings(), fileToOpen)) {
-                // TODO handle exception
-                System.out.println("Exception storing col headers to DB file");
-                return false;
+                throw new DBException("Unable to read column headers in DB file");
             }
 
             for (Record rec : table.getRows()) {
                 if (!storeRecordIntoDBFile(rec.getAttributes(), fileToOpen)) {
-                    // TODO handle exception
-                    System.out.println("Exception storing row to DB file");
-                    return false;
+                    throw new DBException("Unable to read rows in DB file");
                 }
             }
             return true;
         }
-        return false;
+        throw new DBException();
     }
 
     /* default */ boolean createDBFile(File dbFile){

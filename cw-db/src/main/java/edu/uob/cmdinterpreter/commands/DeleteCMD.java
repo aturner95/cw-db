@@ -8,10 +8,26 @@ public class DeleteCMD extends DBCmd {
     @Override
     public String query(DBServer server) {
 
-        // check database and table exist
+        // if the database is in context
+        if(hasDatabase(server)){
+            byte indexOfTable = 0;
 
-        //
+            // if the database has the table
+            if(hasTable(server, getTableNames().get(indexOfTable))){
+
+                // unpack the condition
+
+                // find the entities that match these conditions
+                // for each condition
+                    // for each row in table rows
+                        //
+
+                // remove these rows
+            }
+        }
 
         return null;
     }
+
+
 }

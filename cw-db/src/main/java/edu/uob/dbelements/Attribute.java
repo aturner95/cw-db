@@ -1,6 +1,6 @@
 package edu.uob.dbelements;
 
-import edu.uob.abstractelements.AbstractColumnData;
+import edu.uob.dbelements.abstractelements.AbstractColumnData;
 
 public class Attribute extends AbstractColumnData {
 

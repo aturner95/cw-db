@@ -85,7 +85,7 @@ public class Parser {
 
             }
         }
-        throw new InvalidGrammarException("<Command>  ::=  <CommandType> \";\"");
+        throw new InvalidGrammarException(getCurrentToken(), "<Command>  ::=  <CommandType> \";\"");
     }
 
     /**
@@ -145,7 +145,7 @@ public class Parser {
             }
             return false;
         }
-        throw new InvalidGrammarException("<CommandType> ::= <Use> | <Create> | <Drop> | <Alter> | <Insert> | <Select> " +
+        throw new InvalidGrammarException(getCurrentToken(), "<CommandType> ::= <Use> | <Create> | <Drop> | <Alter> | <Insert> | <Select> " +
                 "| <Update> | <Delete> | <Join>");
     }
 
@@ -162,7 +162,7 @@ public class Parser {
                 return true;
             }
         }
-        throw new InvalidGrammarException("<Use> ::=  \"USE \" <DatabaseName> ;");
+        throw new InvalidGrammarException(getCurrentToken(), "<Use> ::=  \"USE \" <DatabaseName> ;");
     }
 
     /**
@@ -180,7 +180,7 @@ public class Parser {
                 return true;
             }
         }
-        throw new InvalidGrammarException("<Create>  ::=  <CreateDatabase> | <CreateTable> ;");
+        throw new InvalidGrammarException(getCurrentToken(), "<Create>  ::=  <CreateDatabase> | <CreateTable> ;");
     }
 
     /**
@@ -253,7 +253,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("<Drop>  ::=  \"DROP DATABASE \" <DatabaseName> | \"DROP TABLE \" <TableName> ;");
+        throw new InvalidGrammarException(getCurrentToken(), "<Drop>  ::=  \"DROP DATABASE \" <DatabaseName> | \"DROP TABLE \" <TableName> ;");
     }
 
     /**
@@ -276,7 +276,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
+        throw new InvalidGrammarException(getCurrentToken(), "<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
     }
 
     /**
@@ -306,7 +306,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("<Insert>  ::=  \"INSERT INTO \" <TableName> \" VALUES(\" <ValueList> \")\" ;");
+        throw new InvalidGrammarException(getCurrentToken(), "<Insert>  ::=  \"INSERT INTO \" <TableName> \" VALUES(\" <ValueList> \")\" ;");
     }
 
     /**
@@ -334,7 +334,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("\"SELECT \" <WildAttribList> \" FROM \" <TableName> | \"SELECT \" " +
+        throw new InvalidGrammarException(getCurrentToken(), "\"SELECT \" <WildAttribList> \" FROM \" <TableName> | \"SELECT \" " +
                 "<WildAttribList> \" FROM \" <TableName> \" WHERE \" <Condition> ;");
     }
 
@@ -361,7 +361,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("<Update>  ::=  \" UPDATE \" <TableName> \" SET \" <NameValueList> \" WHERE \" <Condition>");
+        throw new InvalidGrammarException(getCurrentToken(), "<Update>  ::=  \" UPDATE \" <TableName> \" SET \" <NameValueList> \" WHERE \" <Condition>");
     }
 
     /**
@@ -385,7 +385,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("<Delete>  ::=  \"DELETE FROM \" <TableName> \" WHERE \" <Condition>");
+        throw new InvalidGrammarException(getCurrentToken(), "<Delete>  ::=  \"DELETE FROM \" <TableName> \" WHERE \" <Condition>");
     }
 
 
@@ -417,7 +417,7 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException("<Join>  ::=  \"JOIN \" <TableName> \" AND \" <TableName> \" ON \" <AttributeName> \" AND \" <AttributeName>");
+        throw new InvalidGrammarException(getCurrentToken(), "<Join>  ::=  \"JOIN \" <TableName> \" AND \" <TableName> \" ON \" <AttributeName> \" AND \" <AttributeName>");
     }
 
 
@@ -817,7 +817,7 @@ public class Parser {
         } if(BNFConstants.LIKE.equals(getCurrentTokenSeq())){
             return true;
         }
-        throw new InvalidGrammarException("<Operator>  ::=  \"==\" | \">\" | \"<\" | \">=\" | \"<=\" | \"!=\" | \" LIKE \"");
+        throw new InvalidGrammarException(getCurrentToken(), "<Operator>  ::=  \"==\" | \">\" | \"<\" | \">=\" | \"<=\" | \"!=\" | \" LIKE \"");
     }
 
 }

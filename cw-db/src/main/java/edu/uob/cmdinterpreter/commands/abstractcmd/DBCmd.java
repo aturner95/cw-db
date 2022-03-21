@@ -5,11 +5,14 @@ import edu.uob.cmdinterpreter.QueryCondition;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Table;
 import edu.uob.dbfilesystem.DBTableFile;
+import edu.uob.exceptions.DBException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 
 public abstract class DBCmd {
 
@@ -47,7 +50,7 @@ public abstract class DBCmd {
     }
 
     public void setDatabaseName(String databaseName){
-        this.databaseName = databaseName;
+        this.databaseName = ROOT_DB_DIR + File.separator + databaseName;
     }
 
     public List<String> getTableNames(){
@@ -88,13 +91,15 @@ public abstract class DBCmd {
 
     public boolean hasDatabase(DBServer server) {
         if(server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory()){
-            return true;
+            if(!"./databases".equalsIgnoreCase(server.getDatabaseDirectory().getName())){
+                return true;
+            }
         }
         return false;
     }
 
     public boolean hasTable(DBServer server, String tableName) {
-        File db = new File(server.getDatabaseDirectory().getName());
+        File db = new File(ROOT_DB_DIR + File.separator + server.getDatabaseDirectory().getName());
         File [] tables = db.listFiles();
         for(File table: tables){
             int indexOfFileExt = table.getName().length() - 4;
@@ -115,7 +120,7 @@ public abstract class DBCmd {
         return false;
     }
 
-    public Table readTableFromFile(DBServer server, String tableName) throws IOException {
+    public Table readTableFromFile(DBServer server, String tableName) throws IOException, DBException {
         DBTableFile dbFile = new DBTableFile();
         File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
         Table table;

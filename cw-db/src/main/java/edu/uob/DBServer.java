@@ -15,11 +15,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+
+import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 
 /** This class implements the DB server. */
 public final class DBServer {
@@ -31,7 +29,7 @@ public final class DBServer {
 
 
   public static void main(String[] args) throws IOException {
-    new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
+      new DBServer(Paths.get(ROOT_DB_DIR).toAbsolutePath().toFile()).blockingListenOn(8888);
   }
 
   /**
@@ -46,9 +44,15 @@ public final class DBServer {
    *     databases. You may assume *exclusive* ownership of this directory for the lifetime of this
    *     server instance.
    */
-  public DBServer(File databaseDirectory) {
-    // TODO implement your server logic here
-    this.databaseDirectory = databaseDirectory;
+  public DBServer(File databaseDirectory){
+    File rootDbDir = new File(ROOT_DB_DIR);
+    if(rootDbDir.exists() && rootDbDir.isDirectory()){
+      this.databaseDirectory = databaseDirectory;
+    } else {
+      System.out.println("ERROR: expect root database directory folder:  ./databases");
+      System.out.println("I do not want files/directories created and deleted willy-nilly in the project workspace!");
+    }
+
   }
 
   /**
@@ -59,32 +63,21 @@ public final class DBServer {
    */
   public String handleCommand(String command) {
 
-    // check database exists
     try {
-//      if(!databaseDirectory.exists() || !databaseDirectory.isDirectory()){
-//        throw new DBDoesNotExistException(databaseDirectory.getName());
-//      }
-
-      // check database contains files
-      // DirectoryStream<Path> dirStream = Files.newDirectoryStream(databaseDirectory.toPath()) ;
-      // if (!dirStream.iterator().hasNext()) {
-
-        //TODO implement command
-        // 1. initialize tokenizer and pass then command
         Tokenizer tokenizer = new Tokenizer();
+
         if(tokenizer.tokenize(command)){
-          // 2. initialize parser, pass tokenizer and call #parse. This returns a DBCmd subtype which has built the query
           Parser parser = new Parser(tokenizer);
           DBCmd cmd = parser.parse();
-          // 3. call #query calling an instance of itself, which returns the result string.
           return cmd.query(this);
         }
 
         throw new DBException();
-      //}
+
     } catch(Exception e){
       return STATUS_ERROR + e.getMessage();
     }
+
   }
 
   //  === Methods below are there to facilitate server related operations. ===

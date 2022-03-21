@@ -15,13 +15,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDatabaseCommands {
 
     private DBServer server;
     private File tempDbDir;
-    private static final String tempDbDirName = "dbtest";
+    private static final String tempDbDirName = ROOT_DB_DIR + File.separator + "dbtest";
     private static final String fileExt = ".tab";
     DBCmd cmd;
 
@@ -29,7 +30,7 @@ public class TestDatabaseCommands {
     public static final String STATUS_ERROR = "[ERROR]";
 
     @BeforeEach
-    void setup(@TempDir File dbDir) {
+    void setup(@TempDir File dbDir) throws Exception {
         tempDbDir = new File(tempDbDirName);
         tempDbDir.deleteOnExit();
         server = new DBServer(dbDir);
@@ -57,7 +58,7 @@ public class TestDatabaseCommands {
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
         cmd = new UseCMD();
-        cmd.setDatabaseName(tempDbDirName);
+        cmd.setDatabaseName("dbtest");
 
         // when
         String resultMessage = cmd.query(server);
@@ -99,7 +100,7 @@ public class TestDatabaseCommands {
     @Test
     public void test_createCMD_databaseCreated_statusCodeOK() throws Exception {
         // given
-        String newTempDb = "newTempDb";
+        String newTempDb = ROOT_DB_DIR + File.separator + "newTempDb";
 
         cmd = new CreateCMD("DATABASE");
         cmd.setDatabaseName("newTempDb");
@@ -130,7 +131,7 @@ public class TestDatabaseCommands {
 
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
-        File tempFile = new File("dbtest" + File.separator + newTempTable + ".tab");
+        File tempFile = new File(ROOT_DB_DIR + File.separator +"dbtest" + File.separator + newTempTable + ".tab");
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
     }
@@ -174,7 +175,7 @@ public class TestDatabaseCommands {
         Files.createDirectory(tempDbDir.toPath());
         setup(tempDbDir);
         cmd = new DropCMD("DATABASE");
-        cmd.setDatabaseName(tempDbDirName);
+        cmd.setDatabaseName("dbtest");
 
         // when
         assertTrue(tempDbDir.exists());

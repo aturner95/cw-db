@@ -1,5 +1,7 @@
 package edu.uob.exceptions;
 
+import edu.uob.cmdinterpreter.Token;
+
 public class ParsingException extends Exception {
 
 
@@ -12,8 +14,8 @@ public class ParsingException extends Exception {
     public static class InvalidGrammarException extends ParsingException {
         private static final long serialVersionUID = -67583742802924349L;
 
-        public InvalidGrammarException(String expectedGrammar) {
-            super("Expected: grammar" + expectedGrammar);
+        public InvalidGrammarException(Token token, String expectedGrammar) {
+            super("Unable to parse token: \'" + token.toString() + "\' for expected grammar \'" + expectedGrammar +"\'");
         }
     }
 

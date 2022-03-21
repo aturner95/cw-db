@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+
 public class CreateCMD extends DBCmd {
 
     public CreateCMD(String createType){
@@ -61,30 +63,34 @@ public class CreateCMD extends DBCmd {
 
         if(hasDatabase(server)){
             String tableName = getTableNames().get(0);
-            File file = new File(tableName);
+            File file = new File(server.getDatabaseDirectory() + File.separator + tableName + DBFileConstants.TABLE_EXT);
 
-            if(!file.exists()){
-                try {
-                    String path = server.getDatabaseDirectory() + File.separator + tableName + DBFileConstants.TABLE_EXT;
-                    file = new File (path);
-                    if(file.createNewFile()){
-                        Table table = new Table();
-                        if(getColNames().size() > 0) {
+            if(!usingRootDatabase(server)) {
+                if (!file.exists()) {
+                    try {
+
+                        if (file.createNewFile()) {
+                            Table table = new Table();
                             TableHeader header = new TableHeader();
                             header.setTableName(tableName);
                             header.setFileLocation(file);
                             table.setHeader(header);
-                            addAttributeList(table, getColNames());
-                        }
+                            if (getColNames().size() > 0) {
+                                addAttributeList(table, getColNames());
+                            } else {
+                                addAttributeList(table, new ArrayList<>());
+                            }
                             DBTableFile dbFile = new DBTableFile();
                             dbFile.storeEntityIntoDBFile(table);
                             return;
+                        }
+                    } catch (IOException ioe) {
+                        throw new IOException("Unable to write to table:" + tableName);
                     }
-                } catch(IOException ioe){
-                    throw new IOException("Unable to write to table:" + tableName);
                 }
+                throw new DBTableExistsException(tableName);
             }
-            throw new DBTableExistsException(tableName);
+            throw new DBException("No DB select, (hint: use USE <database>)");
         }
         throw new DBDoesNotExistException(server.getDatabaseDirectory().getName());
     }
@@ -97,6 +103,14 @@ public class CreateCMD extends DBCmd {
             columnHeaders.add(new ColumnHeader(attribute));
         }
         table.setColHeadings(columnHeaders);
+    }
+
+    private boolean usingRootDatabase(DBServer server){
+        String rootDb = ROOT_DB_DIR;
+        if(rootDb.equals(server.getDatabaseDirectory().getName())){
+            return true;
+        }
+        return false;
     }
 
 }

@@ -48,7 +48,7 @@ public class DropCMD extends DBCmd {
 
     private void dropTable(File db) throws DBTableDoesNotExistException {
         byte indexOfTable = 0;
-        File table = new File( db.getName() + File.separator + getTableNames().get(indexOfTable) + DBFileConstants.TABLE_EXT);
+        File table = new File( db.toString() + File.separator + getTableNames().get(indexOfTable) + DBFileConstants.TABLE_EXT);
         if(table.exists() && table.isFile()){
             table.delete();
             return;

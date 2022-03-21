@@ -29,5 +29,6 @@ public class QueryCondition {
     public String getValue() {
         return value;
     }
+
 }
 

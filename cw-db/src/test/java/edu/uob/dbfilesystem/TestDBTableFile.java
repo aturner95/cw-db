@@ -2,6 +2,8 @@ package edu.uob.dbfilesystem;
 
 import edu.uob.dbelements.*;
 import edu.uob.dbelements.Record;
+import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.TokenizerException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -606,11 +608,7 @@ public class TestDBTableFile {
         }
         tempFile = new File(dbFilePath);
 
-        // when
-        boolean result = dbFile.storeEntityIntoDBFile(table);
-
-        // then
-        assertFalse(result);
+        assertThrows(DBException.class, ()-> dbFile.storeEntityIntoDBFile(table));
     }
 
     @Test
@@ -694,11 +692,9 @@ public class TestDBTableFile {
         rows.add(row2);
         table.setRows(rows);
 
-        // when
-        boolean result = dbFile.storeEntityIntoDBFile(table);
+        // when + then
+        assertThrows(DBException.class, ()-> dbFile.storeEntityIntoDBFile(table));
 
-        // then
-        assertFalse(result);
 
     }
 

@@ -1,4 +1,4 @@
-package edu.uob.abstractelements;
+package edu.uob.dbelements.abstractelements;
 
 abstract public class AbstractColumnData {
     protected String data;
