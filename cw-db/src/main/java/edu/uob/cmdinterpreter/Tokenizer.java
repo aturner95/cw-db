@@ -22,10 +22,12 @@ public class Tokenizer {
         /* --- define tokens information --- */
 
         // Command type (a list of special keywords, so have just placed them all into a single regular expression)
-        addToken("\\bUSE\\b|\\bCREATE\\b|\\bDROP\\b|\\bALTER\\b|\\bINSERT\\b|\\bSELECT\\b|\\bUPDATE\\b|\\bDELETE\\b|\\bJOIN\\b", TokenType.CT);
+        addToken("\\bUSE\\b|\\bCREATE\\b|\\bDROP\\b|\\bALTER\\b|\\bINSERT\\b|\\bSELECT\\b|\\bUPDATE\\b|\\bDELETE\\b" +
+                "|\\bJOIN\\b", TokenType.CT);
 
         // Keywords (Unsure how extensive this list needs to be, but for now will just keep them all in one regular expression)
-        addToken("\\bFROM\\b|\\bWHERE\\b|\\bIN\\b|\\bINTO\\b|\\bVALUES\\b|\\bAND\\b|\\bON\\b", TokenType.KW);
+        addToken("\\bAND\\b|\\bDROP\\b|\\bDATABASE\\b|\\bDROP\\b|\\bFROM\\b|\\bIN\\b|\\bINTO\\b|\\bON\\b" +
+                "|\\bOR\\b|\\bSET\\b|\\bTABLE\\b|\\bVALUES\\b|\\bWHERE\\b", TokenType.KW);
 
         // Operations (in a list)
         addToken(("==|<=|>=|!=|<|>|=|\\bLIKE\\b"), TokenType.OP); // Operation
@@ -35,7 +37,7 @@ public class Tokenizer {
         addToken("[+-]?([0-9]*[.])?[0-9]+", TokenType.LIT); // Number literal
         addToken("\\bTRUE\\b|\\bFALSE\\b", TokenType.LIT); // Boolean literal
         addToken("\\b[a-zA-Z]\\b", TokenType.LIT); // Character literal (letters)
-        addToken("[!#$%&()*+,-\\./:;<=>?@[/]^_`{~}]", TokenType.LIT); // Character literal (special characters) "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | ">" | "=" | "<" | "?" | "@" | "[" | "\" | "]" | "^" | "_" | "`" | "{" | "}" | "~"
+        addToken("[!#$%&()*+,-\\./:;<=>?@[/]^_`{~}]", TokenType.LIT); // Character literal (special characters)
         addToken("\\bNULL\\b", TokenType.LIT); // NULL literal
 
         // Separator

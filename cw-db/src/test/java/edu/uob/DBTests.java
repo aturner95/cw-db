@@ -197,8 +197,6 @@ final class DBTests {
     teardown(db);
   }
 
-
-
   @Test
   public void test_handleCommand_validDropTableCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));

@@ -13,7 +13,7 @@ public class DeleteCMD extends DBCmd {
             byte indexOfTable = 0;
 
             // if the database has the table
-            if(hasTable(server, getTableNames().get(indexOfTable))){
+            // if(hasTable(server, getTableNames().get(indexOfTable))){
 
                 // unpack the condition
 
@@ -23,7 +23,7 @@ public class DeleteCMD extends DBCmd {
                         //
 
                 // remove these rows
-            }
+            // }
         }
 
         return null;

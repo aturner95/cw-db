@@ -3,9 +3,7 @@ package edu.uob;
 import edu.uob.cmdinterpreter.Parser;
 import edu.uob.cmdinterpreter.Tokenizer;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
-import edu.uob.dbelements.TableHeader;
 import edu.uob.exceptions.DBException;
-import edu.uob.exceptions.DBException.DBDoesNotExistException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

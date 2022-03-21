@@ -427,6 +427,11 @@ public class Parser {
      * @return
      */
     private boolean isPlainText() throws TokenIndexOutOfBoundsException {
+
+        if(TokenType.ID != getCurrentToken().getTokenType()){
+            return false;
+        }
+
         char [] charSeq = getCurrentTokenSeq().toCharArray();
         for(int i = 0; i < charSeq.length; i++){
             if(!Character.isLetterOrDigit(charSeq[i])){

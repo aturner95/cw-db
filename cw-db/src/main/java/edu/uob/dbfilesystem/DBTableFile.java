@@ -113,12 +113,12 @@ public class DBTableFile {
             }
 
             if (!storeColumnHeaderIntoDBFile(table.getColHeadings(), fileToOpen)) {
-                throw new DBException("Unable to read column headers in DB file");
+                throw new DBException("Unable to store column headers in DB file");
             }
 
             for (Record rec : table.getRows()) {
                 if (!storeRecordIntoDBFile(rec.getAttributes(), fileToOpen)) {
-                    throw new DBException("Unable to read rows in DB file");
+                    throw new DBException("Unable to store rows in DB file");
                 }
             }
             return true;

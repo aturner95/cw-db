@@ -389,7 +389,7 @@ public class TestDBTableFile {
     }
 
     @Test
-    public void test_storeColomnHeaderIntoDBFile_nullColHeaders_returnsFalse() throws Exception{
+    public void test_storeColumnHeaderIntoDBFile_nullColHeaders_returnsFalse() throws Exception{
 
         // given
         String tempTableName = "people";

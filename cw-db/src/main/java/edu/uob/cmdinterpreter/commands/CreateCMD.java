@@ -90,7 +90,7 @@ public class CreateCMD extends DBCmd {
                 }
                 throw new DBTableExistsException(tableName);
             }
-            throw new DBException("No DB select, (hint: use USE <database>)");
+            throw new DBException("No database has been selected, (hint: USE <database>)");
         }
         throw new DBDoesNotExistException(server.getDatabaseDirectory().getName());
     }
@@ -103,14 +103,6 @@ public class CreateCMD extends DBCmd {
             columnHeaders.add(new ColumnHeader(attribute));
         }
         table.setColHeadings(columnHeaders);
-    }
-
-    private boolean usingRootDatabase(DBServer server){
-        String rootDb = ROOT_DB_DIR;
-        if(rootDb.equals(server.getDatabaseDirectory().getName())){
-            return true;
-        }
-        return false;
     }
 
 }

@@ -1,11 +1,15 @@
 package edu.uob.cmdinterpreter.commands.abstractcmd;
 
 import edu.uob.DBServer;
+import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.QueryCondition;
+import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
+import edu.uob.dbelements.Record;
 import edu.uob.dbelements.Table;
 import edu.uob.dbfilesystem.DBTableFile;
 import edu.uob.exceptions.DBException;
+import edu.uob.exceptions.QueryException.AttributeNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,13 +102,15 @@ public abstract class DBCmd {
         return false;
     }
 
-    public boolean hasTable(DBServer server, String tableName) {
-        File db = new File(ROOT_DB_DIR + File.separator + server.getDatabaseDirectory().getName());
-        File [] tables = db.listFiles();
-        for(File table: tables){
-            int indexOfFileExt = table.getName().length() - 4;
-            if(tableName.equalsIgnoreCase(table.getName().substring(0, indexOfFileExt))){
-                return true;
+    public boolean hasTable(DBServer server, String tableName) throws DBException {
+        if(!usingRootDatabase(server)) {
+            File db = new File(ROOT_DB_DIR + File.separator + server.getDatabaseDirectory().getName());
+            File[] tables = db.listFiles();
+            for (File table : tables) {
+                int indexOfFileExt = table.getName().length() - 4;
+                if (tableName.equalsIgnoreCase(table.getName().substring(0, indexOfFileExt))) {
+                    return true;
+                }
             }
         }
         return false;
@@ -138,5 +144,76 @@ public abstract class DBCmd {
     public List<QueryCondition> getConditions(){
         return conditions;
     }
+
+    public Table buildResultTable(Table queryTable) throws AttributeNotFoundException {
+
+        Table result = new Table();
+        result.setColHeadings(new ArrayList<>());
+        List<Integer> queryAttributeIndices = new ArrayList<>();
+
+        List<String> queryAttributes;
+        if(isSelectStar()){
+            queryAttributes = tableAttributesAsStrings(queryTable.getColHeadings());
+        }  else {
+            queryAttributes = getColNames();
+        }
+
+        for(String attribute: queryAttributes){
+            addResultHeadings(result, attribute, tableAttributesAsStrings(queryTable.getColHeadings()), queryAttributeIndices);
+        }
+
+        for(Record row: queryTable.getRows()){
+            addValueToResult(result, row.getAttributes(), queryAttributeIndices);
+        }
+
+        return result;
+    }
+
+    private boolean isSelectStar(){
+        if(getColNames().size() == 1 && BNFConstants.STAR_SYMBOL.equals(getColNames().get(0))){
+            return true;
+        }
+        return false;
+    }
+
+    private List<String> tableAttributesAsStrings(List<ColumnHeader> cols){
+        List<String> asString = new ArrayList<>();
+        for(ColumnHeader col: cols){
+            asString.add(col.getColName());
+        }
+        return asString;
+    }
+
+    private void addResultHeadings(Table result, String queryAttribute, List<String> tableAttributes,
+                                   List<Integer> indices) throws AttributeNotFoundException {
+        int index = tableAttributes.indexOf(queryAttribute);
+        if(index >= 0){
+            result.getColHeadings().add(new ColumnHeader(tableAttributes.get(index)));
+            indices.add(index);
+            return;
+        }
+        throw new AttributeNotFoundException(queryAttribute);
+    }
+
+    private void addValueToResult(Table resultSet, List<Attribute> row, List<Integer> queryAttributeIndices){
+        int index = 0;
+        List<Attribute> resultValues = new ArrayList<>();
+        for(Attribute value: row){
+            if(queryAttributeIndices.contains(Integer.valueOf(index))){
+                resultValues.add(new Attribute(value.getValue()));
+            }
+            index++;
+        }
+        resultSet.getRows().add(new Record(resultValues));
+    }
+
+    public boolean usingRootDatabase(DBServer server) throws DBException {
+        String rootDb = ROOT_DB_DIR;
+        if(rootDb.equals(server.getDatabaseDirectory().getName())){
+            throw new DBException("No database has been selected, (hint: USE <database>)");
+        }
+        return false;
+    }
+
 
 }
