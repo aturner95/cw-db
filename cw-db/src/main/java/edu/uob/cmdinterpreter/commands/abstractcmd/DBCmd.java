@@ -235,7 +235,27 @@ public abstract class DBCmd {
         return false;
     }
 
+    public Table doConditions(Table table, Table result) throws DBException {
 
+        if(getConditions().size() == 1){
+            result = filterResultByCondition(table, getConditions().get(0));
+        }
+        else if(getConditions().size() == 2){
+            // AND'ed condition
+            if(BNFConstants.AND.equalsIgnoreCase(getConditionJoinOperators().get(0))){
+                result = filterResultByAndConditions(table, getConditions().get(0), getConditions().get(1));
+                // OR'ed condition
+            } else {
+                result = filterResultByOrConditions(table, getConditions().get(0), getConditions().get(1));
+            }
+        } else {
+            throw new DBException("Sorry, haven't managed to implement nested conditions!");
+        }
+        return result;
+    }
+
+
+    // TODO If I have time, I will refactor with the other filter methods for more DRY code!
     public Table filterResultByCondition(Table result, QueryCondition condition){
 
         Table filteredResult = new Table();
@@ -245,6 +265,44 @@ public abstract class DBCmd {
 
         for(Record row: result.getRows()){
             if(isCondition(row.getAttributes().get(attrIndex).getValue(), condition.getOperator(), condition.getValue())){
+                filteredResult.getRows().add(row);
+            }
+        }
+
+        return filteredResult;
+    }
+
+    // TODO If I have time, I will refactor with the other filter methods for more DRY code!
+    public Table filterResultByAndConditions(Table result, QueryCondition conditionA, QueryCondition conditionB){
+
+        Table filteredResult = new Table();
+        filteredResult.setColHeadings(result.getColHeadings());
+
+        int attrIndexA = getAttributeIndex(result.getColHeadings(), conditionA);
+        int attrIndexB = getAttributeIndex(result.getColHeadings(), conditionB);
+
+        for(Record row: result.getRows()){
+            if(isCondition(row.getAttributes().get(attrIndexA).getValue(), conditionA.getOperator(), conditionA.getValue())
+            && isCondition(row.getAttributes().get(attrIndexB).getValue(), conditionB.getOperator(), conditionB.getValue())){
+                filteredResult.getRows().add(row);
+            }
+        }
+
+        return filteredResult;
+    }
+
+    // TODO If I have time, I will refactor with the other filter methods for more DRY code!
+    public Table filterResultByOrConditions(Table result, QueryCondition conditionA, QueryCondition conditionB){
+
+        Table filteredResult = new Table();
+        filteredResult.setColHeadings(result.getColHeadings());
+
+        int attrIndexA = getAttributeIndex(result.getColHeadings(), conditionA);
+        int attrIndexB = getAttributeIndex(result.getColHeadings(), conditionB);
+
+        for(Record row: result.getRows()){
+            if(isCondition(row.getAttributes().get(attrIndexA).getValue(), conditionA.getOperator(), conditionA.getValue())
+                    || isCondition(row.getAttributes().get(attrIndexB).getValue(), conditionB.getOperator(), conditionB.getValue())){
                 filteredResult.getRows().add(row);
             }
         }
@@ -306,7 +364,7 @@ public abstract class DBCmd {
                 return true;
             }
         }
-        if(condition.getTokenType() == TokenType.LIT_CHAR){
+        if(condition.getTokenType() == TokenType.LIT_BOOL){
             if(Boolean.valueOf(condition.getSequence()).equals((Boolean.valueOf(value)))){
                 return true;
             }

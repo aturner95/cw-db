@@ -1467,4 +1467,150 @@ public class TestDatabaseCommands {
                 + "Anna\t55" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
     }
+
+    @Test
+    public void test_selectCmd_selectStarWithAndConditions_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new SelectCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("*");
+        cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "\'Anna\'"));
+        cmd.addConditionJoinOperator("AND");
+        cmd.addCondition(new ColumnHeader("grade"), ">=", new Token(TokenType.LIT_NUM, "50"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("45"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Anna"));
+        attr2.add(new Attribute("63"));
+        Record row2 = new Record(attr2);
+        rows.add(row1);
+        rows.add(row2);
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK + System.lineSeparator()
+                + "id\tname\tgrade" + System.lineSeparator()
+                + "2\tAnna\t63" + System.lineSeparator();
+        assertEquals(expectedMessage, resultMessage);
+    }
+
+    @Test
+    public void test_selectCmd_selectAttributesWithOrConditions_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new SelectCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("id");
+        cmd.addColumnName("name");
+        cmd.addColumnName("grade");
+        cmd.addCondition(new ColumnHeader("grade"), ">=", new Token(TokenType.LIT_NUM, "50"));
+        cmd.addConditionJoinOperator("OR");
+        cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "TRUE"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("45"));
+        attr1.add(new Attribute("TRUE"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("70"));
+        attr2.add(new Attribute("FALSE"));
+        Record row2 = new Record(attr2);
+        rows.add(row1);
+        rows.add(row2);
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK + System.lineSeparator()
+                + "id\tname\tgrade" + System.lineSeparator()
+                + "1\tAnna\t45" + System.lineSeparator()
+                + "2\tBob\t70" + System.lineSeparator();
+        assertEquals(expectedMessage, resultMessage);
+    }
+
+
 }
