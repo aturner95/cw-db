@@ -26,19 +26,19 @@ public class Tokenizer {
                 "|\\bJOIN\\b", TokenType.CT);
 
         // Keywords (Unsure how extensive this list needs to be, but for now will just keep them all in one regular expression)
-        addToken("\\bAND\\b|\\bDROP\\b|\\bDATABASE\\b|\\bDROP\\b|\\bFROM\\b|\\bIN\\b|\\bINTO\\b|\\bON\\b" +
+        addToken("\\bAND\\b|\\bDROP\\b|\\bDATABASE\\b|\\bDROP\\b|\\bFROM\\b|\\bIN\\b|\\bINTO\\b|\\bNULL\\b|\\bON\\b" +
                 "|\\bOR\\b|\\bSET\\b|\\bTABLE\\b|\\bVALUES\\b|\\bWHERE\\b", TokenType.KW);
 
         // Operations (in a list)
         addToken(("==|<=|>=|!=|<|>|=|\\bLIKE\\b"), TokenType.OP); // Operation
 
         // Literals (expressions for are quite messy so separating into String, number, character and boolean)
-        addToken("'([^']|\\.)*'", TokenType.LIT); // String literal \\"([^\\"]|\\.)*\\"
-        addToken("[+-]?([0-9]*[.])?[0-9]+", TokenType.LIT); // Number literal
-        addToken("\\bTRUE\\b|\\bFALSE\\b", TokenType.LIT); // Boolean literal
-        addToken("\\b[a-zA-Z]\\b", TokenType.LIT); // Character literal (letters)
-        addToken("[!#$%&()*+,-\\./:;<=>?@[/]^_`{~}]", TokenType.LIT); // Character literal (special characters)
-        addToken("\\bNULL\\b", TokenType.LIT); // NULL literal
+        addToken("'([^']|\\.)*'", TokenType.LIT_STR); // String literal \\"([^\\"]|\\.)*\\"
+        addToken("[+-]?([0-9]*[.])?[0-9]+", TokenType.LIT_NUM); // Number literal
+        addToken("\\bTRUE\\b|\\bFALSE\\b", TokenType.LIT_BOOL); // Boolean literal
+        addToken("\\b[a-zA-Z]\\b", TokenType.LIT_CHAR); // Character literal (letters)
+        addToken("[!#$%&()*+,-\\./:;<=>?@[/]^_`{~}]", TokenType.LIT_CHAR); // Character literal (special characters)
+        // addToken("\\bNULL\\b", TokenType.LIT); // NULL literal
 
         // Separator
         addToken(("\\s+"), TokenType.SEP);

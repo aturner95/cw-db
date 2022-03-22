@@ -109,9 +109,9 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize("'this is a String''    This is another    string    '"));
 
         assertEquals(2, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_STR, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("this is a String", tokenizer.getTokens().get(0).getSequence());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(1).getTokenType());
+        assertEquals(TokenType.LIT_STR, tokenizer.getTokens().get(1).getTokenType());
         assertEquals("    This is another    string    ", tokenizer.getTokens().get(1).getSequence());
     }
 
@@ -121,9 +121,9 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize("'this is a String' these are not string literals '    This is another    string    '"));
 
         assertEquals(7, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_STR, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("this is a String", tokenizer.getTokens().get(0).getSequence());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(6).getTokenType());
+        assertEquals(TokenType.LIT_STR, tokenizer.getTokens().get(6).getTokenType());
         assertEquals("    This is another    string    ", tokenizer.getTokens().get(6).getSequence());
     }
 
@@ -137,7 +137,7 @@ public class TestTokenizer {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("'Hello world!'"));
         assertEquals(1, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_STR, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("Hello world!", tokenizer.getTokens().get(0).getSequence());
     }
 
@@ -147,7 +147,7 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize(" 77  "));
 
         assertEquals(1, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_NUM, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("77", tokenizer.getTokens().get(0).getSequence());
     }
 
@@ -157,7 +157,7 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize(" -0.5  "));
 
         assertEquals(1, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_NUM, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("-0.5", tokenizer.getTokens().get(0).getSequence());
     }
 
@@ -167,7 +167,7 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize(" TRUE  "));
 
         assertEquals(1, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_BOOL, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("TRUE", tokenizer.getTokens().get(0).getSequence());
     }
 
@@ -177,17 +177,21 @@ public class TestTokenizer {
         assertTrue(tokenizer.tokenize("F"));
 
         assertEquals(1, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(0).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("F", tokenizer.getTokens().get(0).getSequence());
     }
 
+    /**
+     * This will be tokenized, however will be caught later by the parser
+     * @throws Exception
+     */
     @Test
-    public void test_tokenize_validLiteralNULL_nullLiteralAdded() throws Exception {
+    public void test_tokenize_invalidByTokenizedAsId_nullIdAdded() throws Exception {
         tokenizer = new Tokenizer();
         assertTrue(tokenizer.tokenize("=NULL;"));
 
         assertEquals(3, tokenizer.getTokens().size());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(1).getTokenType());
+        assertEquals(TokenType.KW, tokenizer.getTokens().get(1).getTokenType());
         assertEquals("NULL", tokenizer.getTokens().get(1).getSequence());
     }
 
@@ -233,7 +237,7 @@ public class TestTokenizer {
         assertEquals("id", tokenizer.getTokens().get(1).getSequence());
         assertEquals(TokenType.ID, tokenizer.getTokens().get(2).getTokenType());
         assertEquals("LIKE2", tokenizer.getTokens().get(2).getSequence());
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(3).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(3).getTokenType());
         assertEquals(";", tokenizer.getTokens().get(3).getSequence());
     }
 
@@ -262,7 +266,7 @@ public class TestTokenizer {
         assertEquals(TokenType.CT, tokenizer.getTokens().get(0).getTokenType());
         assertEquals("select", tokenizer.getTokens().get(0).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(1).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(1).getTokenType());
         assertEquals("*", tokenizer.getTokens().get(1).getSequence());
 
         assertEquals(TokenType.KW, tokenizer.getTokens().get(2).getTokenType());
@@ -280,10 +284,10 @@ public class TestTokenizer {
         assertEquals(TokenType.OP, tokenizer.getTokens().get(6).getTokenType());
         assertEquals("=", tokenizer.getTokens().get(6).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(7).getTokenType());
+        assertEquals(TokenType.LIT_NUM, tokenizer.getTokens().get(7).getTokenType());
         assertEquals("3", tokenizer.getTokens().get(7).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(8).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(8).getTokenType());
         assertEquals(";", tokenizer.getTokens().get(8).getSequence());
     }
 
@@ -304,52 +308,52 @@ public class TestTokenizer {
         assertEquals(TokenType.ID, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("People", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("(", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
         assertEquals(TokenType.ID, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("Id", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(",", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
         assertEquals(TokenType.ID, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("name", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(",", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
         assertEquals(TokenType.ID, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("age", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(")", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
         assertEquals(TokenType.KW, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("values", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("(", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_NUM, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("2", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(",", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_STR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("Bob", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(",", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_NUM, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("23", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(")", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(";", tokenizer.getTokens().get(tokenIndex).getSequence());
     }
 
@@ -385,7 +389,7 @@ public class TestTokenizer {
         assertEquals(TokenType.ID, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals("Id", tokenizer.getTokens().get(tokenIndex++).getSequence());
 
-        assertEquals(TokenType.LIT, tokenizer.getTokens().get(tokenIndex).getTokenType());
+        assertEquals(TokenType.LIT_CHAR, tokenizer.getTokens().get(tokenIndex).getTokenType());
         assertEquals(";", tokenizer.getTokens().get(tokenIndex).getSequence());
 
     }

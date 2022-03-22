@@ -3,6 +3,8 @@ package edu.uob.cmdinterpreter.commands.abstractcmd;
 import edu.uob.DBServer;
 import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.QueryCondition;
+import edu.uob.cmdinterpreter.Token;
+import edu.uob.cmdinterpreter.TokenType;
 import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
@@ -27,6 +29,10 @@ public abstract class DBCmd {
     protected List<String> colNames;
     protected List<String> variables;
     protected List<QueryCondition> conditions;
+    // NOTE: unable to built tree structure for nested conditions, so decided to provide a hack to a) parse nested b)
+    // interpret only single nested conditions (e.g., (cond AND and) and (cond OR cond); these will be added in the
+    // order in which they were parsed.
+    protected List<String> conditionJoinOperators;
 
     public static final String STATUS_OK = "[OK]";
     public static final String STATUS_ERROR = "[ERROR] ";
@@ -39,6 +45,7 @@ public abstract class DBCmd {
         colNames = new ArrayList<>();
         variables = new ArrayList<>();
         conditions = new ArrayList<>();
+        conditionJoinOperators = new ArrayList<>();
     }
 
     public DBCmd(String commandParameter){
@@ -46,7 +53,7 @@ public abstract class DBCmd {
         this.commandParameter = commandParameter;
     }
 
-    /* Methods */
+    /* Getters and setters (or in this case, 'adders') */
     public abstract String query(DBServer server) throws Exception;
 
     public String getDatabaseName() {
@@ -126,14 +133,11 @@ public abstract class DBCmd {
         return false;
     }
 
-    public Table readTableFromFile(DBServer server, String tableName) throws IOException, DBException {
-        DBTableFile dbFile = new DBTableFile();
-        File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
-        Table table;
-        return dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
+    public List<QueryCondition> getConditions(){
+        return conditions;
     }
 
-    public boolean addCondition(ColumnHeader attribute, String operator, String value){
+    public boolean addCondition(ColumnHeader attribute, String operator, Token value){
         if(conditions != null){
             conditions.add(new QueryCondition(attribute, operator, value));
             return true;
@@ -141,8 +145,23 @@ public abstract class DBCmd {
         return false;
     }
 
-    public List<QueryCondition> getConditions(){
-        return conditions;
+
+
+    public List<String> getConditionJoinOperators(){
+        return conditionJoinOperators;
+    }
+
+    public void addConditionJoinOperator(String operator){
+        getConditionJoinOperators().add(operator);
+    }
+
+    /* Methods */
+
+    public Table readTableFromFile(DBServer server, String tableName) throws IOException, DBException {
+        DBTableFile dbFile = new DBTableFile();
+        File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
+        Table table;
+        return dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
     }
 
     public Table buildResultTable(Table queryTable) throws AttributeNotFoundException {
@@ -184,6 +203,7 @@ public abstract class DBCmd {
         return asString;
     }
 
+
     private void addResultHeadings(Table result, String queryAttribute, List<String> tableAttributes,
                                    List<Integer> indices) throws AttributeNotFoundException {
         int index = tableAttributes.indexOf(queryAttribute);
@@ -215,5 +235,128 @@ public abstract class DBCmd {
         return false;
     }
 
+
+    public Table filterResultByCondition(Table result, QueryCondition condition){
+
+        Table filteredResult = new Table();
+        filteredResult.setColHeadings(result.getColHeadings());
+
+        int attrIndex = getAttributeIndex(result.getColHeadings(), condition);
+
+        for(Record row: result.getRows()){
+            if(isCondition(row.getAttributes().get(attrIndex).getValue(), condition.getOperator(), condition.getValue())){
+                filteredResult.getRows().add(row);
+            }
+        }
+
+        return filteredResult;
+    }
+
+    private int getAttributeIndex(List<ColumnHeader> colHeader,QueryCondition condition){
+        String queryAttribute = condition.getAttribute();
+        int attrIndex = 0;
+        for(ColumnHeader col: colHeader){
+            if(col.getColName().equals(queryAttribute)){
+                return attrIndex;
+            }
+            attrIndex++;
+        }
+        return attrIndex;
+    }
+
+    private boolean isCondition(String value, String operator, Token condition){
+        if(BNFConstants.EQUAL_TO.equals(operator)){
+            return conditionEqualTo(value,condition);
+        }
+        if(BNFConstants.GREATER_THAN.equals(operator)){
+            return conditionGreaterThan(value,condition);
+        }
+        if(BNFConstants.LESS_THAN.equals(operator)){
+            return conditionLessThan(value,condition);
+        }
+        if(BNFConstants.GREATER_OR_EQUAL_TO.equals(operator)){
+            return conditionGreaterThanOrEqualTo(value,condition);
+        }
+        if(BNFConstants.LESS_OR_EQUAL_TO.equals(operator)){
+            return conditionLessThanOrEqualTo(value,condition);
+        }
+        if(BNFConstants.NOT_EQUAL_TO.equals(operator)){
+            return conditionNotEqualTo(value,condition);
+        }
+        // TODO implement LIKE condition
+//        if(BNFConstants.LIKE.equals(operator)){
+//
+//        }
+        return false;
+    }
+
+    private boolean conditionEqualTo(String value, Token condition){
+        if(condition.getTokenType() == TokenType.LIT_NUM){
+            if(Float.valueOf(condition.getSequence()).equals(Float.valueOf(value))){
+                return true;
+            }
+        }
+        if(condition.getTokenType() == TokenType.LIT_STR){
+            if(condition.getSequence().equals(value)){
+                return true;
+            }
+        }
+        if(condition.getTokenType() == TokenType.LIT_CHAR){
+            if(Character.valueOf(condition.getSequence().charAt(0)).equals(value)){
+                return true;
+            }
+        }
+        if(condition.getTokenType() == TokenType.LIT_CHAR){
+            if(Boolean.valueOf(condition.getSequence()).equals((Boolean.valueOf(value)))){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean conditionGreaterThan(String value, Token condition){
+        if(condition.getTokenType() == TokenType.LIT_NUM){
+            if(Float.valueOf(value) > Float.valueOf(condition.getSequence())){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean conditionLessThan(String value, Token condition){
+        if(condition.getTokenType() == TokenType.LIT_NUM){
+            if(Float.valueOf(value) < Float.valueOf(condition.getSequence())){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean conditionGreaterThanOrEqualTo(String value, Token condition){
+        if(conditionGreaterThan(value, condition) || conditionEqualTo(value, condition)){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean conditionLessThanOrEqualTo(String value, Token condition){
+        if(conditionLessThan(value, condition) || conditionEqualTo(value, condition)){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean conditionNotEqualTo(String value, Token condition){
+        if(!conditionEqualTo(value, condition)){
+            return true;
+        }
+        return false;
+    }
+// TODO implement LIKE condition
+//    private boolean conditionLike(String value, Token condition){
+//
+//    }
 
 }

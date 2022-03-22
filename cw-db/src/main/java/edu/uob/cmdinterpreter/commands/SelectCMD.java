@@ -1,6 +1,7 @@
 package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
+import edu.uob.cmdinterpreter.QueryCondition;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbelements.Table;
 import edu.uob.dbfilesystem.DBTableFile;
@@ -28,7 +29,25 @@ public class SelectCMD extends DBCmd {
                         return STATUS_OK;
                     }
 
-                    Table result = buildResultTable(table);
+//                    Table result = buildResultTable(table);
+//
+//                    if(getConditions().size() > 0){
+//                        for(QueryCondition cond: getConditions()){
+//                            result = filterResultByCondition(result, cond);
+//                        }
+//                    }
+                    Table result = null;
+
+                    if(getConditions().size() > 0){
+                        for(QueryCondition cond: getConditions()){
+                            result = filterResultByCondition(table, cond);
+                        }
+                        result = buildResultTable(result);
+                    } else {
+                        result = buildResultTable(table);
+                    }
+
+
 
                     return STATUS_OK + System.lineSeparator() + result.toString();
 

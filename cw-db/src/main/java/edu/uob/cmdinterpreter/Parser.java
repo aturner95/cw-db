@@ -763,6 +763,11 @@ public class Parser {
     private boolean isCondition() throws ParsingException {
         if(isBracketedCondition()){
             if(BNFConstants.AND.equals(getCurrentTokenSeq()) || BNFConstants.OR.equals(getCurrentTokenSeq())){
+                if(BNFConstants.AND.equals(getCurrentTokenSeq())){
+                    cmd.addConditionJoinOperator(BNFConstants.AND);
+                } else {
+                    cmd.addConditionJoinOperator(BNFConstants.OR);
+                }
                 incrementToken();
                 if(isBracketedCondition()){
                     return true;
@@ -770,14 +775,18 @@ public class Parser {
             }
         }
         ColumnHeader attribute;
-        String operator, value;
+        String operator;
+        Token value;
         if(isAttributeName()){
             attribute = new ColumnHeader(getPreviousTokenSeq());
+            // isAttributeName will be token to DBCmd.colNames. However, this is not an attribute, but a query condition.
+            // So, we're just going to remove the last element straight after its added as a quick work around...
+            cmd.getColNames().remove(cmd.getColNames().size() - 1);
             if(isOperator()){
                 operator =  getCurrentTokenSeq();
                 incrementToken();
                 if(isValue()){
-                    value = getPreviousTokenSeq();
+                    value = getPreviousToken();
                     cmd.addCondition(attribute, operator, value);
                     return true;
                 }

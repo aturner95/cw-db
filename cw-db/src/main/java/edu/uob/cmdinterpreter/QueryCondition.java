@@ -6,13 +6,13 @@ public class QueryCondition {
 
     private ColumnHeader attribute;
     private String operator;
-    private String value;
+    private Token value;
 
     public QueryCondition() {
         super();
     }
 
-    public QueryCondition(ColumnHeader attribute, String operator, String value) {
+    public QueryCondition(ColumnHeader attribute, String operator, Token value) {
         this.attribute = attribute;
         this.operator = operator;
         this.value = value;
@@ -26,7 +26,7 @@ public class QueryCondition {
         return operator;
     }
 
-    public String getValue() {
+    public Token getValue() {
         return value;
     }
 

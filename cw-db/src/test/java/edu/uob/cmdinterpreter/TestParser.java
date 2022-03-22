@@ -256,10 +256,11 @@ public class TestParser {
         assertEquals("*", cmd.getColNames().get(0));
         assertEquals("pass", cmd.getConditions().get(0).getAttribute());
         assertEquals("==", cmd.getConditions().get(0).getOperator());
-        assertEquals("FALSE", cmd.getConditions().get(0).getValue());
+        assertEquals("FALSE", cmd.getConditions().get(0).getValue().getSequence());
+        assertEquals("AND", cmd.getConditionJoinOperators().get(0));
         assertEquals("mark", cmd.getConditions().get(1).getAttribute());
         assertEquals(">", cmd.getConditions().get(1).getOperator());
-        assertEquals("35", cmd.getConditions().get(1).getValue());
+        assertEquals("35", cmd.getConditions().get(1).getValue().getSequence());
     }
 
     @Test
@@ -279,7 +280,7 @@ public class TestParser {
         assertEquals("*", cmd.getColNames().get(0));
         assertEquals("name", cmd.getConditions().get(0).getAttribute());
         assertEquals("LIKE", cmd.getConditions().get(0).getOperator());
-        assertEquals("ve", cmd.getConditions().get(0).getValue());
+        assertEquals("ve", cmd.getConditions().get(0).getValue().getSequence());
     }
 
     @Test
@@ -298,7 +299,7 @@ public class TestParser {
         assertEquals("marks", cmd.getTableNames().get(0));
         assertEquals("mark", cmd.getConditions().get(0).getAttribute());
         assertEquals("<", cmd.getConditions().get(0).getOperator());
-        assertEquals("40", cmd.getConditions().get(0).getValue());
+        assertEquals("40", cmd.getConditions().get(0).getValue().getSequence());
     }
 
     @Test
@@ -317,7 +318,7 @@ public class TestParser {
         assertEquals("marks", cmd.getTableNames().get(0));
         assertEquals("name", cmd.getConditions().get(0).getAttribute());
         assertEquals("==", cmd.getConditions().get(0).getOperator());
-        assertEquals("Dave", cmd.getConditions().get(0).getValue());
+        assertEquals("Dave", cmd.getConditions().get(0).getValue().getSequence());
     }
 
     @Test
@@ -337,7 +338,7 @@ public class TestParser {
         assertEquals("mark", cmd.getColNames().get(0));
         assertEquals("name", cmd.getConditions().get(0).getAttribute());
         assertEquals("==", cmd.getConditions().get(0).getOperator());
-        assertEquals("Clive", cmd.getConditions().get(0).getValue());
+        assertEquals("Clive", cmd.getConditions().get(0).getValue().getSequence());
     }
 
     @Test
@@ -380,15 +381,19 @@ public class TestParser {
 
         assertEquals("pass", cmd.getConditions().get(0).getAttribute());
         assertEquals("==", cmd.getConditions().get(0).getOperator());
-        assertEquals("TRUE", cmd.getConditions().get(0).getValue());
+        assertEquals("TRUE", cmd.getConditions().get(0).getValue().getSequence());
+
+        assertEquals("OR", cmd.getConditionJoinOperators().get(0));
 
         assertEquals("course", cmd.getConditions().get(1).getAttribute());
         assertEquals("==", cmd.getConditions().get(1).getOperator());
-        assertEquals("MSc", cmd.getConditions().get(1).getValue());
+        assertEquals("MSc", cmd.getConditions().get(1).getValue().getSequence());
+
+        assertEquals("AND", cmd.getConditionJoinOperators().get(1));
 
         assertEquals("grade", cmd.getConditions().get(2).getAttribute());
         assertEquals(">", cmd.getConditions().get(2).getOperator());
-        assertEquals("50", cmd.getConditions().get(2).getValue());
+        assertEquals("50", cmd.getConditions().get(2).getValue().getSequence());
     }
 
 }
