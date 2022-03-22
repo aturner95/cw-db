@@ -51,4 +51,13 @@ public class Record {
 
         return false;
     }
+
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (this.getId() != null ? this.getAttributes().hashCode() : 0);
+        hash = 53 * hash + this.attributes.size();
+        return hash;
+    }
 }
