@@ -57,6 +57,7 @@ public class InsertCMD extends DBCmd {
         data.add(new Record(attributes));
     }
 
+    // TODO this needs to be redone so that a table keeps a record of it's sequence so that a primary key is not generated twice
     private String getNextSeq(List<Record> data){
         if(data.size() == 0){
             return "1";

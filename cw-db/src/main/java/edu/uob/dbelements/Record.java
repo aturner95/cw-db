@@ -33,4 +33,22 @@ public class Record {
         Attribute attribute = new Attribute(" ");
         attributes.add(attribute);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Record other = (Record) obj;
+        if(this.getId() != null && other.getId() != null && this.getId().equals(other.getId())){
+            return true;
+        }
+
+        return false;
+    }
 }

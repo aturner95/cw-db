@@ -33,24 +33,7 @@ public class SelectCMD extends DBCmd {
 
                     Table result = null;
 
-                    // TODO this is so janky... try DRY it up if you can, for now just get it working!
                     if(getConditions().size() > 0) {
-                        // single condition
-//                        if(getConditions().size() == 1){
-//                            result = filterResultByCondition(table, getConditions().get(0));
-//                        }
-//                        else if(getConditions().size() == 2){
-//                            // AND'ed condition
-//                            if(BNFConstants.AND.equalsIgnoreCase(getConditionJoinOperators().get(0))){
-//                                result = filterResultByAndConditions(table, getConditions().get(0), getConditions().get(1));
-//                            // OR'ed condition
-//                            } else {
-//                                result = filterResultByOrConditions(table, getConditions().get(0), getConditions().get(1));
-//                            }
-//                        } else {
-//                            throw new DBException("Sorry, haven't managed to implement nested conditions!");
-//                        }
-
                         result = doConditions(table, result);
 
                         result = buildResultTable(result);

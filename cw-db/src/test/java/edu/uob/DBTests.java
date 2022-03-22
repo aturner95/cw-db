@@ -258,4 +258,35 @@ final class DBTests {
     teardown(db);
   }
 
+  @Test
+  public void test_handleCommand_selectCommand_statusOk() throws Exception {
+    // create database
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    setup(db);
+
+    // set up table
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE student (name, grade, pass);").startsWith("[OK]"));
+
+    // insert data, some will be OK some will ERROR, but Server should still run in either case
+    assertTrue(server.handleCommand("INSERT INTO student VALUES ('Anna', 67, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO student VALUES ('Bob', 55, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO student VALUES ('Clive', 49, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO student VALUES ('Diana', 35, FALSE);").startsWith("[OK]"));
+
+    Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "student.tab");
+    assertEquals(4, marks.getRows().size());
+
+    assertTrue(server.handleCommand("select * from student;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("select id, name from student;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("select * from student where pass == TRUE;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("select name, grade from student where (pass == TRUE) OR (grade >= 50);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("select name, grade from student where (pass == TRUE) AND (grade >= 50);").startsWith("[OK]"));
+
+    teardown(db);
+  }
+
+
+
 }

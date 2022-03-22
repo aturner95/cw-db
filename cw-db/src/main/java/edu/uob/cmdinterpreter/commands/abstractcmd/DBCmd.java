@@ -235,6 +235,7 @@ public abstract class DBCmd {
         return false;
     }
 
+    // TODO this is so janky... try DRY it up if you can, for now just get it working!
     public Table doConditions(Table table, Table result) throws DBException {
 
         if(getConditions().size() == 1){
@@ -255,7 +256,6 @@ public abstract class DBCmd {
     }
 
 
-    // TODO If I have time, I will refactor with the other filter methods for more DRY code!
     public Table filterResultByCondition(Table result, QueryCondition condition){
 
         Table filteredResult = new Table();
@@ -272,7 +272,6 @@ public abstract class DBCmd {
         return filteredResult;
     }
 
-    // TODO If I have time, I will refactor with the other filter methods for more DRY code!
     public Table filterResultByAndConditions(Table result, QueryCondition conditionA, QueryCondition conditionB){
 
         Table filteredResult = new Table();
@@ -291,7 +290,6 @@ public abstract class DBCmd {
         return filteredResult;
     }
 
-    // TODO If I have time, I will refactor with the other filter methods for more DRY code!
     public Table filterResultByOrConditions(Table result, QueryCondition conditionA, QueryCondition conditionB){
 
         Table filteredResult = new Table();
