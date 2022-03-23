@@ -522,7 +522,7 @@ public class Parser {
         if(isNameValuePair()){
             if(BNFConstants.COMMA.equals(getCurrentTokenSeq())){
                 incrementToken();
-                if(isValueList()){
+                if(isNameValueList()){
                     return true;
                 }
                 return false;
@@ -539,9 +539,17 @@ public class Parser {
      */
     private boolean isNameValuePair() throws TokenIndexOutOfBoundsException {
         if(isAttributeName()){
+            // isAttributeName will add token to DBCmd.colNames. However, this is not an attribute, but an attribute in a SET clause.
+            // So, we're just going to remove the last element straight after its added as a quick workaround...
+            cmd.getColNames().remove(cmd.getColNames().size() - 1);
+            String name = getPreviousTokenSeq();
             if(BNFConstants.EQUALS_SYMBOL.equals(getCurrentTokenSeq())){
                 incrementToken();
                 if(isValue()){
+                    // Same here
+                    cmd.getVariables().remove(cmd.getVariables().size() - 1);
+                    String value = getPreviousTokenSeq();
+                    cmd.addNameValuePair(name, value);
                     return true;
                 }
             }
@@ -624,6 +632,7 @@ public class Parser {
      */
     private boolean isBooleanLiteral() throws TokenIndexOutOfBoundsException {
         if(BNFConstants.TRUE.equalsIgnoreCase(getCurrentTokenSeq())){
+
             incrementToken();
             return true;
         } else if (BNFConstants.FALSE.equalsIgnoreCase(getCurrentTokenSeq())){
@@ -779,7 +788,7 @@ public class Parser {
         Token value;
         if(isAttributeName()){
             attribute = new ColumnHeader(getPreviousTokenSeq());
-            // isAttributeName will be token to DBCmd.colNames. However, this is not an attribute, but a query condition.
+            // isAttributeName will add token to DBCmd.colNames. However, this is not an attribute, but a query condition.
             // So, we're just going to remove the last element straight after its added as a quick work around...
             cmd.getColNames().remove(cmd.getColNames().size() - 1);
             if(isOperator()){

@@ -28,14 +28,16 @@ public class DeleteCMD extends DBCmd {
 
                     dataToDelete = doConditions(table, dataToDelete);
 
-                    for(Record deleteRow: dataToDelete.getRows()){
+                    if(dataToDelete.getRows().size() > 0) {
 
-                        if(table.getRows().contains(deleteRow)){
-                            table.getRows().remove(deleteRow);
+                        for (Record deleteRow : dataToDelete.getRows()) {
+
+                            if (table.getRows().contains(deleteRow)) {
+                                table.getRows().remove(deleteRow);
+                            }
                         }
+                        new DBTableFile().storeEntityIntoDBFile(table);
                     }
-
-                    new DBTableFile().storeEntityIntoDBFile(table);
 
                     return STATUS_OK;
                 }

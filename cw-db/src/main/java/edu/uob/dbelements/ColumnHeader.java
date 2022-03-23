@@ -16,4 +16,31 @@ public class ColumnHeader extends AbstractColumnData {
         this.data = colName;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass() || obj.getClass() == String.class) {
+            return false;
+        }
+
+        final ColumnHeader other = (ColumnHeader) obj;
+        if(this.data != null && other.getData() != null && this.data.equals(other.getData())){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (this.data != null ? this.getColName().hashCode() : 0);
+        hash = 53 * hash + this.toString().hashCode();
+        return hash;
+    }
+
 }

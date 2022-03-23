@@ -5,6 +5,7 @@ import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.QueryCondition;
 import edu.uob.cmdinterpreter.Token;
 import edu.uob.cmdinterpreter.TokenType;
+import edu.uob.cmdinterpreter.commands.NameValuePair;
 import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
@@ -15,8 +16,7 @@ import edu.uob.exceptions.QueryException.AttributeNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 
@@ -33,6 +33,7 @@ public abstract class DBCmd {
     // interpret only single nested conditions (e.g., (cond AND and) and (cond OR cond); these will be added in the
     // order in which they were parsed.
     protected List<String> conditionJoinOperators;
+    protected List<NameValuePair> nameValueList;
 
     public static final String STATUS_OK = "[OK]";
     public static final String STATUS_ERROR = "[ERROR] ";
@@ -46,6 +47,7 @@ public abstract class DBCmd {
         variables = new ArrayList<>();
         conditions = new ArrayList<>();
         conditionJoinOperators = new ArrayList<>();
+        nameValueList = new ArrayList<>();
     }
 
     public DBCmd(String commandParameter){
@@ -68,36 +70,24 @@ public abstract class DBCmd {
         return tableNames;
     }
 
-    public boolean addTableName(String tableName){
-        if(tableName != null && tableName != null){
-            tableNames.add(tableName);
-            return true;
-        }
-        return false;
+    public void addTableName(String tableName){
+        tableNames.add(tableName);
     }
 
     public List<String> getColNames(){
         return colNames;
     }
 
-    public boolean addColumnName(String colName){
-        if(colNames != null && colName != null){
-            colNames.add(colName);
-            return true;
-        }
-        return false;
+    public void addColumnName(String colName){
+        colNames.add(colName);
     }
 
     public List<String> getVariables(){
         return variables;
     }
 
-    public boolean addVariable(String variable){
-        if(variables != null && variable != null){
-            variables.add(variable);
-            return true;
-        }
-        return false;
+    public void addVariable(String variable){
+        variables.add(variable);
     }
 
     public boolean hasDatabase(DBServer server) {
@@ -137,12 +127,8 @@ public abstract class DBCmd {
         return conditions;
     }
 
-    public boolean addCondition(ColumnHeader attribute, String operator, Token value){
-        if(conditions != null){
-            conditions.add(new QueryCondition(attribute, operator, value));
-            return true;
-        }
-        return false;
+    public void addCondition(ColumnHeader attribute, String operator, Token value){
+        conditions.add(new QueryCondition(attribute, operator, value));
     }
 
 
@@ -152,7 +138,15 @@ public abstract class DBCmd {
     }
 
     public void addConditionJoinOperator(String operator){
-        getConditionJoinOperators().add(operator);
+        conditionJoinOperators.add(operator);
+    }
+
+    public List<NameValuePair> getNameValuePair() {
+        return nameValueList;
+    }
+
+    public void addNameValuePair(String name, String value){
+        nameValueList.add(new NameValuePair(name, value));
     }
 
     /* Methods */
@@ -242,11 +236,10 @@ public abstract class DBCmd {
             result = filterResultByCondition(table, getConditions().get(0));
         }
         else if(getConditions().size() == 2){
-            // AND'ed condition
             if(BNFConstants.AND.equalsIgnoreCase(getConditionJoinOperators().get(0))){
                 result = filterResultByAndConditions(table, getConditions().get(0), getConditions().get(1));
-                // OR'ed condition
-            } else {
+
+            } else { // else OR
                 result = filterResultByOrConditions(table, getConditions().get(0), getConditions().get(1));
             }
         } else {

@@ -322,7 +322,17 @@ public class TestParser {
     }
 
     @Test
-    public void test_parse_basicUpdate1_updateCmdBuilt() throws Exception{
+    public void test_parse_invalidDeleteWithNoCondition_deleteCmdBuilt() throws Exception{
+
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("DELETE FROM marks;");
+        Parser parser = new Parser(tokenizer);
+
+        assertThrows(ParsingException.class, parser::parse);
+    }
+
+    @Test
+    public void test_parse_basicUpdate_updateCmdBuilt() throws Exception{
 
         // given
         Tokenizer tokenizer = new Tokenizer();
@@ -335,10 +345,37 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof UpdateCMD);
         assertEquals("marks", cmd.getTableNames().get(0));
-        assertEquals("mark", cmd.getColNames().get(0));
+        assertEquals("mark", cmd.getNameValuePair().get(0).getName());
+        assertEquals("38", cmd.getNameValuePair().get(0).getValue());
         assertEquals("name", cmd.getConditions().get(0).getAttribute());
         assertEquals("==", cmd.getConditions().get(0).getOperator());
         assertEquals("Clive", cmd.getConditions().get(0).getValue().getSequence());
+    }
+
+    @Test
+    public void test_parse_trickyUpdate_updateCmdBuilt() throws Exception{
+
+        // given
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("UPDATE marks SET mark = 38, pass = FALSE WHERE (name=='Clive') AND (sausage LIKE 5);");
+        Parser parser = new Parser(tokenizer);
+
+        // when
+        DBCmd cmd = parser.parse();
+
+        // then
+        assertTrue(cmd instanceof UpdateCMD);
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("mark", cmd.getNameValuePair().get(0).getName());
+        assertEquals("38", cmd.getNameValuePair().get(0).getValue());
+        assertEquals("pass", cmd.getNameValuePair().get(1).getName());
+        assertEquals("FALSE", cmd.getNameValuePair().get(1).getValue());
+        assertEquals("name", cmd.getConditions().get(0).getAttribute());
+        assertEquals("==", cmd.getConditions().get(0).getOperator());
+        assertEquals("Clive", cmd.getConditions().get(0).getValue().getSequence());
+        assertEquals("sausage", cmd.getConditions().get(1).getAttribute());
+        assertEquals("LIKE", cmd.getConditions().get(1).getOperator());
+        assertEquals("5", cmd.getConditions().get(1).getValue().getSequence());
     }
 
     @Test
@@ -364,7 +401,7 @@ public class TestParser {
     }
 
     @Test
-    public void test_parse_trickyCondition_selectCmdBuilt() throws Exception {
+    public void test_parse_validSelectCmdWithtrickyCondition_selectCmdBuilt() throws Exception {
         // given
         Tokenizer tokenizer = new Tokenizer();
         tokenizer.tokenize("select id, name from Marks where (pass==TRUE) OR ((course=='MSc') AND (grade>50));");

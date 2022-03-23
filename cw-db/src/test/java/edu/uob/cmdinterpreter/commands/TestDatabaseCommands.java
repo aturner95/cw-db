@@ -1783,4 +1783,454 @@ public class TestDatabaseCommands {
         assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
     }
 
+    @Test
+    public void test_selectCmd_deleteCmdNoRows_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new DeleteCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("id");
+        cmd.addColumnName("name");
+        cmd.addColumnName("grade");
+        cmd.addColumnName("pass");
+        cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "FALSE"));
+        cmd.getConditionJoinOperators().add("OR");
+        cmd.addCondition(new ColumnHeader("grade"), "<=", new Token(TokenType.LIT_NUM, "50"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+        Table testResult = file.readDBFileIntoEntity(fullPath);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK;
+        assertEquals(expectedMessage, resultMessage);
+        assertEquals(0, testResult.getRows().size());
+    }
+
+    @Test
+    public void test_selectCmd_deleteCmdNoRowsDeleted_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new DeleteCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("id");
+        cmd.addColumnName("name");
+        cmd.addColumnName("grade");
+        cmd.addColumnName("pass");
+        cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Darren"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("66"));
+        attr1.add(new Attribute("TRUE"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("49"));
+        attr2.add(new Attribute("TRUE"));
+        Record row2 = new Record(attr2);
+
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("3"));
+        attr3.add(new Attribute("Clive"));
+        attr3.add(new Attribute("33"));
+        attr3.add(new Attribute("FALSE"));
+        Record row3 = new Record(attr3);
+
+        rows.add(row1);
+        rows.add(row2);
+        rows.add(row3);
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+        Table testResult = file.readDBFileIntoEntity(fullPath);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK;
+        assertEquals(expectedMessage, resultMessage);
+        assertEquals(3, testResult.getRows().size());
+        assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
+        assertEquals("Bob", testResult.getRows().get(1).getAttributes().get(1).getValue());
+        assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
+    }
+
+    @Test
+    public void test_selectCmd_updateCmd_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new UpdateCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("id");
+        cmd.addColumnName("name");
+        cmd.addColumnName("grade");
+        cmd.addColumnName("pass");
+        cmd.addNameValuePair("grade", "50");
+        cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Bob"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("66"));
+        attr1.add(new Attribute("TRUE"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("49"));
+        attr2.add(new Attribute("TRUE"));
+        Record row2 = new Record(attr2);
+
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("3"));
+        attr3.add(new Attribute("Clive"));
+        attr3.add(new Attribute("33"));
+        attr3.add(new Attribute("FALSE"));
+        Record row3 = new Record(attr3);
+
+        rows.add(row1);
+        rows.add(row2);
+        rows.add(row3);
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+        Table testResult = file.readDBFileIntoEntity(fullPath);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK;
+        assertEquals(expectedMessage, resultMessage);
+        assertEquals(3, testResult.getRows().size());
+
+        assertEquals("1", testResult.getRows().get(0).getAttributes().get(0).getValue());
+        assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
+        assertEquals("66", testResult.getRows().get(0).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(0).getAttributes().get(3).getValue());
+
+        assertEquals("2", testResult.getRows().get(1).getAttributes().get(0).getValue());
+        assertEquals("Bob", testResult.getRows().get(1).getAttributes().get(1).getValue());
+        assertEquals("50", testResult.getRows().get(1).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(1).getAttributes().get(3).getValue());
+
+        assertEquals("3", testResult.getRows().get(2).getAttributes().get(0).getValue());
+        assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
+        assertEquals("33", testResult.getRows().get(2).getAttributes().get(2).getValue());
+        assertEquals("FALSE", testResult.getRows().get(2).getAttributes().get(3).getValue());
+    }
+
+    @Test
+    public void test_selectCmd_updateCmdNamePairList_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new UpdateCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("id");
+        cmd.addColumnName("name");
+        cmd.addColumnName("grade");
+        cmd.addColumnName("pass");
+        cmd.addNameValuePair("grade", "50");
+        cmd.addNameValuePair("pass", "TRUE");
+        cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Bob"));
+        cmd.addConditionJoinOperator("OR");
+        cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Clive"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("66"));
+        attr1.add(new Attribute("TRUE"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("49"));
+        attr2.add(new Attribute("TRUE"));
+        Record row2 = new Record(attr2);
+
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("3"));
+        attr3.add(new Attribute("Clive"));
+        attr3.add(new Attribute("33"));
+        attr3.add(new Attribute("FALSE"));
+        Record row3 = new Record(attr3);
+
+        rows.add(row1);
+        rows.add(row2);
+        rows.add(row3);
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+        Table testResult = file.readDBFileIntoEntity(fullPath);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK;
+        assertEquals(expectedMessage, resultMessage);
+        assertEquals(3, testResult.getRows().size());
+
+        assertEquals("1", testResult.getRows().get(0).getAttributes().get(0).getValue());
+        assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
+        assertEquals("66", testResult.getRows().get(0).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(0).getAttributes().get(3).getValue());
+
+        assertEquals("2", testResult.getRows().get(1).getAttributes().get(0).getValue());
+        assertEquals("Bob", testResult.getRows().get(1).getAttributes().get(1).getValue());
+        assertEquals("50", testResult.getRows().get(1).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(1).getAttributes().get(3).getValue());
+
+        assertEquals("3", testResult.getRows().get(2).getAttributes().get(0).getValue());
+        assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
+        assertEquals("50", testResult.getRows().get(2).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(2).getAttributes().get(3).getValue());
+    }
+
+    @Test
+    public void test_selectCmd_updateCmdNoRowsFound_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "students";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new UpdateCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("id");
+        cmd.addColumnName("name");
+        cmd.addColumnName("grade");
+        cmd.addColumnName("pass");
+        cmd.addNameValuePair("grade", "50");
+        cmd.addNameValuePair("pass", "TRUE");
+        cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Clive"));
+        cmd.addConditionJoinOperator("AND");
+        cmd.addCondition(new ColumnHeader("grade"), ">=", new Token(TokenType.LIT_STR, "48"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("grade"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        // set up row data
+        List<Record> rows = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("Anna"));
+        attr1.add(new Attribute("66"));
+        attr1.add(new Attribute("TRUE"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("Bob"));
+        attr2.add(new Attribute("49"));
+        attr2.add(new Attribute("TRUE"));
+        Record row2 = new Record(attr2);
+
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("3"));
+        attr3.add(new Attribute("Clive"));
+        attr3.add(new Attribute("33"));
+        attr3.add(new Attribute("FALSE"));
+        Record row3 = new Record(attr3);
+
+        rows.add(row1);
+        rows.add(row2);
+        rows.add(row3);
+        table.setRows(rows);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+        Table testResult = file.readDBFileIntoEntity(fullPath);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK;
+        assertEquals(expectedMessage, resultMessage);
+        assertEquals(3, testResult.getRows().size());
+
+        assertEquals("1", testResult.getRows().get(0).getAttributes().get(0).getValue());
+        assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
+        assertEquals("66", testResult.getRows().get(0).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(0).getAttributes().get(3).getValue());
+
+        assertEquals("2", testResult.getRows().get(1).getAttributes().get(0).getValue());
+        assertEquals("Bob", testResult.getRows().get(1).getAttributes().get(1).getValue());
+        assertEquals("49", testResult.getRows().get(1).getAttributes().get(2).getValue());
+        assertEquals("TRUE", testResult.getRows().get(1).getAttributes().get(3).getValue());
+
+        assertEquals("3", testResult.getRows().get(2).getAttributes().get(0).getValue());
+        assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
+        assertEquals("33", testResult.getRows().get(2).getAttributes().get(2).getValue());
+        assertEquals("FALSE", testResult.getRows().get(2).getAttributes().get(3).getValue());
+    }
+
 }
