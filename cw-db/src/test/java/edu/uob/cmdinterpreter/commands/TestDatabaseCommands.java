@@ -2233,4 +2233,288 @@ public class TestDatabaseCommands {
         assertEquals("FALSE", testResult.getRows().get(2).getAttributes().get(3).getValue());
     }
 
+    @Test
+    public void test_selectCmd_joinCmd_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+
+        // create coursework.tab
+        String tableNameA = "coursework";
+        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        File tempDBFileA = new File(fullPathA);
+        assertTrue(tempDBFileA.createNewFile());
+        assertTrue(tempDBFileA.exists());
+        assertTrue(tempDBFileA.isFile());
+
+        // create marks.tab
+        String tableNameB = "marks";
+        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        File tempDBFileB = new File(fullPathB);
+        assertTrue(tempDBFileB.createNewFile());
+        assertTrue(tempDBFileB.exists());
+        assertTrue(tempDBFileB.isFile());
+
+        // set up command
+        cmd = new JoinCMD();
+        cmd.addTableName(tableNameA);
+        cmd.addTableName(tableNameB);
+        cmd.addColumnName("grade");
+        cmd.addColumnName("id");
+
+        // set up coursework table data
+        Table course = new Table();
+        TableHeader courseHeader = new TableHeader();
+        courseHeader.setFileLocation(tempDBFileA);
+        courseHeader.setTableName(tableNameA);
+        course.setHeader(courseHeader);
+
+        List<ColumnHeader> courseColHeaders = new ArrayList<>();
+        courseColHeaders.add(new ColumnHeader("id"));
+        courseColHeaders.add(new ColumnHeader("task"));
+        courseColHeaders.add(new ColumnHeader("grade"));
+        course.setColHeadings(courseColHeaders);
+
+        List<Record> courseworkData = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("OXO"));
+        attr1.add(new Attribute("3"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("DB"));
+        attr2.add(new Attribute("1"));
+        Record row2 = new Record(attr2);
+
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("3"));
+        attr3.add(new Attribute("OXO"));
+        attr3.add(new Attribute("4"));
+        Record row3 = new Record(attr3);
+
+        List<Attribute> attr4 = new ArrayList<>();
+        attr4.add(new Attribute("4"));
+        attr4.add(new Attribute("STAG"));
+        attr4.add(new Attribute("2"));
+        Record row4 = new Record(attr4);
+
+        courseworkData.add(row1);
+        courseworkData.add(row2);
+        courseworkData.add(row3);
+        courseworkData.add(row4);
+        course.setRows(courseworkData);
+
+
+        // set up marks table and data
+        Table marks = new Table();
+        TableHeader marksHeader = new TableHeader();
+        marksHeader.setFileLocation(tempDBFileB);
+        marksHeader.setTableName(tableNameB);
+        marks.setHeader(marksHeader);
+
+        List<ColumnHeader> markHeaders = new ArrayList<>();
+        markHeaders.add(new ColumnHeader("id"));
+        markHeaders.add(new ColumnHeader("name"));
+        markHeaders.add(new ColumnHeader("mark"));
+        markHeaders.add(new ColumnHeader("pass"));
+        marks.setColHeadings(markHeaders);
+
+        List<Record> marksData = new ArrayList<>();
+        List<Attribute> attr5 = new ArrayList<>();
+        attr5.add(new Attribute("1"));
+        attr5.add(new Attribute("Steve"));
+        attr5.add(new Attribute("65"));
+        attr5.add(new Attribute("TRUE"));
+        Record row5 = new Record(attr5);
+
+        List<Attribute> attr6 = new ArrayList<>();
+        attr6.add(new Attribute("2"));
+        attr6.add(new Attribute("Dave"));
+        attr6.add(new Attribute("55"));
+        attr6.add(new Attribute("TRUE"));
+        Record row6 = new Record(attr6);
+
+        List<Attribute> attr7 = new ArrayList<>();
+        attr7.add(new Attribute("3"));
+        attr7.add(new Attribute("Bob"));
+        attr7.add(new Attribute("35"));
+        attr7.add(new Attribute("FALSE"));
+        Record row7 = new Record(attr7);
+
+        List<Attribute> attr8 = new ArrayList<>();
+        attr8.add(new Attribute("4"));
+        attr8.add(new Attribute("Clive"));
+        attr8.add(new Attribute("20"));
+        attr8.add(new Attribute("FALSE"));
+        Record row8 = new Record(attr8);
+
+        marksData.add(row5);
+        marksData.add(row6);
+        marksData.add(row7);
+        marksData.add(row8);
+        marks.setRows(marksData);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(marks);
+        file.storeEntityIntoDBFile(course);
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK + System.lineSeparator() +
+                "id\ttask\tname\tmark\tpass" + System.lineSeparator() +
+                "1\tOXO\tBob\t35\tFALSE" + System.lineSeparator() +
+                "2\tDB\tSteve\t65\tTRUE" + System.lineSeparator() +
+                "3\tOXO\tClive\t20\tFALSE" + System.lineSeparator() +
+                "4\tSTAG\tDave\t55\tTRUE" + System.lineSeparator();
+        assertEquals(expectedMessage, resultMessage);
+    }
+
+    @Test
+    public void test_selectCmd_joinCmdNoResult_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+
+        // create coursework.tab
+        String tableNameA = "coursework";
+        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        File tempDBFileA = new File(fullPathA);
+        assertTrue(tempDBFileA.createNewFile());
+        assertTrue(tempDBFileA.exists());
+        assertTrue(tempDBFileA.isFile());
+
+        // create marks.tab
+        String tableNameB = "marks";
+        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        File tempDBFileB = new File(fullPathB);
+        assertTrue(tempDBFileB.createNewFile());
+        assertTrue(tempDBFileB.exists());
+        assertTrue(tempDBFileB.isFile());
+
+        // set up command
+        cmd = new JoinCMD();
+        cmd.addTableName(tableNameA);
+        cmd.addTableName(tableNameB);
+        cmd.addColumnName("grade");
+        cmd.addColumnName("id");
+
+        // set up coursework table data
+        Table course = new Table();
+        TableHeader courseHeader = new TableHeader();
+        courseHeader.setFileLocation(tempDBFileA);
+        courseHeader.setTableName(tableNameA);
+        course.setHeader(courseHeader);
+
+        List<ColumnHeader> courseColHeaders = new ArrayList<>();
+        courseColHeaders.add(new ColumnHeader("id"));
+        courseColHeaders.add(new ColumnHeader("task"));
+        courseColHeaders.add(new ColumnHeader("grade"));
+        course.setColHeadings(courseColHeaders);
+
+        List<Record> courseworkData = new ArrayList<>();
+        List<Attribute> attr1 = new ArrayList<>();
+        attr1.add(new Attribute("1"));
+        attr1.add(new Attribute("OXO"));
+        attr1.add(new Attribute("11"));
+        Record row1 = new Record(attr1);
+
+        List<Attribute> attr2 = new ArrayList<>();
+        attr2.add(new Attribute("2"));
+        attr2.add(new Attribute("DB"));
+        attr2.add(new Attribute("11"));
+        Record row2 = new Record(attr2);
+
+        List<Attribute> attr3 = new ArrayList<>();
+        attr3.add(new Attribute("3"));
+        attr3.add(new Attribute("OXO"));
+        attr3.add(new Attribute("41"));
+        Record row3 = new Record(attr3);
+
+        List<Attribute> attr4 = new ArrayList<>();
+        attr4.add(new Attribute("4"));
+        attr4.add(new Attribute("STAG"));
+        attr4.add(new Attribute("21"));
+        Record row4 = new Record(attr4);
+
+        courseworkData.add(row1);
+        courseworkData.add(row2);
+        courseworkData.add(row3);
+        courseworkData.add(row4);
+        course.setRows(courseworkData);
+
+
+        // set up marks table and data
+        Table marks = new Table();
+        TableHeader marksHeader = new TableHeader();
+        marksHeader.setFileLocation(tempDBFileB);
+        marksHeader.setTableName(tableNameB);
+        marks.setHeader(marksHeader);
+
+        List<ColumnHeader> markHeaders = new ArrayList<>();
+        markHeaders.add(new ColumnHeader("id"));
+        markHeaders.add(new ColumnHeader("name"));
+        markHeaders.add(new ColumnHeader("mark"));
+        markHeaders.add(new ColumnHeader("pass"));
+        marks.setColHeadings(markHeaders);
+
+        List<Record> marksData = new ArrayList<>();
+        List<Attribute> attr5 = new ArrayList<>();
+        attr5.add(new Attribute("1"));
+        attr5.add(new Attribute("Steve"));
+        attr5.add(new Attribute("65"));
+        attr5.add(new Attribute("TRUE"));
+        Record row5 = new Record(attr5);
+
+        List<Attribute> attr6 = new ArrayList<>();
+        attr6.add(new Attribute("2"));
+        attr6.add(new Attribute("Dave"));
+        attr6.add(new Attribute("55"));
+        attr6.add(new Attribute("TRUE"));
+        Record row6 = new Record(attr6);
+
+        List<Attribute> attr7 = new ArrayList<>();
+        attr7.add(new Attribute("3"));
+        attr7.add(new Attribute("Bob"));
+        attr7.add(new Attribute("35"));
+        attr7.add(new Attribute("FALSE"));
+        Record row7 = new Record(attr7);
+
+        List<Attribute> attr8 = new ArrayList<>();
+        attr8.add(new Attribute("4"));
+        attr8.add(new Attribute("Clive"));
+        attr8.add(new Attribute("20"));
+        attr8.add(new Attribute("FALSE"));
+        Record row8 = new Record(attr8);
+
+        marksData.add(row5);
+        marksData.add(row6);
+        marksData.add(row7);
+        marksData.add(row8);
+        marks.setRows(marksData);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(marks);
+        file.storeEntityIntoDBFile(course);
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK + System.lineSeparator() +
+                "id\ttask\tname\tmark\tpass" + System.lineSeparator();
+        assertEquals(expectedMessage, resultMessage);
+    }
+
 }

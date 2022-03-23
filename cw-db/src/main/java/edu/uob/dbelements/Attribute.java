@@ -16,4 +16,31 @@ public class Attribute extends AbstractColumnData {
         this.data = value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Attribute other = (Attribute) obj;
+        if(this.getValue() != null && other.getValue() != null && this.getValue().equals(other.getValue())){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (this.data != null ? this.data.hashCode() : 0);
+        hash = 53 * hash + this.data.length();
+        return hash;
+    }
+
 }

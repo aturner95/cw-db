@@ -22,7 +22,7 @@ public class ColumnHeader extends AbstractColumnData {
             return false;
         }
 
-        if (obj.getClass() != this.getClass() || obj.getClass() == String.class) {
+        if (obj.getClass() != this.getClass()) {
             return false;
         }
 
