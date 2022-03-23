@@ -1332,6 +1332,94 @@ public class TestDatabaseCommands {
     }
 
     @Test
+    public void test_selectCmd_selectAttributesNotInOrder_statusCodeOK() throws Exception {
+
+        // ------------- given -------------
+        // create dir and file
+        Files.createDirectory(tempDbDir.toPath());
+        assertTrue(tempDbDir.exists());
+        assertTrue(tempDbDir.isDirectory());
+        setup(tempDbDir);
+        String tableName = "marks";
+        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        File tempDBFile = new File(fullPath);
+        assertTrue(tempDBFile.createNewFile());
+        assertTrue(tempDBFile.exists());
+        assertTrue(tempDBFile.isFile());
+
+        // set up command
+        cmd = new SelectCMD();
+        cmd.addTableName(tableName);
+        cmd.addColumnName("name");
+        cmd.addColumnName("id");
+        cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "TRUE"));
+
+
+        // set up table and header
+        Table table = new Table();
+        TableHeader header = new TableHeader();
+        header.setFileLocation(tempDBFile);
+        header.setTableName(tableName);
+        table.setHeader(header);
+
+        // set up column headers
+        List<ColumnHeader> colHeaders = new ArrayList<>();
+        colHeaders.add(new ColumnHeader("id"));
+        colHeaders.add(new ColumnHeader("name"));
+        colHeaders.add(new ColumnHeader("mark"));
+        colHeaders.add(new ColumnHeader("pass"));
+        table.setColHeadings(colHeaders);
+
+        List<Record> marksData = new ArrayList<>();
+        List<Attribute> attr5 = new ArrayList<>();
+        attr5.add(new Attribute("1"));
+        attr5.add(new Attribute("Steve"));
+        attr5.add(new Attribute("65"));
+        attr5.add(new Attribute("TRUE"));
+        Record row5 = new Record(attr5);
+
+        List<Attribute> attr6 = new ArrayList<>();
+        attr6.add(new Attribute("2"));
+        attr6.add(new Attribute("Dave"));
+        attr6.add(new Attribute("55"));
+        attr6.add(new Attribute("TRUE"));
+        Record row6 = new Record(attr6);
+
+        List<Attribute> attr7 = new ArrayList<>();
+        attr7.add(new Attribute("3"));
+        attr7.add(new Attribute("Bob"));
+        attr7.add(new Attribute("35"));
+        attr7.add(new Attribute("FALSE"));
+        Record row7 = new Record(attr7);
+
+        List<Attribute> attr8 = new ArrayList<>();
+        attr8.add(new Attribute("4"));
+        attr8.add(new Attribute("Clive"));
+        attr8.add(new Attribute("20"));
+        attr8.add(new Attribute("FALSE"));
+        Record row8 = new Record(attr8);
+
+        marksData.add(row5);
+        marksData.add(row6);
+        marksData.add(row7);
+        marksData.add(row8);
+        table.setRows(marksData);
+
+        DBTableFile file = new DBTableFile();
+        file.storeEntityIntoDBFile(table);
+
+        // ------------- when -------------
+        String resultMessage = cmd.query(server);
+
+        // ------------- then -------------
+        String expectedMessage = STATUS_OK + System.lineSeparator()
+                + "name\tid" + System.lineSeparator()
+                + "Steve\t1" + System.lineSeparator()
+                + "Dave\t2" + System.lineSeparator();
+        assertEquals(expectedMessage, resultMessage);
+    }
+
+    @Test
     public void test_selectCmd_selectAttrWithCondition_statusCodeOK() throws Exception {
 
         // ------------- given -------------

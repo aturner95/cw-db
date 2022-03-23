@@ -176,7 +176,7 @@ public abstract class DBCmd {
         }
 
         for(Record row: queryTable.getRows()){
-            addValueToResult(result, row.getAttributes(), queryAttributeIndices);
+            addRowToResult(result, row.getAttributes(), queryAttributeIndices);
         }
 
         return result;
@@ -209,16 +209,12 @@ public abstract class DBCmd {
         throw new AttributeNotFoundException(queryAttribute);
     }
 
-    private void addValueToResult(Table resultSet, List<Attribute> row, List<Integer> queryAttributeIndices){
-        int index = 0;
-        List<Attribute> resultValues = new ArrayList<>();
-        for(Attribute value: row){
-            if(queryAttributeIndices.contains(Integer.valueOf(index))){
-                resultValues.add(new Attribute(value.getValue()));
-            }
-            index++;
+    private void addRowToResult(Table resultSet, List<Attribute> row, List<Integer> queryAttributeIndices){
+        List<Attribute> newRow = new ArrayList<>();
+        for(Integer i : queryAttributeIndices) {
+            newRow.add(new Attribute(row.get(i).getValue()));
         }
-        resultSet.getRows().add(new Record(resultValues));
+        resultSet.getRows().add(new Record(newRow));
     }
 
     public boolean usingRootDatabase(DBServer server) throws DBException {

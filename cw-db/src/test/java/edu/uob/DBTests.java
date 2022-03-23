@@ -303,7 +303,7 @@ final class DBTests {
 
     // try some selects
     // TODO grade is not an attribute of MARK, however error message is wrong!
-    assertTrue(server.handleCommand("SELECT * FROM marks WHERE (grade >=) OR (pass == TRUE)").startsWith("[OK]"));
+    assertTrue(server.handleCommand("SELECT * FROM marks WHERE (grade >=) OR (pass == TRUE)").startsWith("[ERROR]"));
 
 
     teardown(db);
@@ -325,17 +325,22 @@ final class DBTests {
     assertTrue(server.handleCommand("ALTER TABLE marks ADD pass;").startsWith("[OK]"));
 
     // insert data into the two tables
-    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Steve', 65, TRUE);").startsWith("[OK]"));
-    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Dave', 55, TRUE);").startsWith("[OK]"));
-    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Bob', 35, FALSE);").startsWith("[OK]"));
-    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Clive', 20, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('OXO', 3);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('DB', 1);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('OXO', 4);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('STAG', 2);").startsWith("[OK]"));
+
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Steve', 65, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Dave', 55, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Bob', 35, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Clive', 20, FALSE);").startsWith("[OK]"));
 
     // try some selects
-    assertTrue(server.handleCommand("SELECT * FROM coursework WHERE task == 'OXO;").startsWith("[OK]"));
-    assertTrue(server.handleCommand("SELECT * FROM marks WHERE (grade >=) OR (pass == TRUE)").startsWith("[OK]"));
+    assertTrue(server.handleCommand("SELECT * FROM coursework WHERE task == 'OXO';").startsWith("[OK]"));
+    assertTrue(server.handleCommand("SELECT name, pass FROM marks WHERE (mark >= 50) OR (pass == TRUE);").startsWith("[OK]"));
 
     // try join
-    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('OXO', 3);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("JOIN coursework AND marks ON grade AND id;").startsWith("[OK]"));
 
     teardown(db);
   }
