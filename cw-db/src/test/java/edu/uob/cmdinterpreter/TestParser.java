@@ -47,7 +47,7 @@ public class TestParser {
         tokenizer.tokenize("select * from people");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(InvalidGrammarException.class, parser::parse);
+        assertThrows(ParsingException.class, parser::parse);
 
     }
 

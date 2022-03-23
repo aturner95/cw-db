@@ -85,7 +85,7 @@ public class Parser {
 
             }
         }
-        throw new InvalidGrammarException(getCurrentToken(), "<Command>  ::=  <CommandType> \";\"");
+        throw new ParsingException("Missing token: \";\"");
     }
 
     /**

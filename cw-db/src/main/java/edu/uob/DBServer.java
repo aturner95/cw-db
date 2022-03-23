@@ -73,7 +73,7 @@ public final class DBServer {
         throw new DBException();
 
     } catch(Exception e){
-      return STATUS_ERROR + e.getMessage();
+      return STATUS_ERROR + e.getClass().getSimpleName() + ": " + e.getMessage();
     }
 
   }
