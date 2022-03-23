@@ -188,16 +188,17 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreateDatabase() throws TokenIndexOutOfBoundsException {
+    private boolean isCreateDatabase() throws ParsingException {
         if (BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())) {
             cmd = new CreateCMD(BNFConstants.DATABASE);
             incrementToken();
             if (isDatabaseName()) {
                 return true;
             }
+            throw new InvalidGrammarException(getCurrentToken(), "<CreateDatabase> ::=  \"CREATE DATABASE \" <DatabaseName> ;");
         }
-
         return false;
+
     }
 
     /**
@@ -205,7 +206,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreateTable() throws TokenIndexOutOfBoundsException {
+    private boolean isCreateTable() throws ParsingException {
         if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())) {
             cmd = new CreateCMD(BNFConstants.TABLE);
             incrementToken();
@@ -224,9 +225,9 @@ public class Parser {
                     }
                 }
             }
+            throw new InvalidGrammarException(getCurrentToken(), "<CreateTable>  ::=  \"CREATE TABLE \" <TableName> | \"CREATE TABLE \" <TableName> \"(\" <AttributeList> \")\";");
         }
-
-    return false;
+        return false;
     }
 
 
