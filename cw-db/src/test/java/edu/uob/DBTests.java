@@ -287,6 +287,59 @@ final class DBTests {
     teardown(db);
   }
 
+  @Test
+  public void test_handleCommand_invalidSelectCommand_statusOk() throws Exception {
+    // create database
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    setup(db);
+
+    // use table and create table
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("ALTER TABLE marks ADD name;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("ALTER TABLE marks ADD mark;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("ALTER TABLE marks ADD pass;").startsWith("[OK]"));
+
+    // try some selects
+    // TODO grade is not an attribute of MARK, however error message is wrong!
+    assertTrue(server.handleCommand("SELECT * FROM marks WHERE (grade >=) OR (pass == TRUE)").startsWith("[OK]"));
+
+
+    teardown(db);
+  }
+
+  @Test
+  public void test_handleCommand_joinCommand_statusOk() throws Exception {
+    // create database
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    setup(db);
+
+    // use table and create tables via different methods
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE coursework (task, grade);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("ALTER TABLE marks ADD name;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("ALTER TABLE marks ADD mark;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("ALTER TABLE marks ADD pass;").startsWith("[OK]"));
+
+    // insert data into the two tables
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Steve', 65, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Dave', 55, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Bob', 35, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('Clive', 20, FALSE);").startsWith("[OK]"));
+
+    // try some selects
+    assertTrue(server.handleCommand("SELECT * FROM coursework WHERE task == 'OXO;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("SELECT * FROM marks WHERE (grade >=) OR (pass == TRUE)").startsWith("[OK]"));
+
+    // try join
+    assertTrue(server.handleCommand("INSERT INTO coursework VALUES ('OXO', 3);").startsWith("[OK]"));
+
+    teardown(db);
+  }
+
 
 
 }
