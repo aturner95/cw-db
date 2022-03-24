@@ -29,10 +29,7 @@ public class Token {
         int indexOfFirstChar = 0;
         int indexOfLastChar = sequence.length() - 1;
 
-        if(BNFConstants.SINGLE_QUOTATION.equals(Character.toString(sequence.charAt(indexOfFirstChar)))
-                && BNFConstants.SINGLE_QUOTATION.equals(Character.toString(sequence.charAt(indexOfLastChar)))){
-            return true;
-        }
-        return false;
+        return BNFConstants.SINGLE_QUOTATION.equals(Character.toString(sequence.charAt(indexOfFirstChar)))
+                && BNFConstants.SINGLE_QUOTATION.equals(Character.toString(sequence.charAt(indexOfLastChar)));
     }
 }

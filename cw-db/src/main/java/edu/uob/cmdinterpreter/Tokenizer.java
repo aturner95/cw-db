@@ -3,7 +3,6 @@ package edu.uob.cmdinterpreter;
 import edu.uob.exceptions.TokenizerException;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,8 +42,7 @@ public class Tokenizer {
         // Separator
         addToken(("\\s+"), TokenType.SEP);
 
-        // Identifiers (Basically any word, so has the lowest precedence - expect this may change...!)
-        //TODO really struggling to regex terms containing only alphanumeric characters...!
+        // Identifiers (Basically any word, so has the lowest precedence)
         addToken("\\b([a-zA-Z0-9])*\\b", TokenType.ID);
     }
 
@@ -77,12 +75,18 @@ public class Tokenizer {
 
                         string = m.replaceFirst("");
                         string = string.strip();
+
+                        // Cannot quite get regex to filter out some special character scenarios, sending Tokenizer  into an
+                        // infinite loop. To stop this, if the number of tokens generated is greater than the size of the input,
+                        // then something has obviously gone wrong, and we will throw a TokenizeException.
+                        if(tokens.size() > inputSequence.length()){
+                            throw new TokenizerException("Invalid token within input sequence: '" + inputSequence + "'");
+                        }
                         break;
                     }
                 }
-
                 if(!match) {
-                    throw new TokenizerException("Invalid token within input sequence: " + inputSequence);
+                    throw new TokenizerException("Invalid token within input sequence: '" + inputSequence + "'");
                 }
             }
             return true;

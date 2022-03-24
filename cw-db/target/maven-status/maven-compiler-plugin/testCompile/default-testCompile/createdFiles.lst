@@ -1,0 +1,5 @@
+edu/uob/cmdinterpreter/TestParser.class
+edu/uob/cmdinterpreter/commands/TestDatabaseCommands.class
+edu/uob/DBTests.class
+edu/uob/cmdinterpreter/TestTokenizer.class
+edu/uob/dbfilesystem/TestDBTableFile.class

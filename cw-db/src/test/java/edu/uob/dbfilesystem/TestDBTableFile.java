@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uob.dbfilesystem.DBFileConstants.METADATA_FILENAME;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -240,8 +241,6 @@ public class TestDBTableFile {
         // test table
         assertNotNull(table);
         assertEquals("people", table.getHeader().getTableName());
-        // TODO find out why this test fails...
-        // assertEquals("dbtest" + File.separator + "people.tab", table.getHeader().getFileLocation());
 
         // test column headings
         assertNotNull(table.getColHeadings());
@@ -282,8 +281,6 @@ public class TestDBTableFile {
         // test table
         assertNotNull(table);
         assertEquals("people", table.getHeader().getTableName());
-        // TODO find out why this test fails...
-        // assertEquals("dbtest" + File.separator + "people.tab", table.getHeader().getFileLocation());
 
         // test column headings
         assertNotNull(table.getColHeadings());
@@ -382,8 +379,6 @@ public class TestDBTableFile {
         assertTrue(tableFile.storeColumnHeaderIntoDBFile(colHeaders, tempFile));
 
         // then
-        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
-        // assertEquals("people.tab", tempFile.getName());
         assertTrue(checkDBFileContainsString(tempFile, "Id\tName\tAge\tEmail"));
         assertFalse(checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
@@ -429,8 +424,6 @@ public class TestDBTableFile {
 
 
         // then
-        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
-        // assertEquals("people.tab", tempFile.getName());
         assertFalse(tableFile.storeColumnHeaderIntoDBFile(colHeaders, tempFile));
     }
 
@@ -464,10 +457,6 @@ public class TestDBTableFile {
         assertTrue(tempFile.isFile());
 
         assertTrue(checkDBFileContainsString(tempFile, "1\tBob\t21\tbob@bob.net"));
-        // TODO find why tempFileName contains garbage numbers e.g., people3853033247386902340.tab
-        // assertEquals("people.tab", tempFile.getName());
-        // TODO find out why a File containing a \n returns false here
-        // assertTrue(checkDBFileContainsString(tempFile, System.lineSeparator()));
     }
 
     /*
@@ -695,7 +684,41 @@ public class TestDBTableFile {
         // when + then
         assertThrows(DBException.class, ()-> dbFile.storeEntityIntoDBFile(table));
 
+    }
+
+    @Test
+    public void test_variousMetadataTests() throws Exception{
+
+        // This file lives in /test
+        File metadata = new File(METADATA_FILENAME);
+        if(!metadata.exists()){
+            metadata.createNewFile();
+        }
+
+        DBTableFile db = new DBTableFile();
+        db.addTableToMetadata("markbook", "marks");
+        db.addTableToMetadata("markbook", "coursework");
+
+        assertTrue(db.containsDbTable("markbook", "marks"));
+        assertTrue(db.containsDbTable("markbook", "coursework"));
+        assertTrue(db.containsDbTable("MARKBOOK", "MARKS"));
+        assertTrue(db.containsDbTable("MarkBook", "Coursework"));
+
+        assertTrue(db.removeTableFromMetadata("markbook", "marks"));
+
+        assertFalse(db.containsDbTable("markbook", "marks"));
+        assertTrue(db.containsDbTable("markbook", "coursework"));
+        assertFalse(db.containsDbTable("nope", "marks"));
+
+        assertEquals(1, db.nextSeq("markbook", "coursework"));
+        assertEquals(2, db.nextSeq("markbook", "coursework"));
+        assertEquals(3, db.nextSeq("markbook", "coursework"));
+
+        assertTrue(db.removeTableFromMetadata("markbook", "coursework"));
+
+        metadata.delete();
 
     }
+
 
 }

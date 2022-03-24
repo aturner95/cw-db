@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+// import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestParser {
@@ -47,7 +48,7 @@ public class TestParser {
         tokenizer.tokenize("select * from people");
         Parser parser = new Parser(tokenizer);
 
-        assertThrows(InvalidGrammarException.class, parser::parse);
+        assertThrows(ParsingException.class, parser::parse);
 
     }
 
@@ -64,7 +65,7 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof UseCMD);
         assertEquals(3, tokenizer.getTokens().size());
-        assertEquals(ROOT_DB_DIR + File.separator + "DB", cmd.getDatabaseName());
+        assertEquals(/*ROOT_DB_DIR + File.separator + */"db", cmd.getDatabaseName());
     }
 
     @Test
@@ -90,7 +91,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
-        assertEquals("databases/dummyDb", cmd.getDatabaseName());
+        assertEquals("dummydb", cmd.getDatabaseName());
         assertEquals("DATABASE", ((CreateCMD) cmd).getCreateType());
     }
 
@@ -107,7 +108,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
-        assertEquals("dummyTable", cmd.getTableNames().get(0));
+        assertEquals("dummytable", cmd.getTableNames().get(0));
     }
 
     @Test
@@ -142,7 +143,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DropCMD);
-        assertEquals("databases/testDb", cmd.getDatabaseName());
+        assertEquals("testdb", cmd.getDatabaseName());
         assertEquals("DATABASE", ((DropCMD) cmd).getDropType());
     }
 
@@ -159,7 +160,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DropCMD);
-        assertEquals("TABLENAME", cmd.getTableNames().get(0));
+        assertEquals("tablename", cmd.getTableNames().get(0));
         assertEquals("TABLE", ((DropCMD) cmd).getDropType());
     }
 
@@ -176,7 +177,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof AlterCMD);
-        assertEquals("Country", cmd.getTableNames().get(0));
+        assertEquals("country", cmd.getTableNames().get(0));
         assertEquals("DROP", ((AlterCMD) cmd).getAlterationType());
         assertEquals("Id", cmd.getColNames().get(0));
     }
@@ -232,8 +233,8 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof JoinCMD);
-        assertEquals("Marks", cmd.getTableNames().get(0));
-        assertEquals("Students", cmd.getTableNames().get(1));
+        assertEquals("marks", cmd.getTableNames().get(0));
+        assertEquals("students", cmd.getTableNames().get(1));
         assertEquals("studentId", cmd.getColNames().get(0));
         assertEquals("id", cmd.getColNames().get(1));
     }
@@ -412,7 +413,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof SelectCMD);
-        assertEquals("Marks", cmd.getTableNames().get(0));
+        assertEquals("marks", cmd.getTableNames().get(0));
         assertEquals("id", cmd.getColNames().get(0));
         assertEquals("name", cmd.getColNames().get(1));
 

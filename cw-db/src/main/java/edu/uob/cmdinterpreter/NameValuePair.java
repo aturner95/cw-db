@@ -1,6 +1,4 @@
-package edu.uob.cmdinterpreter.commands;
-
-import edu.uob.dbelements.ColumnHeader;
+package edu.uob.cmdinterpreter;
 
 public class NameValuePair {
 

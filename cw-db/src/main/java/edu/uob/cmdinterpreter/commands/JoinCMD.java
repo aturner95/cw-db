@@ -38,7 +38,7 @@ public class JoinCMD extends DBCmd {
                         doJoin(result, tableA, tableB, indexOfAttrA, indexOfAttrB);
                         result.setHeader(new TableHeader());
 
-                        return STATUS_OK + System.lineSeparator() + result.toString();
+                        return STATUS_OK + System.lineSeparator() + result;
                     }
                     String errorMsg = attributeNameA + " or " + attributeNameB;
                     throw new DBAttributeDoesNotExistException(errorMsg);
@@ -54,24 +54,18 @@ public class JoinCMD extends DBCmd {
     }
 
 
-    private void doJoin(Table result, Table tableA, Table tableB, int indexOfAttrA, int indexOfAttrB) throws QueryException.AttributeNotFoundException{
+    private void doJoin(Table result, Table tableA, Table tableB, int indexOfAttrA, int indexOfAttrB) {
 
         result.setRows(new ArrayList<>());
-
         int newRowId = 1;
 
         for(Record rowA : tableA.getRows()){
-
             for(Record rowB : tableB.getRows()){
-
                 if(rowA.getAttributes().get(indexOfAttrA).equals(rowB.getAttributes().get(indexOfAttrB))){
-
                     Record newRow = new Record(new ArrayList<>());
-
                     newRow.getAttributes().add(new Attribute(String.valueOf(newRowId++)));
 
                     addAttributesToJoin(newRow, rowA, indexOfAttrA);
-
                     addAttributesToJoin(newRow, rowB, indexOfAttrB);
 
                     result.getRows().add(newRow);

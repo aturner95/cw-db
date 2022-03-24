@@ -4,11 +4,10 @@ public enum TokenType {
     CT, // Command type: <list of words>
     ID, // Identifier: table name, column name
     KW, // Keyword: <list of words>
-    // LIT, // Literal: integer literal, String literal, character literal, float literal, boolean literal
-    LIT_NUM,
-    LIT_STR,
-    LIT_CHAR,
-    LIT_BOOL,
+    LIT_NUM, // Literal number (integer and float)
+    LIT_STR, // Literal String
+    LIT_CHAR, // Literal Character
+    LIT_BOOL, // Literal Boolean
     OP, // Operation
     SEP, // Separator
 }

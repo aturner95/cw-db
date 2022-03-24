@@ -15,8 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+import java.util.Locale;
 
 public class CreateCMD extends DBCmd {
 
@@ -48,27 +47,27 @@ public class CreateCMD extends DBCmd {
         }
     }
 
-    private void createDatabase() throws DBException{
-        File database = new File(getDatabaseName());
+    private void createDatabase() throws DBException {
+        File database = new File("." + File.separator + getDatabaseName().toLowerCase(Locale.ROOT));
         if(!database.exists() && !database.isDirectory()){
             if(database.mkdir()){
                 return;
             }
             throw new DBException();
         }
-        throw new DBTableExistsException(getDatabaseName());
+        throw new DBExistsException(getDatabaseName());
     }
 
-    private void createTable(DBServer server) throws DBException, IOException{
+    private void createTable(DBServer server) throws Exception {
 
         if(hasDatabase(server)){
+            if(server.getUseDatabaseDirectory() != null) {
             String tableName = getTableNames().get(0);
-            File file = new File(server.getDatabaseDirectory() + File.separator + tableName + DBFileConstants.TABLE_EXT);
+            String dbName = server.getUseDatabaseDirectory().getName().toLowerCase(Locale.ROOT);
+            File file = new File(dbName + File.separator + tableName.toLowerCase(Locale.ROOT) + DBFileConstants.TABLE_EXT);
 
-            if(!usingRootDatabase(server)) {
                 if (!file.exists()) {
                     try {
-
                         if (file.createNewFile()) {
                             Table table = new Table();
                             TableHeader header = new TableHeader();
@@ -77,11 +76,13 @@ public class CreateCMD extends DBCmd {
                             table.setHeader(header);
                             if (getColNames().size() > 0) {
                                 addAttributeList(table, getColNames());
+
                             } else {
                                 addAttributeList(table, new ArrayList<>());
                             }
                             DBTableFile dbFile = new DBTableFile();
                             dbFile.storeEntityIntoDBFile(table);
+                            dbFile.addTableToMetadata(dbName, tableName);
                             return;
                         }
                     } catch (IOException ioe) {
@@ -90,7 +91,7 @@ public class CreateCMD extends DBCmd {
                 }
                 throw new DBTableExistsException(tableName);
             }
-            throw new DBException("No database has been selected, (hint: USE <database>)");
+             throw new DBException("No database has been selected, (hint: USE <database>)");
         }
         throw new DBDoesNotExistException(server.getDatabaseDirectory().getName());
     }

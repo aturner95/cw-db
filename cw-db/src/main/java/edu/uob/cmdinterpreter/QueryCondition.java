@@ -8,10 +8,6 @@ public class QueryCondition {
     private String operator;
     private Token value;
 
-    public QueryCondition() {
-        super();
-    }
-
     public QueryCondition(ColumnHeader attribute, String operator, Token value) {
         this.attribute = attribute;
         this.operator = operator;

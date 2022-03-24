@@ -21,11 +21,11 @@ public class Parser {
         this.currentToken = 0;
     }
 
-    private String getCurrentTokenSeq() throws TokenIndexOutOfBoundsException {
+    private String getCurrentTokenSeq() {
         return getCurrentToken().getSequence();
     }
 
-    private Token getCurrentToken() throws TokenIndexOutOfBoundsException {
+    private Token getCurrentToken()  {
         return tokens.get(currentToken);
     }
 
@@ -51,20 +51,12 @@ public class Parser {
         throw new TokenIndexOutOfBoundsException(currentToken, tokens.size());
     }
 
-    private String lookAheadTokenSeq() throws TokenIndexOutOfBoundsException {
-        if(currentToken + 1 < tokens.size()){
-            return tokens.get(currentToken + 1).getSequence();
-        }
-        throw new TokenIndexOutOfBoundsException(currentToken + 1, tokens.size());
-    }
-
     public DBCmd parse() throws ParsingException {
         if(isCommand()) {
             return cmd;
         }
 
-        // TODO throw new parsing exception
-        return null;
+        throw new ParsingException("Unknown parsing exception");
     }
 
     /**
@@ -84,8 +76,9 @@ public class Parser {
                 }
 
             }
+            throw new ParsingException("An unknown parsing error has occurred");
         }
-        throw new InvalidGrammarException(getCurrentToken(), "<Command>  ::=  <CommandType> \";\"");
+        throw new ParsingException("Missing token: \";\"");
     }
 
     /**
@@ -188,16 +181,17 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreateDatabase() throws TokenIndexOutOfBoundsException {
+    private boolean isCreateDatabase() throws ParsingException {
         if (BNFConstants.DATABASE.equalsIgnoreCase(getCurrentTokenSeq())) {
             cmd = new CreateCMD(BNFConstants.DATABASE);
             incrementToken();
             if (isDatabaseName()) {
                 return true;
             }
+            throw new InvalidGrammarException(getCurrentToken(), "<CreateDatabase> ::=  \"CREATE DATABASE \" <DatabaseName> ;");
         }
-
         return false;
+
     }
 
     /**
@@ -205,7 +199,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isCreateTable() throws TokenIndexOutOfBoundsException {
+    private boolean isCreateTable() throws ParsingException {
         if(BNFConstants.TABLE.equalsIgnoreCase(getCurrentTokenSeq())) {
             cmd = new CreateCMD(BNFConstants.TABLE);
             incrementToken();
@@ -224,9 +218,9 @@ public class Parser {
                     }
                 }
             }
+            throw new InvalidGrammarException(getCurrentToken(), "<CreateTable>  ::=  \"CREATE TABLE \" <TableName> | \"CREATE TABLE \" <TableName> \"(\" <AttributeList> \")\";");
         }
-
-    return false;
+        return false;
     }
 
 
@@ -417,7 +411,8 @@ public class Parser {
                 }
             }
         }
-        throw new InvalidGrammarException(getCurrentToken(), "<Join>  ::=  \"JOIN \" <TableName> \" AND \" <TableName> \" ON \" <AttributeName> \" AND \" <AttributeName>");
+        throw new InvalidGrammarException(getCurrentToken(), "<Join>  ::=  \"JOIN \" <TableName> \" AND \" <TableName> \" ON \" "
+                + "<AttributeName> \" AND \" <AttributeName>");
     }
 
 
@@ -448,7 +443,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isSymbol() throws TokenIndexOutOfBoundsException {
+    private boolean isSymbol()  {
         if(BNFConstants.EXCLAMATION_MARK.equalsIgnoreCase(getCurrentTokenSeq())){
             return true;
         } else if (BNFConstants.HASH_SYMBOL.equalsIgnoreCase(getCurrentTokenSeq())){
@@ -822,9 +817,7 @@ public class Parser {
      *
      * @return
      */
-    private boolean isOperator() throws InvalidGrammarException, TokenIndexOutOfBoundsException {
-//        if(BNFConstants.ASSIGNMENT.equals(getCurrentTokenSeq())){
-//            return true; }
+    private boolean isOperator() throws InvalidGrammarException {
         if(BNFConstants.EQUAL_TO.equals(getCurrentTokenSeq())){
             return true;
         } if(BNFConstants.GREATER_THAN.equals(getCurrentTokenSeq())){
