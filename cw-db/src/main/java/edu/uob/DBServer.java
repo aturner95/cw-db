@@ -47,7 +47,7 @@ public final class DBServer {
     if(rootDbDir.exists() && rootDbDir.isDirectory()){
       this.databaseDirectory = databaseDirectory;
     } else {
-      System.out.println("ERROR: expect root database directory folder:  ./databases");
+      System.out.println("ERROR: expect root database directory folder:  cw-db/databases");
       System.out.println("I do not want files/directories created and deleted willy-nilly in the project workspace!");
     }
 

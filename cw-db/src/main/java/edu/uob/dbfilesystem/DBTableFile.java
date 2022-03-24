@@ -196,4 +196,116 @@ public class DBTableFile {
         }
     }
 
+    public boolean containsDbTable(String databaseName, String tableName) throws Exception {
+        File fileToOpen = new File("databases" + File.separator + "databases.data");
+
+        FileReader reader = new FileReader(fileToOpen);
+        try(BufferedReader br = new BufferedReader(reader)){
+            String line;
+
+            while((line = br.readLine()) != null){
+                String dbFile = databaseName + ":" + tableName;
+                if(line.toUpperCase().contains(dbFile.toUpperCase())){
+                    return true;
+                }
+            }
+
+            return false;
+        } catch(FileNotFoundException fnf){
+
+            throw new DBException("Unable to find databases.data metadata file");
+        }
+    }
+
+    public boolean addTableToMetadata(String databaseName, String tableName) throws Exception {
+        return (addTableToMetadata(databaseName, tableName, 1));
+    }
+
+    public boolean addTableToMetadata(String databaseName, String tableName, int sequence) throws Exception {
+
+        File dbFile = new File("databases" + File.separator + "databases.data");
+        boolean appendMode = true;
+
+        if(containsDbTable(databaseName, tableName)) {
+            throw new DBException.DBTableExistsException(tableName);
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, appendMode))) {
+
+            bw.append(System.lineSeparator() + databaseName + ":" + tableName + ":" + sequence + System.lineSeparator());
+            return true;
+
+        } catch (IOException ioe) {
+            return false;
+        }
+    }
+
+    public boolean removeTableFromMetadata(String databaseName, String tableName) throws FileNotFoundException{
+
+        File file = new File("databases" + File.separator + "databases.data");
+        FileReader reader = new FileReader(file);
+        StringBuilder rewrite = null;
+
+        try(BufferedReader br = new BufferedReader(reader)){
+
+            rewrite = new StringBuilder();
+            String line;
+
+            while((line = br.readLine()) != null){
+                String dbFile = databaseName + ":" + tableName;
+                if(!line.toLowerCase(Locale.ROOT).contains(dbFile.toLowerCase(Locale.ROOT))) {
+                    rewrite.append(line);
+                }
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, false))) {
+
+            bw.write(rewrite.toString().toLowerCase(Locale.ROOT));
+            return true;
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Returns current sequence and increments
+     * @param databaseName
+     * @param tableName
+     * @return
+     * @throws FileNotFoundException
+     */
+    public int nextSeq(String databaseName, String tableName) throws Exception{
+
+        File fileToOpen = new File("databases" + File.separator + "databases.data");
+        FileReader reader = new FileReader(fileToOpen);
+
+        try(BufferedReader br = new BufferedReader(reader)){
+
+            String line;
+
+            while((line = br.readLine()) != null){
+                String dbFile = databaseName + ":" + tableName;
+                if(line.toLowerCase(Locale.ROOT).contains(dbFile.toLowerCase(Locale.ROOT))) {
+                    String [] split = line.split(":");
+                    // db:table:seq
+                    int indexOfSeq = 2;
+                    int currentSeq = Integer.valueOf(split[indexOfSeq]).intValue();
+                    removeTableFromMetadata(databaseName, tableName);
+                    addTableToMetadata(databaseName,tableName, currentSeq+1);
+
+                    return currentSeq;
+                }
+            }
+            throw new IOException("seq attribute not found!");
+        }
+    }
+
+
 }

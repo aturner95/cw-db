@@ -16,6 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +34,7 @@ public class TestDatabaseCommands {
 
     @BeforeEach
     void setup(@TempDir File dbDir) throws Exception {
-        tempDbDir = new File(tempDbDirName);
+        tempDbDir = new File(tempDbDirName.toLowerCase());
         tempDbDir.deleteOnExit();
         server = new DBServer(dbDir);
     }
@@ -52,6 +53,11 @@ public class TestDatabaseCommands {
             assertTrue(tempDbDir.delete());
         }
         cmd = null;
+
+    }
+
+    void clearDatabaseMetadata(String tablename) throws Exception{
+        new DBTableFile().removeTableFromMetadata("dbtest", tablename);
     }
 
     @Test
@@ -112,7 +118,7 @@ public class TestDatabaseCommands {
 
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
-        tempDbDir = new File(newTempDb);
+        tempDbDir = new File(newTempDb.toLowerCase(Locale.ROOT));
         assertTrue(tempDbDir.exists());
         assertTrue(tempDbDir.isDirectory());
     }
@@ -133,9 +139,11 @@ public class TestDatabaseCommands {
 
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
-        File tempFile = new File(ROOT_DB_DIR + File.separator +"dbtest" + File.separator + newTempTable + ".tab");
+        File tempFile = new File(ROOT_DB_DIR + File.separator +"dbtest" + File.separator + newTempTable.toLowerCase(Locale.ROOT) + ".tab");
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
+
+        clearDatabaseMetadata("newtemptable");
     }
 
     @Test
@@ -168,6 +176,8 @@ public class TestDatabaseCommands {
         assertEquals("name", marks.getColHeadings().get(1).getColName());
         assertEquals("mark", marks.getColHeadings().get(2).getColName());
         assertEquals("pass", marks.getColHeadings().get(3).getColName());
+
+        clearDatabaseMetadata("marks");
     }
 
     @Test
@@ -187,6 +197,7 @@ public class TestDatabaseCommands {
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
         assertFalse(tempDbDir.exists());
+
     }
 
     @Test
@@ -209,6 +220,7 @@ public class TestDatabaseCommands {
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
         assertFalse(tempDBFile.exists());
+        clearDatabaseMetadata("table");
     }
 
     @Test
@@ -312,6 +324,7 @@ public class TestDatabaseCommands {
         assertEquals(4, table.getColHeadings().size());
         assertEquals(4, table.getRows().get(0).getAttributes().size());
         assertEquals(4, table.getRows().get(1).getAttributes().size());
+        clearDatabaseMetadata("people");
     }
 
     @Test
@@ -386,6 +399,7 @@ public class TestDatabaseCommands {
         assertEquals(2, table.getRows().get(1).getAttributes().size());
         assertEquals("2", table.getRows().get(1).getAttributes().get(0).getValue());
         assertEquals("Bob", table.getRows().get(1).getAttributes().get(1).getValue());
+        clearDatabaseMetadata("people");
     }
 
 
@@ -412,6 +426,7 @@ public class TestDatabaseCommands {
 
         // then
         assertTrue(resultMessage.contains(STATUS_ERROR));
+        clearDatabaseMetadata("people");
     }
 
     @Test
@@ -488,6 +503,8 @@ public class TestDatabaseCommands {
         assertEquals("2", table.getRows().get(1).getAttributes().get(0).getValue());
         assertEquals("Bob", table.getRows().get(1).getAttributes().get(1).getValue());
         assertEquals("bob@email.com", table.getRows().get(1).getAttributes().get(2).getValue());
+
+        clearDatabaseMetadata("people");
     }
 
     @Test
@@ -563,6 +580,7 @@ public class TestDatabaseCommands {
         assertEquals("2", table.getRows().get(1).getAttributes().get(0).getValue());
         assertEquals("Bob", table.getRows().get(1).getAttributes().get(1).getValue());
         assertEquals("bob@email.com", table.getRows().get(1).getAttributes().get(2).getValue());
+        clearDatabaseMetadata("people");
     }
 
     @Test
@@ -622,6 +640,7 @@ public class TestDatabaseCommands {
 
         DBTableFile file = new DBTableFile();
         file.storeEntityIntoDBFile(table);
+        file.addTableToMetadata(tempDbDirName, tableName.toLowerCase(Locale.ROOT), 3);
 
         // ------------- when -------------
         String resultMessage = cmd.query(server);
@@ -647,6 +666,8 @@ public class TestDatabaseCommands {
         assertEquals("3", table.getRows().get(2).getAttributes().get(0).getValue());
         assertEquals("France", table.getRows().get(2).getAttributes().get(1).getValue());
         assertEquals("Paris", table.getRows().get(2).getAttributes().get(2).getValue());
+
+        clearDatabaseMetadata("country");
     }
 
 
@@ -728,6 +749,8 @@ public class TestDatabaseCommands {
         assertEquals("2", table.getRows().get(1).getAttributes().get(0).getValue());
         assertEquals("Spain", table.getRows().get(1).getAttributes().get(1).getValue());
         assertEquals("Madrid", table.getRows().get(1).getAttributes().get(2).getValue());
+
+        clearDatabaseMetadata("country");
     }
 
 
@@ -809,6 +832,8 @@ public class TestDatabaseCommands {
         assertEquals("2", table.getRows().get(1).getAttributes().get(0).getValue());
         assertEquals("Spain", table.getRows().get(1).getAttributes().get(1).getValue());
         assertEquals("Madrid", table.getRows().get(1).getAttributes().get(2).getValue());
+
+        clearDatabaseMetadata("country");
     }
 
     @Test
@@ -933,6 +958,9 @@ public class TestDatabaseCommands {
 
         // ------------- then -------------
         assertTrue(resultMessage.contains(STATUS_OK));
+
+        clearDatabaseMetadata("pet");
+        clearDatabaseMetadata("person");
     }
 
     @Test
@@ -1102,6 +1130,8 @@ public class TestDatabaseCommands {
 
         // ------------- then -------------
         assertTrue(resultMessage.contains(STATUS_ERROR));
+        clearDatabaseMetadata("pet");
+        clearDatabaseMetadata("person");
     }
 
 
@@ -1171,6 +1201,8 @@ public class TestDatabaseCommands {
                 + "1\tGermany\tBerlin" + System.lineSeparator()
                 + "2\tSpain\tMadrid" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("country");
     }
 
     @Test
@@ -1219,6 +1251,8 @@ public class TestDatabaseCommands {
         String expectedMessage = STATUS_OK + System.lineSeparator()
                 + "Id\tName\tCapital" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("country");
     }
 
 
@@ -1261,6 +1295,8 @@ public class TestDatabaseCommands {
         // ------------- then -------------
         String expectedMessage = STATUS_OK;
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("country");
     }
 
 
@@ -1329,6 +1365,8 @@ public class TestDatabaseCommands {
                 + "Id\tName\tCapital" + System.lineSeparator()
                 + "2\tSpain\tMadrid" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("country");
     }
 
     @Test
@@ -1417,6 +1455,8 @@ public class TestDatabaseCommands {
                 + "Steve\t1" + System.lineSeparator()
                 + "Dave\t2" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("marks");
     }
 
     @Test
@@ -1486,6 +1526,8 @@ public class TestDatabaseCommands {
                 + "1\tGermany" + System.lineSeparator()
                 + "2\tSpain" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("country");
     }
 
     @Test
@@ -1554,6 +1596,8 @@ public class TestDatabaseCommands {
                 + "name\tgrade" + System.lineSeparator()
                 + "Anna\t55" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -1623,6 +1667,8 @@ public class TestDatabaseCommands {
                 + "id\tname\tgrade" + System.lineSeparator()
                 + "2\tAnna\t63" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -1698,6 +1744,8 @@ public class TestDatabaseCommands {
                 + "1\tAnna\t45" + System.lineSeparator()
                 + "2\tBob\t70" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -1783,6 +1831,8 @@ public class TestDatabaseCommands {
         assertEquals(2, testResult.getRows().size());
         assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
         assertEquals("Bob", testResult.getRows().get(1).getAttributes().get(1).getValue());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -1869,6 +1919,8 @@ public class TestDatabaseCommands {
         assertEquals(expectedMessage, resultMessage);
         assertEquals(1, testResult.getRows().size());
         assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -1930,6 +1982,8 @@ public class TestDatabaseCommands {
         String expectedMessage = STATUS_OK;
         assertEquals(expectedMessage, resultMessage);
         assertEquals(0, testResult.getRows().size());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -2016,6 +2070,8 @@ public class TestDatabaseCommands {
         assertEquals("Anna", testResult.getRows().get(0).getAttributes().get(1).getValue());
         assertEquals("Bob", testResult.getRows().get(1).getAttributes().get(1).getValue());
         assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -2115,6 +2171,8 @@ public class TestDatabaseCommands {
         assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
         assertEquals("33", testResult.getRows().get(2).getAttributes().get(2).getValue());
         assertEquals("FALSE", testResult.getRows().get(2).getAttributes().get(3).getValue());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -2217,6 +2275,8 @@ public class TestDatabaseCommands {
         assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
         assertEquals("50", testResult.getRows().get(2).getAttributes().get(2).getValue());
         assertEquals("TRUE", testResult.getRows().get(2).getAttributes().get(3).getValue());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -2319,6 +2379,8 @@ public class TestDatabaseCommands {
         assertEquals("Clive", testResult.getRows().get(2).getAttributes().get(1).getValue());
         assertEquals("33", testResult.getRows().get(2).getAttributes().get(2).getValue());
         assertEquals("FALSE", testResult.getRows().get(2).getAttributes().get(3).getValue());
+
+        clearDatabaseMetadata("students");
     }
 
     @Test
@@ -2463,6 +2525,9 @@ public class TestDatabaseCommands {
                 "3\tOXO\tClive\t20\tFALSE" + System.lineSeparator() +
                 "4\tSTAG\tDave\t55\tTRUE" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("marks");
+        clearDatabaseMetadata("coursework");
     }
 
     @Test
@@ -2603,6 +2668,9 @@ public class TestDatabaseCommands {
         String expectedMessage = STATUS_OK + System.lineSeparator() +
                 "id\ttask\tname\tmark\tpass" + System.lineSeparator();
         assertEquals(expectedMessage, resultMessage);
+
+        clearDatabaseMetadata("marks");
+        clearDatabaseMetadata("coursework");
     }
 
 }

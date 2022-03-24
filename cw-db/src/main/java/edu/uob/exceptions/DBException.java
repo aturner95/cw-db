@@ -26,7 +26,7 @@ public class DBException extends Exception {
         private static final long serialVersionUID = 783202793903458L;
 
         public DBDoesNotExistException(String dbName) {
-            super("Table does not exist: " + dbName);
+            super("Database does not exist: " + dbName);
         }
     }
 

@@ -4,6 +4,7 @@ import edu.uob.DBServer;
 import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
 import edu.uob.dbfilesystem.DBFileConstants;
+import edu.uob.dbfilesystem.DBTableFile;
 import edu.uob.exceptions.DBException;
 import edu.uob.exceptions.DBException.*;
 
@@ -46,11 +47,13 @@ public class DropCMD extends DBCmd {
         deleteDirectory(database);
     }
 
-    private void dropTable(File db) throws DBTableDoesNotExistException {
+    private void dropTable(File db) throws Exception {
         byte indexOfTable = 0;
         File table = new File( db.toString() + File.separator + getTableNames().get(indexOfTable) + DBFileConstants.TABLE_EXT);
         if(table.exists() && table.isFile()){
             table.delete();
+            DBTableFile dbFile = new DBTableFile();
+            dbFile.removeTableFromMetadata(databaseName, getTableNames().get(indexOfTable));
             return;
         }
         throw new DBTableDoesNotExistException(table.getName());

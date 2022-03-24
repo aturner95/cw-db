@@ -695,7 +695,32 @@ public class TestDBTableFile {
         // when + then
         assertThrows(DBException.class, ()-> dbFile.storeEntityIntoDBFile(table));
 
-
     }
+
+    @Test
+    public void test_variousMetadataTests() throws Exception{
+
+        DBTableFile db = new DBTableFile();
+        db.addTableToMetadata("markbook", "marks");
+        db.addTableToMetadata("markbook", "coursework");
+
+        assertTrue(db.containsDbTable("markbook", "marks"));
+        assertTrue(db.containsDbTable("markbook", "coursework"));
+        assertTrue(db.containsDbTable("MARKBOOK", "MARKS"));
+        assertTrue(db.containsDbTable("MarkBook", "Coursework"));
+
+        assertTrue(db.removeTableFromMetadata("markbook", "marks"));
+
+        assertFalse(db.containsDbTable("markbook", "marks"));
+        assertTrue(db.containsDbTable("markbook", "coursework"));
+        assertFalse(db.containsDbTable("nope", "marks"));
+
+        assertEquals(1, db.nextSeq("markbook", "coursework"));
+        assertEquals(2, db.nextSeq("markbook", "coursework"));
+        assertEquals(3, db.nextSeq("markbook", "coursework"));
+
+        assertTrue(db.removeTableFromMetadata("markbook", "coursework"));
+    }
+
 
 }

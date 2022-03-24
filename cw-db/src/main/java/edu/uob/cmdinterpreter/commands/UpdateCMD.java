@@ -50,6 +50,10 @@ public class UpdateCMD extends DBCmd {
                                     String name = nameValuePair.getName();
                                     String value = nameValuePair.getValue();
 
+                                    if(name.equalsIgnoreCase("id")){
+                                        throw new DBException("Cannot update primary key of a row");
+                                    }
+
                                     // if the name exists in the table header
                                     if(table.getColHeadings().contains(new ColumnHeader(name))) {
 

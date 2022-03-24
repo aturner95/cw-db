@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
+import static edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd.STATUS_OK;
 import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,7 +41,13 @@ final class DBTests {
       assertTrue(tempDbDir.delete());
       tempDbDir = null;
     }
+
   }
+
+  void clearDatabaseMetadata(String tablename) throws Exception{
+    new DBTableFile().removeTableFromMetadata("dbtest", tablename);
+  }
+
 
   @AfterEach
   void teardown(@TempDir File tempDbDir){
@@ -93,7 +101,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_validCreateTableCommand_statusOk() {
+  public void test_handleCommand_validCreateTableCommand_statusOk() throws FileNotFoundException {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File(ROOT_DB_DIR + File.separator + "markbook");
@@ -107,6 +115,8 @@ final class DBTests {
     File table = new File(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
     assertTrue(table.exists());
     assertTrue(table.isFile());
+
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
@@ -127,7 +137,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_invalidCreateThenValidCreate_statusErrorThenOK() {
+  public void test_handleCommand_invalidCreateThenValidCreate_statusErrorThenOK() throws FileNotFoundException {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File(ROOT_DB_DIR + File.separator +"markbook");
@@ -145,6 +155,7 @@ final class DBTests {
     // assert file exists, then teardown
     File table = new File(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
     assertTrue(table.exists());
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
@@ -168,6 +179,7 @@ final class DBTests {
     assertEquals("id", marks.getColHeadings().get(0).getColName());
     assertEquals("name", marks.getColHeadings().get(1).getColName());
 
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
@@ -194,11 +206,12 @@ final class DBTests {
     Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
     assertEquals(5, marks.getRows().size());
 
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
   @Test
-  public void test_handleCommand_validDropTableCommand_statusOk() {
+  public void test_handleCommand_validDropTableCommand_statusOk() throws FileNotFoundException {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     String dbPathName ="markbook";
     File db = new File(ROOT_DB_DIR + File.separator + dbPathName);
@@ -210,6 +223,7 @@ final class DBTests {
     assertTrue(table.isFile());
 
     assertTrue(server.handleCommand("DROP TABLE marks;").startsWith("[OK]"));
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
@@ -224,7 +238,7 @@ final class DBTests {
   }
 
   @Test
-  public void test_handleCommand_validDropDbWithTableCommand_statusOk() {
+  public void test_handleCommand_validDropDbWithTableCommand_statusOk() throws FileNotFoundException {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File(ROOT_DB_DIR + File.separator + "markbook");
     setup(db);
@@ -237,11 +251,12 @@ final class DBTests {
     assertTrue(server.handleCommand("DROP DATABASE markbook;").startsWith("[OK]"));
     assertFalse(db.exists());
     assertFalse(table.exists());
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
   @Test
-  public void test_handleCommand_validJoinCommand_statusOk() {
+  public void test_handleCommand_validJoinCommand_statusOk() throws FileNotFoundException {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     File db = new File(ROOT_DB_DIR + File.separator +"markbook");
     setup(db);
@@ -255,6 +270,8 @@ final class DBTests {
     assertTrue(server.handleCommand("INSERT INTO students VALUES ('Donte', 'MSc', 2);").startsWith("[OK]"));
 
     assertTrue(server.handleCommand("JOIN students AND marks on id AND studentId;").startsWith("[OK]"));
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
+    new DBTableFile().removeTableFromMetadata("markbook", "students");
     teardown(db);
   }
 
@@ -284,6 +301,7 @@ final class DBTests {
     assertTrue(server.handleCommand("select name, grade from student where (pass == TRUE) OR (grade >= 50);").startsWith("[OK]"));
     assertTrue(server.handleCommand("select name, grade from student where (pass == TRUE) AND (grade >= 50);").startsWith("[OK]"));
 
+    new DBTableFile().removeTableFromMetadata("markbook", "student");
     teardown(db);
   }
 
@@ -305,7 +323,7 @@ final class DBTests {
     // TODO grade is not an attribute of MARK, however error message is wrong!
     assertTrue(server.handleCommand("SELECT * FROM marks WHERE (grade >=) OR (pass == TRUE)").startsWith("[ERROR]"));
 
-
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
@@ -342,9 +360,43 @@ final class DBTests {
     // try join
     assertTrue(server.handleCommand("JOIN coursework AND marks ON grade AND id;").startsWith("[OK]"));
 
+    new DBTableFile().removeTableFromMetadata("markbook", "coursework");
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
   }
 
+
+
+  @Test
+  public void test_handleCommand_insertCommand_sequencePreservedAfterDelete() throws Exception {
+    // create database
+    assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
+    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    setup(db);
+
+    // set up table
+    assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
+    assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
+
+    // insert data, some will be OK some will ERROR, but Server should still run in either case
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Steve', 65, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Dave', 55, TRUE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Bob', 35, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Clive', 20, FALSE);").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Amir', 24, TRUE);").startsWith("[OK]"));
+
+    assertTrue(server.handleCommand("DELETE FROM marks WHERE name == 'Amir';").startsWith("[OK]"));
+    assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Jules', 20, TRUE);").startsWith("[OK]"));
+
+    Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    assertEquals(5, marks.getRows().size());
+    assertFalse(marks.toString().contains("5\tJules\t20\tTRUE"));
+    assertTrue(marks.toString().contains("6\tJules\t20\tTRUE"));
+
+
+    new DBTableFile().removeTableFromMetadata("markbook", "marks");
+    teardown(db);
+  }
 
 
 }

@@ -63,7 +63,7 @@ public abstract class DBCmd {
     }
 
     public void setDatabaseName(String databaseName){
-        this.databaseName = ROOT_DB_DIR + File.separator + databaseName;
+        this.databaseName = ROOT_DB_DIR + File.separator + databaseName.toLowerCase(Locale.ROOT);
     }
 
     public List<String> getTableNames(){
@@ -71,7 +71,7 @@ public abstract class DBCmd {
     }
 
     public void addTableName(String tableName){
-        tableNames.add(tableName);
+        tableNames.add(tableName.toLowerCase(Locale.ROOT));
     }
 
     public List<String> getColNames(){
@@ -92,6 +92,7 @@ public abstract class DBCmd {
 
     public boolean hasDatabase(DBServer server) {
         if(server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory()){
+            // if(!ROOT_DB_DIR.equalsIgnoreCase(server.getDatabaseDirectory().getName())){
             if(!"./databases".equalsIgnoreCase(server.getDatabaseDirectory().getName())){
                 return true;
             }
@@ -105,11 +106,37 @@ public abstract class DBCmd {
             File[] tables = db.listFiles();
             for (File table : tables) {
                 int indexOfFileExt = table.getName().length() - 4;
-                if (tableName.equalsIgnoreCase(table.getName().substring(0, indexOfFileExt))) {
+                if (tableName.equalsIgnoreCase(table.getName().toLowerCase(Locale.ROOT).substring(0, indexOfFileExt))) {
                     return true;
                 }
             }
         }
+        return false;
+    }
+
+    /**
+     * File.exists() is case-sensitive! This code is from https://forum.x86labs.org/index.php?topic=4665.0 (23-Mar-2022)
+     * @param filename
+     * @return
+     */
+    private boolean fileExistsIgnoreCase(String filename)
+    {
+        File file = new File(filename);
+        File directory;
+        String[] files;
+
+        if(file.exists())
+            return true;
+
+        /* Get the directory listing */
+        directory = file.getParentFile();
+        files = directory.list();
+        for(int i = 0; i < files.length; i++)
+        {
+            if(files[i].equalsIgnoreCase(file.getName()))
+                return true;
+        }
+
         return false;
     }
 
