@@ -47,7 +47,7 @@ public final class DBServer {
     String top = databaseDirectory.getPath();
 
     if(top.endsWith(".")){
-      top.substring(0, top.length() - 1);
+      top = top.substring(0, top.length() - 1);
     }
 
     File base = new File(top);
@@ -60,7 +60,7 @@ public final class DBServer {
         metadata.createNewFile();
       }
     }catch(Exception e){
-      System.out.println("ERROR: the 'databases.data' metadata file databases.data does not exist and was not able to be created");
+      System.out.println("ERROR: the 'databases.data' metadata file does not exist and was not able to be created");
     }
 
   }

@@ -21,17 +21,11 @@ public class Attribute extends AbstractColumnData {
         if (obj == null) {
             return false;
         }
-
         if (obj.getClass() != this.getClass()) {
             return false;
         }
-
         final Attribute other = (Attribute) obj;
-        if(this.getValue() != null && other.getValue() != null && this.getValue().equalsIgnoreCase(other.getValue())){
-            return true;
-        }
-
-        return false;
+        return this.getValue() != null && other.getValue() != null && this.getValue().equalsIgnoreCase(other.getValue());
     }
 
 
@@ -39,7 +33,6 @@ public class Attribute extends AbstractColumnData {
     public int hashCode() {
         int hash = 3;
         hash = 53 * hash + (this.data != null ? this.data.hashCode() : 0);
-        hash = 53 * hash + this.data.length();
         return hash;
     }
 

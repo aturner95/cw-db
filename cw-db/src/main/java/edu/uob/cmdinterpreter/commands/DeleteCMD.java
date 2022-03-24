@@ -50,14 +50,4 @@ public class DeleteCMD extends DBCmd {
         }
     }
 
-    private boolean deleteRow(Table table, Record rowToDelete){
-        for(Record tableRow : table.getRows()){
-            if(rowToDelete.getId().equals(tableRow.getId())){
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 }

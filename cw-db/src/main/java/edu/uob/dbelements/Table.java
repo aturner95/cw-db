@@ -1,11 +1,6 @@
 package edu.uob.dbelements;
 
-import edu.uob.dbfilesystem.DBRowType;
-
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +11,14 @@ public class Table {
     private List<Record> rows;
 
     public Table(){
-        // this.colHeadings = new ArrayList<>();
-        this.rows = new ArrayList<Record>();
+        this.rows = new ArrayList<>();
     }
 
     public Table(String tableName, File fileLocation){
         this.tableHeader = new TableHeader();
         this.tableHeader.setTableName(tableName);
         this.tableHeader.setFileLocation(fileLocation);
-        // this.colHeadings = new ArrayList<>();
-        this.rows = new ArrayList<Record>();
+        this.rows = new ArrayList<>();
 
     }
 
@@ -76,8 +69,6 @@ public class Table {
                 }
             }
         }
-
         return asString.toString();
     }
 }
-

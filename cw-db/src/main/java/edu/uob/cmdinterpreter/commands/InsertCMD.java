@@ -50,7 +50,6 @@ public class InsertCMD extends DBCmd {
 
     private void insertEntity(DBServer server, List<Record> data, List<String> variables) throws Exception {
         List<Attribute> attributes = new ArrayList<>();
-        //attributes.add(new Attribute(getNextSeq(data)));
         attributes.add(new Attribute(getNextSeq(server.getUseDatabaseDirectory().getName(), getTableNames().get(0))));
         for(String var: variables){
             attributes.add(new Attribute(var));
@@ -58,21 +57,10 @@ public class InsertCMD extends DBCmd {
         data.add(new Record(attributes));
     }
 
-    // TODO this needs to be redone so that a table keeps a record of it's sequence so that a primary key is not generated twice
     private String getNextSeq(String databaseName, String tableName) throws Exception {
-//        if(data.size() == 0){
-//            return "1";
-//        }
-//        Integer currentKey = Integer.valueOf(data.get(data.size() - 1).getId());
-//        return  Integer.toString(currentKey.intValue() + 1);
-
-
         DBTableFile file = new DBTableFile();
         int seq = file.nextSeq(databaseName, tableName);
         return Integer.toString(seq);
-
-//        Integer currentKey = Integer.valueOf(data.get(data.size() - 1).getId());
-//        return  Integer.toString(currentKey.intValue() + 1);
     }
 
 }

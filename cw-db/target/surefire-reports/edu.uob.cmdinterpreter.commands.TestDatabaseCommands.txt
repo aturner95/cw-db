@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: edu.uob.cmdinterpreter.commands.TestDatabaseCommands
 -------------------------------------------------------------------------------
-Tests run: 39, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.235 s - in edu.uob.cmdinterpreter.commands.TestDatabaseCommands
+Tests run: 39, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.236 s - in edu.uob.cmdinterpreter.commands.TestDatabaseCommands

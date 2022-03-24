@@ -3,7 +3,6 @@ package edu.uob.cmdinterpreter;
 public class BNFConstants {
 
     // Query language key words
-    // public static final String SELECT = "SELECT";
     public static final String FROM = "FROM";
     public static final String WHERE = "WHERE";
     public static final String DATABASE = "DATABASE";
@@ -12,7 +11,6 @@ public class BNFConstants {
     public static final String VALUES = "VALUES";
     public static final String NULL = "NULL";
     public static final String SET = "SET";
-    // public static final String WHERE = "WHERE";
     public static final String AND = "AND";
     public static final String ON = "ON";
     public static final String OR ="OR";
@@ -20,7 +18,7 @@ public class BNFConstants {
     // Command types
     public static final String USE = "USE";
     public static final String CREATE = "CREATE";
-    // public static final String DROP = "DROP";
+    public static final String DROP = "DROP";
     public static final String ALTER = "ALTER";
     public static final String INSERT = "INSERT";
     public static final String SELECT = "SELECT";
@@ -59,11 +57,9 @@ public class BNFConstants {
     public static final String RIGHT_BRACE = "}";
     public static final String TILDA = "~";
     public static final String SINGLE_QUOTATION = "'";
-    public static final String DOUBLE_QUOTATION = "\"";
 
-    // Alteration type
+    // Alteration type (DROP included under commands)
     public static final String ADD = "ADD";
-    public static final String DROP = "DROP";
 
     // Boolean literals
     public static final String TRUE = "TRUE";
@@ -71,7 +67,6 @@ public class BNFConstants {
 
 
     // Operator characters
-    public static final String ASSIGNMENT = "=";
     public static final String EQUAL_TO = "==";
     public static final String GREATER_THAN = ">";
     public static final String LESS_THAN = "<";

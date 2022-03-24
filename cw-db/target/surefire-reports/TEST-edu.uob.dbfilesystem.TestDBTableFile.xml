@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.uob.dbfilesystem.TestDBTableFile" time="0.373" tests="32" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.uob.dbfilesystem.TestDBTableFile" time="0.354" tests="32" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -12,7 +12,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="GB"/>
     <property name="sun.boot.library.path" value="/home/andy/.jdks/temurin-17.0.1/lib"/>
-    <property name="sun.java.command" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter16000378538849434664.jar /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire 2022-03-24T18-07-55_025-jvmRun1 surefire4901414334997606913tmp surefire_016138321022151468145tmp"/>
+    <property name="sun.java.command" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter689579696194979532.jar /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire 2022-03-24T20-39-18_982-jvmRun1 surefire13063120322065233412tmp surefire_011777991373460569310tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/test-classes:/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/classes:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter/5.8.2/junit-jupiter-5.8.2.jar:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/andy/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/andy/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite/1.8.2/junit-platform-suite-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite-api/1.8.2/junit-platform-suite-api-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite-engine/1.8.2/junit-platform-suite-engine-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite-commons/1.8.2/junit-platform-suite-commons-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-launcher/1.8.2/junit-platform-launcher-1.8.2.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -27,7 +27,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter16000378538849434664.jar"/>
+    <property name="surefire.real.class.path" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter689579696194979532.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.1+12"/>
     <property name="user.name" value="andy"/>
@@ -52,36 +52,36 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="test_storeRecordIntoDBFile_nullRecord_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.117"/>
-  <testcase name="test_getTableName_noDirectory_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
-  <testcase name="test_createDBFile_fileDoesNotExist_fileCreated" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.014"/>
-  <testcase name="test_storeRecordIntoDBFile_nullAttributes_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
-  <testcase name="test_readColumnHeadingsIntoEntity_spacesInHeader_tableHeaderPopulated" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
-  <testcase name="test_storeEntityIntoDBFile_happyPath_headerAndRowsStoredInDBFile" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.017"/>
-  <testcase name="test_storeColomnHeaderIntoDBFile_noColHeaders_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.011"/>
-  <testcase name="test_variousMetadataTests" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.031"/>
+  <testcase name="test_storeRecordIntoDBFile_nullRecord_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.085"/>
+  <testcase name="test_getTableName_noDirectory_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
+  <testcase name="test_createDBFile_fileDoesNotExist_fileCreated" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.021"/>
+  <testcase name="test_storeRecordIntoDBFile_nullAttributes_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
+  <testcase name="test_readColumnHeadingsIntoEntity_spacesInHeader_tableHeaderPopulated" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
+  <testcase name="test_storeEntityIntoDBFile_happyPath_headerAndRowsStoredInDBFile" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.015"/>
+  <testcase name="test_storeColomnHeaderIntoDBFile_noColHeaders_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
+  <testcase name="test_variousMetadataTests" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.028"/>
   <testcase name="test_readColumnHeadingsIntoEntity_happyPath_tableHeaderPopulated" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_readRecordIntoEntity_happyPath_rowAdded" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_storeRecordIntoDBFile_happyPath_fileExistsAndContainsSingleRow" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_storeEntityIntoDBFile_noRows_headerStillStoredInDBFile" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
-  <testcase name="test_readDBFileIntoEntity_happyPath_tableReadIntoEntity" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
-  <testcase name="test_readRecordIntoEntity_twice_tableContainsTwoRows" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
+  <testcase name="test_readDBFileIntoEntity_happyPath_tableReadIntoEntity" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.006"/>
+  <testcase name="test_readRecordIntoEntity_twice_tableContainsTwoRows" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_readColumnHeadingsIntoEntity_nullString_methodFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
-  <testcase name="test_readDBFileIntoEntity_noRows_tableReadIntoEntity" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
+  <testcase name="test_readDBFileIntoEntity_noRows_tableReadIntoEntity" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
   <testcase name="test_getTableName_fileHasTwoExts_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_storeEntityIntoDBFile_noColHeaders_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
-  <testcase name="test_readRecordIntoEntity_emptyRow_returnFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
+  <testcase name="test_readRecordIntoEntity_emptyRow_returnFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
   <testcase name="test_createDBFile_nullFile_returnFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_readColumnHeadingsIntoEntity_nullTable_methodFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
-  <testcase name="test_getTableName_nullFile_returnsNull" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.008"/>
+  <testcase name="test_getTableName_nullFile_returnsNull" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
   <testcase name="test_readRecordIntoEntity_rowNull_returnFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
-  <testcase name="test_getTableName_noExt_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
+  <testcase name="test_getTableName_noExt_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.006"/>
   <testcase name="test_readColumnHeadingsIntoEntity_emptyLine_methodFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
-  <testcase name="test_readColumnHeadingsIntoEntity_spaceDelimited_singleColHeader" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
+  <testcase name="test_readColumnHeadingsIntoEntity_spaceDelimited_singleColHeader" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
   <testcase name="test_storeEntityIntoDBFile_nullTable_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
-  <testcase name="test_getTableName_happyPath_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
+  <testcase name="test_getTableName_happyPath_fileNameReturned" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
   <testcase name="test_storeRecordIntoDBFile_noAttributes_returnsTrue" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
-  <testcase name="test_storeColomnHeaderIntoDBFile_happyPath_fileExistsAndContainsHeaderText" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.003"/>
-  <testcase name="test_storeColumnHeaderIntoDBFile_nullColHeaders_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
+  <testcase name="test_storeColomnHeaderIntoDBFile_happyPath_fileExistsAndContainsHeaderText" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.004"/>
+  <testcase name="test_storeColumnHeaderIntoDBFile_nullColHeaders_returnsFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.005"/>
   <testcase name="test_readRecordIntoEntity_tableNull_returnFalse" classname="edu.uob.dbfilesystem.TestDBTableFile" time="0.002"/>
 </testsuite>

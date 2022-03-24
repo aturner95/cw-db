@@ -6,11 +6,9 @@ public class TableHeader {
 
     private String tableName;
     private File fileLocation;
-    private String description;
-    private long nextId;
 
     public TableHeader(){
-
+        super();
     }
 
     public String getTableName() {
@@ -29,19 +27,4 @@ public class TableHeader {
         this.fileLocation = fileLocation;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public long getNextId() {
-        return nextId;
-    }
-
-    public void incrementId() {
-        this.nextId++;
-    }
 }

@@ -38,10 +38,8 @@ public class SelectCMD extends DBCmd {
                     }
                     return STATUS_OK + System.lineSeparator() + result.toString();
                 }
-
                 throw new DBTableDoesNotExistException(getTableNames().get(0));
             }
-
             throw new DBTableDoesNotExistException(getDatabaseName());
 
         } catch(Exception e){

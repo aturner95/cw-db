@@ -17,7 +17,6 @@ edu/uob/cmdinterpreter/commands/DeleteCMD.class
 edu/uob/exceptions/ParsingException$TokenIndexOutOfBoundsException.class
 edu/uob/exceptions/DBException$DBExistsException.class
 edu/uob/cmdinterpreter/commands/UseCMD.class
-edu/uob/exceptions/DBException$DBEntityExistsException.class
 edu/uob/cmdinterpreter/Token.class
 edu/uob/exceptions/DBException$DBTableExistsException.class
 edu/uob/cmdinterpreter/Tokenizer.class

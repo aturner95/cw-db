@@ -12,26 +12,16 @@ public class ColumnHeader extends AbstractColumnData {
         return data;
     }
 
-    public void setColName(String colName) {
-        this.data = colName;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
-
         if (obj.getClass() != this.getClass()) {
             return false;
         }
-
         final ColumnHeader other = (ColumnHeader) obj;
-        if(this.data != null && other.getData() != null && this.data.equalsIgnoreCase(other.getData())){
-            return true;
-        }
-
-        return false;
+        return this.data != null && other.getData() != null && this.data.equalsIgnoreCase(other.getData());
     }
 
 

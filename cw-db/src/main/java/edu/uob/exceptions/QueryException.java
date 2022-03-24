@@ -1,19 +1,19 @@
 package edu.uob.exceptions;
 
+import java.io.Serial;
+
 public class QueryException extends Exception{
+
+    @Serial
     private static final long serialVersionUID = -7342988237478234L;
-
-    private static final String ERR_UNKNOWN = "An unknown QueryException has occurred";
-
-    public QueryException() {
-        super(ERR_UNKNOWN);
-    }
 
     public QueryException(String message) {
         super(message);
     }
 
     public static class AttributeNotFoundException extends QueryException {
+
+        @Serial
         private static final long serialVersionUID = 47398294623844324L;
 
         public AttributeNotFoundException(String attributeName) {

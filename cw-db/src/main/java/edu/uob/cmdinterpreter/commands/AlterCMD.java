@@ -17,7 +17,6 @@ import edu.uob.exceptions.ParsingException.InvalidGrammarException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AlterCMD extends DBCmd {
@@ -56,7 +55,6 @@ public class AlterCMD extends DBCmd {
                         table = readTableFromFile(server, tableName);
                         alterTable(table, attributeName, commandParameter);
                         dbFile.storeEntityIntoDBFile(table);
-                        // TODO populate result string
                         return STATUS_OK;
 
                     } catch (IOException ioe) {
@@ -130,7 +128,8 @@ public class AlterCMD extends DBCmd {
                 throw new DBAttributeDoesNotExistException(attributeName);
             }
         }
-        throw new InvalidGrammarException(new Token(TokenType.KW, getAlterationType()), "<Alter> ::=  \"ALTER TABLE \" <TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
+        throw new InvalidGrammarException(new Token(TokenType.KW, getAlterationType()), "<Alter> ::=  \"ALTER TABLE \" "
+                + "<TableName> \" \" <AlterationType> \" \" <AttributeName> ;");
     }
 
 }

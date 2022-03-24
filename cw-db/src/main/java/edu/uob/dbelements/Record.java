@@ -1,6 +1,5 @@
 package edu.uob.dbelements;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Record {
@@ -8,7 +7,7 @@ public class Record {
     private List<Attribute> attributes;
 
     public Record(){
-
+        super();
     }
 
     public Record(List<Attribute> attributes){
@@ -28,8 +27,7 @@ public class Record {
     }
 
     public void addDefaultAttribute(){
-        // TODO adding an empty String causes an issue; because the String is empty, nothing is
-        // written to the DBFile. Therefore, nothing is read back! For now, populate with a space
+        // When empty String is written to DB file, nothing is read back! So decided to populate with a space
         Attribute attribute = new Attribute(" ");
         attributes.add(attribute);
     }
@@ -39,17 +37,11 @@ public class Record {
         if (obj == null) {
             return false;
         }
-
         if (obj.getClass() != this.getClass()) {
             return false;
         }
-
         final Record other = (Record) obj;
-        if(this.getId() != null && other.getId() != null && this.getId().equals(other.getId())){
-            return true;
-        }
-
-        return false;
+        return this.getId() != null && other.getId() != null && this.getId().equals(other.getId());
     }
 
 

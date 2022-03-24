@@ -51,9 +51,11 @@ public class DropCMD extends DBCmd {
             }
         }
         File [] contents = database.listFiles();
-        for(File dbfile: contents){
-            removeTableMetadata(database, dbfile, dbfile.getName().substring(0, dbfile.getName().length()-4));
-            dbfile.delete();
+        if(contents != null) {
+            for (File dbfile : contents) {
+                removeTableMetadata(database, dbfile, dbfile.getName().substring(0, dbfile.getName().length() - 4));
+                dbfile.delete();
+            }
         }
         deleteDirectory(database);
     }
@@ -63,18 +65,15 @@ public class DropCMD extends DBCmd {
         byte indexOfTable = 0;
         File table = new File( db.toString() + File.separator + getTableNames().get(indexOfTable) + DBFileConstants.TABLE_EXT);
         if(table.exists() && table.isFile()){
-//            table.delete();
-//            DBTableFile dbFile = new DBTableFile();
-//            dbFile.removeTableFromMetadata(db.getName(), getTableNames().get(indexOfTable));
             removeTableMetadata(db, table, getTableNames().get(indexOfTable));
             return;
         }
         throw new DBTableDoesNotExistException(table.getName());
     }
 
-    private void deleteDirectory(File dir){
-        File [] contents = dir.listFiles();
-        for(File dbfile: contents){
+    private void deleteDirectory(File dir) {
+        File[] contents = dir.listFiles();
+        for (File dbfile : contents) {
             dbfile.delete();
         }
         dir.delete();

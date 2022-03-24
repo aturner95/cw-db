@@ -47,7 +47,7 @@ public class CreateCMD extends DBCmd {
         }
     }
 
-    private void createDatabase() throws DBException, IOException {
+    private void createDatabase() throws DBException {
         File database = new File("." + File.separator + getDatabaseName().toLowerCase(Locale.ROOT));
         if(!database.exists() && !database.isDirectory()){
             if(database.mkdir()){
@@ -55,7 +55,7 @@ public class CreateCMD extends DBCmd {
             }
             throw new DBException();
         }
-        throw new DBTableExistsException(getDatabaseName());
+        throw new DBExistsException(getDatabaseName());
     }
 
     private void createTable(DBServer server) throws Exception {
@@ -63,12 +63,11 @@ public class CreateCMD extends DBCmd {
         if(hasDatabase(server)){
             if(server.getUseDatabaseDirectory() != null) {
             String tableName = getTableNames().get(0);
-            String dbName = /*ROOT_DB_DIR + File.separator + */ server.getUseDatabaseDirectory().getName().toLowerCase(Locale.ROOT);
+            String dbName = server.getUseDatabaseDirectory().getName().toLowerCase(Locale.ROOT);
             File file = new File(dbName + File.separator + tableName.toLowerCase(Locale.ROOT) + DBFileConstants.TABLE_EXT);
 
                 if (!file.exists()) {
                     try {
-
                         if (file.createNewFile()) {
                             Table table = new Table();
                             TableHeader header = new TableHeader();
@@ -77,13 +76,13 @@ public class CreateCMD extends DBCmd {
                             table.setHeader(header);
                             if (getColNames().size() > 0) {
                                 addAttributeList(table, getColNames());
+
                             } else {
                                 addAttributeList(table, new ArrayList<>());
                             }
                             DBTableFile dbFile = new DBTableFile();
                             dbFile.storeEntityIntoDBFile(table);
                             dbFile.addTableToMetadata(dbName, tableName);
-
                             return;
                         }
                     } catch (IOException ioe) {
@@ -106,7 +105,5 @@ public class CreateCMD extends DBCmd {
         }
         table.setColHeadings(columnHeaders);
     }
-
-
 
 }

@@ -40,7 +40,6 @@ public class DBTableFile {
                         throw new DBException("Unable to read rows from DB file");
                     }
                 }
-
                 return table;
             }
         }
@@ -52,14 +51,11 @@ public class DBTableFile {
         if (table != null && header != null && header.length() > 0) {
             String[] tabDelimitedCols = header.split("\t");
             List<ColumnHeader> columns = new ArrayList<>();
-            // int colCounter = 0;
 
             for (String colAsString : tabDelimitedCols) {
                 if (!colAsString.isEmpty()) {
                     colAsString = colAsString.trim();
                     ColumnHeader tableCol = new ColumnHeader(colAsString);
-                    // tableCol.setColNumber(colCounter++);
-                    // tableCol.setColName();
                     columns.add(tableCol);
                 }
             }
@@ -78,7 +74,6 @@ public class DBTableFile {
 
             for (String s : tabDelimitedRow) {
                 Attribute attr = new Attribute(s);
-                // attr.setValue(s);
                 listOfAttributes.add(attr);
             }
             record.setAttributes(listOfAttributes);
@@ -101,7 +96,6 @@ public class DBTableFile {
         return null;
     }
 
-    // TODO currently this method simply creates and writes to a new file from scratch. If file exists should we just add new rows?
     public boolean storeEntityIntoDBFile(Table table) throws DBException {
 
         if(table != null && table.getHeader() != null && table.getHeader().getFileLocation()!= null) {
@@ -129,7 +123,6 @@ public class DBTableFile {
     }
 
     /* default */ boolean createDBFile(File dbFile){
-
         if (dbFile != null) {
             try {
                 if(!dbFile.createNewFile()){
@@ -145,7 +138,6 @@ public class DBTableFile {
     }
 
     /* default */ boolean storeColumnHeaderIntoDBFile(List<ColumnHeader> colHeaders, File dbFile) {
-
         if(colHeaders != null && colHeaders.size() > 0) {
             return storeDataIntoDBFile(colHeaders, DBRowType.COLUMN_HEADER, dbFile);
         }
@@ -153,7 +145,6 @@ public class DBTableFile {
     }
 
     /* default */ boolean storeRecordIntoDBFile(List<Attribute> record, File dbFile){
-
         if(record != null) {
             if(record.size() == 0){
                 return true;
@@ -220,7 +211,8 @@ public class DBTableFile {
     }
 
     public boolean addTableToMetadata(String databaseName, String tableName) throws Exception {
-        return (addTableToMetadata(databaseName, tableName, 1));
+        byte newTableStartingSeq = 1;
+        return (addTableToMetadata(databaseName, tableName, newTableStartingSeq));
     }
 
     public boolean addTableToMetadata(String databaseName, String tableName, int sequence) throws Exception {
@@ -233,7 +225,6 @@ public class DBTableFile {
         }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, appendMode))) {
-
             bw.append(System.lineSeparator() + databaseName + ":" + tableName + ":" + sequence + System.lineSeparator());
             return true;
 
@@ -277,7 +268,7 @@ public class DBTableFile {
     }
 
     /**
-     * Returns current sequence and increments
+     * Returns current sequence from databases.data and increments seq to next
      * @param databaseName
      * @param tableName
      * @return
@@ -291,23 +282,20 @@ public class DBTableFile {
         try(BufferedReader br = new BufferedReader(reader)){
 
             String line;
-
             while((line = br.readLine()) != null){
                 String dbFile = databaseName + ":" + tableName;
                 if(line.toLowerCase(Locale.ROOT).contains(dbFile.toLowerCase(Locale.ROOT))) {
                     String [] split = line.split(":");
-                    // db:table:seq
+                    // database.data holds data as <db:table:seq>
                     int indexOfSeq = 2;
-                    int currentSeq = Integer.valueOf(split[indexOfSeq]).intValue();
+                    int currentSeq = Integer.parseInt(split[indexOfSeq]);
                     removeTableFromMetadata(databaseName, tableName);
                     addTableToMetadata(databaseName,tableName, currentSeq+1);
-
                     return currentSeq;
                 }
             }
             throw new IOException("seq attribute not found!");
         }
     }
-
 
 }

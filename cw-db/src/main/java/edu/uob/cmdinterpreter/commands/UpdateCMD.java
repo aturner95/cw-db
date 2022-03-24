@@ -24,24 +24,18 @@ public class UpdateCMD extends DBCmd {
             if (hasDatabase(server)) {
                 int indexOfTable = 0;
                 String tableName = getTableNames().get(indexOfTable);
+
                 if (hasTable(server, tableName)) {
                     String tablePath = server.getUseDatabaseDirectory() + File.separator + tableName + TABLE_EXT;
                     Table table = new DBTableFile().readDBFileIntoEntity(tablePath);
 
                     Table dataToUpdate = null;
-
                     dataToUpdate = doConditions(table, dataToUpdate);
 
-                    // if the condition returns data to update
                     if(dataToUpdate.getRows().size() > 0) {
-
-                        // for every row
                         for(Record row: table.getRows()){
 
-                            // if the current row is in the list of required updates
                             if(dataToUpdate.getRows().contains(row)){
-
-                                // for each name in the name Value pair list
                                 for(NameValuePair nameValuePair: getNameValuePair()) {
 
                                     String name = nameValuePair.getName();
@@ -51,13 +45,8 @@ public class UpdateCMD extends DBCmd {
                                         throw new DBException("Cannot update primary key of a row");
                                     }
 
-                                    // if the name exists in the table header
                                     if(table.getColHeadings().contains(new ColumnHeader(name))) {
-
-                                        // get the index of the name in the column header
                                         int indexOfName = table.getColHeadings().indexOf(new ColumnHeader(name));
-
-                                        // use index to update target value with data from name pair col
                                         row.getAttributes().get(indexOfName).setValue(value);
 
                                     } else {
@@ -66,20 +55,16 @@ public class UpdateCMD extends DBCmd {
                                 }
                             }
                         }
-
                         new DBTableFile().storeEntityIntoDBFile(table);
                     }
-
                     return STATUS_OK;
                 }
                 throw new DBException.DBTableDoesNotExistException(getTableNames().get(0));
             }
             throw new DBException.DBTableDoesNotExistException(getDatabaseName());
-
         } catch(Exception e){
             return STATUS_ERROR + e.getMessage();
         }
     }
-
 
 }

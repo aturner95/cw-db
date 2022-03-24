@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-//import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
-
 public abstract class DBCmd {
 
     /* Variables */
@@ -30,14 +28,13 @@ public abstract class DBCmd {
     protected List<String> variables;
     protected List<QueryCondition> conditions;
     // NOTE: unable to built tree structure for nested conditions, so decided to provide a hack to a) parse nested b)
-    // interpret only single nested conditions (e.g., (cond AND and) and (cond OR cond); these will be added in the
+    // interpret only single nested conditions (e.g., "(cond AND cond)" and "(cond OR cond)"); these will be added in the
     // order in which they were parsed.
     protected List<String> conditionJoinOperators;
     protected List<NameValuePair> nameValueList;
 
     public static final String STATUS_OK = "[OK]";
     public static final String STATUS_ERROR = "[ERROR] ";
-    public static final String SPACE = " ";
 
     /* Constructors */
     public DBCmd(){
@@ -92,15 +89,12 @@ public abstract class DBCmd {
 
     public boolean hasDatabase(DBServer server) {
         if(server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory()){
-            // if(server.getBaseDatabaseDirectory().getName().equalsIgnoreCase(server.getDatabaseDirectory().getName())){
-            //if(!"./databases".equalsIgnoreCase(server.getDatabaseDirectory().getName())){
                 return true;
-            // }
         }
         return false;
     }
 
-    public boolean hasTable(DBServer server, String tableName) throws DBException {
+    public boolean hasTable(DBServer server, String tableName) {
          if(server.getUseDatabaseDirectory() != null) {
             File db = new File(server.getUseDatabaseDirectory().getName());
             File[] tables = db.listFiles();
@@ -156,7 +150,6 @@ public abstract class DBCmd {
     public Table readTableFromFile(DBServer server, String tableName) throws IOException, DBException {
         DBTableFile dbFile = new DBTableFile();
         File file = new File(server.getUseDatabaseDirectory() + File.separator + tableName);
-        Table table;
         return dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
     }
 
@@ -185,7 +178,10 @@ public abstract class DBCmd {
     }
 
     private boolean isSelectStar(){
-        if(getColNames().size() == 1 && BNFConstants.STAR_SYMBOL.equals(getColNames().get(0))){
+        byte sizeOfWildcardSelect = 1;
+        byte indexOfWildcardSelect = 0;
+        if(getColNames().size() == sizeOfWildcardSelect
+                && BNFConstants.STAR_SYMBOL.equals(getColNames().get(indexOfWildcardSelect))){
             return true;
         }
         return false;
@@ -219,15 +215,7 @@ public abstract class DBCmd {
         resultSet.getRows().add(new Record(newRow));
     }
 
-//    public boolean usingRootDatabase(DBServer server) throws DBException {
-//        String rootDb = ROOT_DB_DIR;
-//        if(rootDb.equals(server.getDatabaseDirectory().getName())){
-//            throw new DBException("No database has been selected, (hint: USE <database>)");
-//        }
-//        return false;
-//    }
 
-    // TODO this is so janky... try DRY it up if you can, for now just get it working!
     public Table doConditions(Table table, Table result) throws DBException {
 
         if(getConditions().size() == 1){

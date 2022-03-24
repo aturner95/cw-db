@@ -2,7 +2,6 @@ package edu.uob.dbfilesystem;
 
 public class DBFileConstants {
 
-    // public static final String ROOT_DB_DIR = "databases";
     public static final String TABLE_EXT = ".tab";
     public static final String METADATA_FILENAME = "databases.data";
 
