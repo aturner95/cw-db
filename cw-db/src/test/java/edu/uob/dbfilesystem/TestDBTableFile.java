@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uob.dbfilesystem.DBFileConstants.METADATA_FILENAME;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -700,6 +701,12 @@ public class TestDBTableFile {
     @Test
     public void test_variousMetadataTests() throws Exception{
 
+        // This file lives in /test
+        File metadata = new File(METADATA_FILENAME);
+        if(!metadata.exists()){
+            metadata.createNewFile();
+        }
+
         DBTableFile db = new DBTableFile();
         db.addTableToMetadata("markbook", "marks");
         db.addTableToMetadata("markbook", "coursework");
@@ -720,6 +727,9 @@ public class TestDBTableFile {
         assertEquals(3, db.nextSeq("markbook", "coursework"));
 
         assertTrue(db.removeTableFromMetadata("markbook", "coursework"));
+
+        metadata.delete();
+
     }
 
 

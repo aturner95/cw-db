@@ -17,7 +17,7 @@ public class UseCMD extends DBCmd {
             if (getDatabaseName() != null && !getDatabaseName().isEmpty()) {
                 File dbDir = new File(getDatabaseName());
                 if (dbDir.exists() && dbDir.isDirectory()) {
-                    server.setDatabaseDirectory(dbDir);
+                    server.setUseDatabaseDirectory(dbDir);
                     return STATUS_OK;
                 }
                 throw new DBDoesNotExistException(getDatabaseName());

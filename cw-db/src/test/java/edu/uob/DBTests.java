@@ -10,8 +10,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd.STATUS_OK;
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+// import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class DBTests {
@@ -19,12 +18,15 @@ final class DBTests {
   private DBServer server;
   private File tempDbDir;
 
+  // private String databasesDir = "." + File.separator + ROOT_DB_DIR;
+
 
   @BeforeEach
   void setup(@TempDir File db) {
-    db = new File(ROOT_DB_DIR + db.getName());
+    db = new File(db.getName());
     db.deleteOnExit();
-    server = new DBServer(new File(ROOT_DB_DIR));
+    // server = new DBServer(new File(ROOT_DB_DIR));
+    server = new DBServer(db);
   }
 
   @AfterEach
@@ -77,26 +79,30 @@ final class DBTests {
 
   @Test
   public void test_handleCommand_validCreateDbCommand_statusOk() {
+    // server.handleCommand("CREATE DATABASE markbook;");
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator + "markbook");
+    String dbName = "markbook";
+    File db = new File(dbName);
     setup(db);
     assertTrue(db.exists());
     assertTrue(db.isDirectory());
-    // database context should NOT be set to markbook after creating a database
-    assertEquals("databases",server.getDatabaseDirectory().toString());
-    assertTrue(db.delete());
+    // TODO database context should NOT be set to markbook after creating a database
+    assertEquals(dbName , server.getDatabaseDirectory().toString());
+    assertTrue(new File(dbName).delete());
   }
 
   @Test
   public void test_handleCommand_validUseCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator + "markbook");
+    String dbName = "markbook";
+    File db = new File(dbName);
     setup(db);
     assertTrue(db.exists());
     assertTrue(db.isDirectory());
 
     assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
-    assertEquals("databases/markbook", server.getDatabaseDirectory().toString());
+    assertEquals(dbName, server.getDatabaseDirectory().toString());
+    assertTrue(new File(dbName).delete());
     teardown(db);
   }
 
@@ -104,7 +110,8 @@ final class DBTests {
   public void test_handleCommand_validCreateTableCommand_statusOk() throws FileNotFoundException {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator + "markbook");
+    String dbName = "markbook";
+    File db = new File(dbName);
     setup(db);
 
     // use Db and create table
@@ -112,7 +119,7 @@ final class DBTests {
     assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
 
     // assert file exists, then teardown
-    File table = new File(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    File table = new File(dbName + File.separator + "marks.tab");
     assertTrue(table.exists());
     assertTrue(table.isFile());
 
@@ -124,14 +131,13 @@ final class DBTests {
   public void test_handleCommand_invalidCreateTableCommandWithoutUse_statusError() {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
-    // try creating a table without first selecting a Db
     assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[ERROR]"));
 
     // assert file exists, then teardown
-    File table = new File(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    File table = new File("markbook" + File.separator + "marks.tab");
     assertFalse(table.exists());
     teardown(db);
   }
@@ -140,7 +146,7 @@ final class DBTests {
   public void test_handleCommand_invalidCreateThenValidCreate_statusErrorThenOK() throws FileNotFoundException {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
     // Then try creating a table without first selecting a Db, expected response is ERROR
@@ -153,7 +159,7 @@ final class DBTests {
     assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
 
     // assert file exists, then teardown
-    File table = new File(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    File table = new File("markbook" + File.separator + "marks.tab");
     assertTrue(table.exists());
     new DBTableFile().removeTableFromMetadata("markbook", "marks");
     teardown(db);
@@ -163,7 +169,7 @@ final class DBTests {
   public void test_parse_trickyAlterOnTableWithNoAttributes_alterCmdBuilt() throws Exception{
     // create and use database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
     assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
 
@@ -174,7 +180,7 @@ final class DBTests {
     assertTrue(server.handleCommand("ALTER TABLE marks ADD name;").startsWith("[OK]"));
 
     // grab the table and assert the id column has been added along with the name
-    Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator +"markbook" + File.separator + "marks.tab");
+    Table marks = new DBTableFile().readDBFileIntoEntity("markbook" + File.separator + "marks.tab");
     assertEquals(2, marks.getColHeadings().size());
     assertEquals("id", marks.getColHeadings().get(0).getColName());
     assertEquals("name", marks.getColHeadings().get(1).getColName());
@@ -187,7 +193,7 @@ final class DBTests {
   public void test_handleCommand_insertCommand_fiveRowsInserted() throws Exception {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
     // set up table
@@ -203,7 +209,7 @@ final class DBTests {
     assertTrue(server.handleCommand("INSERT INTO marks VALUES (Laura, 33, False);").startsWith("[ERROR]"));
     assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Amir', 24, TRUE);").startsWith("[OK]"));
 
-    Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    Table marks = new DBTableFile().readDBFileIntoEntity("markbook" + File.separator + "marks.tab");
     assertEquals(5, marks.getRows().size());
 
     new DBTableFile().removeTableFromMetadata("markbook", "marks");
@@ -214,11 +220,11 @@ final class DBTests {
   public void test_handleCommand_validDropTableCommand_statusOk() throws FileNotFoundException {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
     String dbPathName ="markbook";
-    File db = new File(ROOT_DB_DIR + File.separator + dbPathName);
+    File db = new File(dbPathName);
     setup(db);
     assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
     assertTrue(server.handleCommand("CREATE TABLE marks;").startsWith("[OK]"));
-    File table = new File(ROOT_DB_DIR + File.separator + dbPathName + File.separator + "marks.tab");
+    File table = new File(dbPathName + File.separator + "marks.tab");
     assertTrue(table.exists());
     assertTrue(table.isFile());
 
@@ -230,7 +236,7 @@ final class DBTests {
   @Test
   public void test_handleCommand_validDropDbCommand_statusOk() {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
     assertTrue(server.handleCommand("DROP DATABASE markbook;").startsWith("[OK]"));
     assertFalse(db.exists());
@@ -240,11 +246,11 @@ final class DBTests {
   @Test
   public void test_handleCommand_validDropDbWithTableCommand_statusOk() throws FileNotFoundException {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator + "markbook");
+    File db = new File("markbook");
     setup(db);
     assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
     assertTrue(server.handleCommand("CREATE TABLE marks (name, mark, pass);").startsWith("[OK]"));
-    File table = new File(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    File table = new File("markbook" + File.separator + "marks.tab");
     assertTrue(table.exists());
     assertTrue(table.isFile());
 
@@ -258,7 +264,7 @@ final class DBTests {
   @Test
   public void test_handleCommand_validJoinCommand_statusOk() throws FileNotFoundException {
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
     assertTrue(server.handleCommand("USE markbook;").startsWith("[OK]"));
     assertTrue(server.handleCommand("CREATE TABLE marks (studentId, mark, pass);").startsWith("[OK]"));
@@ -279,7 +285,7 @@ final class DBTests {
   public void test_handleCommand_selectCommand_statusOk() throws Exception {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
     // set up table
@@ -292,7 +298,7 @@ final class DBTests {
     assertTrue(server.handleCommand("INSERT INTO student VALUES ('Clive', 49, TRUE);").startsWith("[OK]"));
     assertTrue(server.handleCommand("INSERT INTO student VALUES ('Diana', 35, FALSE);").startsWith("[OK]"));
 
-    Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "student.tab");
+    Table marks = new DBTableFile().readDBFileIntoEntity("markbook" + File.separator + "student.tab");
     assertEquals(4, marks.getRows().size());
 
     assertTrue(server.handleCommand("select * from student;").startsWith("[OK]"));
@@ -309,7 +315,7 @@ final class DBTests {
   public void test_handleCommand_invalidSelectCommand_statusOk() throws Exception {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
     // use table and create table
@@ -331,7 +337,7 @@ final class DBTests {
   public void test_handleCommand_joinCommand_statusOk() throws Exception {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
     // use table and create tables via different methods
@@ -371,7 +377,7 @@ final class DBTests {
   public void test_handleCommand_insertCommand_sequencePreservedAfterDelete() throws Exception {
     // create database
     assertTrue(server.handleCommand("CREATE DATABASE markbook;").startsWith("[OK]"));
-    File db = new File(ROOT_DB_DIR + File.separator +"markbook");
+    File db = new File("markbook");
     setup(db);
 
     // set up table
@@ -388,7 +394,7 @@ final class DBTests {
     assertTrue(server.handleCommand("DELETE FROM marks WHERE name == 'Amir';").startsWith("[OK]"));
     assertTrue(server.handleCommand("INSERT INTO marks VALUES ('Jules', 20, TRUE);").startsWith("[OK]"));
 
-    Table marks = new DBTableFile().readDBFileIntoEntity(ROOT_DB_DIR + File.separator + "markbook" + File.separator + "marks.tab");
+    Table marks = new DBTableFile().readDBFileIntoEntity("markbook" + File.separator + "marks.tab");
     assertEquals(5, marks.getRows().size());
     assertFalse(marks.toString().contains("5\tJules\t20\tTRUE"));
     assertTrue(marks.toString().contains("6\tJules\t20\tTRUE"));

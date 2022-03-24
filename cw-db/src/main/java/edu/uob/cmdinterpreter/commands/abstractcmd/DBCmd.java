@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+//import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
 
 public abstract class DBCmd {
 
@@ -63,7 +63,7 @@ public abstract class DBCmd {
     }
 
     public void setDatabaseName(String databaseName){
-        this.databaseName = ROOT_DB_DIR + File.separator + databaseName.toLowerCase(Locale.ROOT);
+        this.databaseName = databaseName.toLowerCase(Locale.ROOT);
     }
 
     public List<String> getTableNames(){
@@ -92,17 +92,17 @@ public abstract class DBCmd {
 
     public boolean hasDatabase(DBServer server) {
         if(server.getDatabaseDirectory().exists() && server.getDatabaseDirectory().isDirectory()){
-            // if(!ROOT_DB_DIR.equalsIgnoreCase(server.getDatabaseDirectory().getName())){
-            if(!"./databases".equalsIgnoreCase(server.getDatabaseDirectory().getName())){
+            // if(server.getBaseDatabaseDirectory().getName().equalsIgnoreCase(server.getDatabaseDirectory().getName())){
+            //if(!"./databases".equalsIgnoreCase(server.getDatabaseDirectory().getName())){
                 return true;
-            }
+            // }
         }
         return false;
     }
 
     public boolean hasTable(DBServer server, String tableName) throws DBException {
-        if(!usingRootDatabase(server)) {
-            File db = new File(ROOT_DB_DIR + File.separator + server.getDatabaseDirectory().getName());
+         if(server.getUseDatabaseDirectory() != null) {
+            File db = new File(server.getUseDatabaseDirectory().getName());
             File[] tables = db.listFiles();
             for (File table : tables) {
                 int indexOfFileExt = table.getName().length() - 4;
@@ -114,31 +114,6 @@ public abstract class DBCmd {
         return false;
     }
 
-    /**
-     * File.exists() is case-sensitive! This code is from https://forum.x86labs.org/index.php?topic=4665.0 (23-Mar-2022)
-     * @param filename
-     * @return
-     */
-    private boolean fileExistsIgnoreCase(String filename)
-    {
-        File file = new File(filename);
-        File directory;
-        String[] files;
-
-        if(file.exists())
-            return true;
-
-        /* Get the directory listing */
-        directory = file.getParentFile();
-        files = directory.list();
-        for(int i = 0; i < files.length; i++)
-        {
-            if(files[i].equalsIgnoreCase(file.getName()))
-                return true;
-        }
-
-        return false;
-    }
 
     public boolean hasAttribute(Table table, String attributeName) {
         List<ColumnHeader> colHeads = table.getColHeadings();
@@ -180,7 +155,7 @@ public abstract class DBCmd {
 
     public Table readTableFromFile(DBServer server, String tableName) throws IOException, DBException {
         DBTableFile dbFile = new DBTableFile();
-        File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
+        File file = new File(server.getUseDatabaseDirectory() + File.separator + tableName);
         Table table;
         return dbFile.readDBFileIntoEntity(file.getPath() + ".tab");
     }
@@ -244,13 +219,13 @@ public abstract class DBCmd {
         resultSet.getRows().add(new Record(newRow));
     }
 
-    public boolean usingRootDatabase(DBServer server) throws DBException {
-        String rootDb = ROOT_DB_DIR;
-        if(rootDb.equals(server.getDatabaseDirectory().getName())){
-            throw new DBException("No database has been selected, (hint: USE <database>)");
-        }
-        return false;
-    }
+//    public boolean usingRootDatabase(DBServer server) throws DBException {
+//        String rootDb = ROOT_DB_DIR;
+//        if(rootDb.equals(server.getDatabaseDirectory().getName())){
+//            throw new DBException("No database has been selected, (hint: USE <database>)");
+//        }
+//        return false;
+//    }
 
     // TODO this is so janky... try DRY it up if you can, for now just get it working!
     public Table doConditions(Table table, Table result) throws DBException {

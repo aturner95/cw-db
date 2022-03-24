@@ -27,7 +27,7 @@ public class Attribute extends AbstractColumnData {
         }
 
         final Attribute other = (Attribute) obj;
-        if(this.getValue() != null && other.getValue() != null && this.getValue().equals(other.getValue())){
+        if(this.getValue() != null && other.getValue() != null && this.getValue().equalsIgnoreCase(other.getValue())){
             return true;
         }
 

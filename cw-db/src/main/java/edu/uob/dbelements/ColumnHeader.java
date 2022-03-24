@@ -27,7 +27,7 @@ public class ColumnHeader extends AbstractColumnData {
         }
 
         final ColumnHeader other = (ColumnHeader) obj;
-        if(this.data != null && other.getData() != null && this.data.equals(other.getData())){
+        if(this.data != null && other.getData() != null && this.data.equalsIgnoreCase(other.getData())){
             return true;
         }
 

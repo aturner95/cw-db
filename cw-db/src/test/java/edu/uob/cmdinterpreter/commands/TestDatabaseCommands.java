@@ -18,15 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+import static edu.uob.dbfilesystem.DBFileConstants.TABLE_EXT;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDatabaseCommands {
 
     private DBServer server;
     private File tempDbDir;
-    private static final String tempDbDirName = ROOT_DB_DIR + File.separator + "dbtest";
-    private static final String fileExt = ".tab";
+    private final String tempDbDirName = "dbtest";
     DBCmd cmd;
 
     public static final String STATUS_OK = "[OK]";
@@ -108,7 +107,7 @@ public class TestDatabaseCommands {
     @Test
     public void test_createCMD_databaseCreated_statusCodeOK() throws Exception {
         // given
-        String newTempDb = ROOT_DB_DIR + File.separator + "newTempDb";
+        String newTempDb = "newTempDb";
 
         cmd = new CreateCMD("DATABASE");
         cmd.setDatabaseName("newTempDb");
@@ -133,13 +132,14 @@ public class TestDatabaseCommands {
 
         cmd = new CreateCMD("TABLE");
         cmd.addTableName(newTempTable);
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // given
         String resultMessage = cmd.query(server);
 
         // then
         assertTrue(resultMessage.contains(STATUS_OK));
-        File tempFile = new File(ROOT_DB_DIR + File.separator +"dbtest" + File.separator + newTempTable.toLowerCase(Locale.ROOT) + ".tab");
+        File tempFile = new File(tempDbDirName + File.separator + newTempTable.toLowerCase(Locale.ROOT) + ".tab");
         assertTrue(tempFile.exists());
         assertTrue(tempFile.isFile());
 
@@ -153,13 +153,14 @@ public class TestDatabaseCommands {
         setup(tempDbDir);
         Files.createDirectory(tempDbDir.toPath());
         String newTempTable = "marks";
-        String fullPath = tempDbDirName + File.separator + newTempTable + fileExt;
+        String fullPath = tempDbDirName + File.separator + newTempTable + TABLE_EXT;
 
         cmd = new CreateCMD("TABLE");
         cmd.addTableName(newTempTable);
         cmd.addColumnName("name");
         cmd.addColumnName("mark");
         cmd.addColumnName("pass");
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // given
         String resultMessage = cmd.query(server);
@@ -209,6 +210,7 @@ public class TestDatabaseCommands {
         cmd = new DropCMD("TABLE");
         cmd.setDatabaseName(tempDbDirName);
         cmd.addTableName("table");
+        server.setUseDatabaseDirectory(tempDbDir);
         File tempDBFile = new File(tempDbDirName + File.separator + "table.tab");
         assertTrue(tempDBFile.createNewFile());
 
@@ -269,7 +271,7 @@ public class TestDatabaseCommands {
         setup(tempDbDir);
         String tableName = "people";
         String attrName = "newCol";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -279,6 +281,7 @@ public class TestDatabaseCommands {
         cmd = new AlterCMD("ADD");
         cmd.addTableName(tableName);
         cmd.addColumnName(attrName);
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up table and header
         Table table = new Table();
@@ -338,7 +341,7 @@ public class TestDatabaseCommands {
         setup(tempDbDir);
         String tableName = "people";
         String attrName = "email";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -348,6 +351,7 @@ public class TestDatabaseCommands {
         cmd = new AlterCMD("DROP");
         cmd.addTableName(tableName);
         cmd.addColumnName(attrName);
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up table and header
         Table table = new Table();
@@ -413,7 +417,7 @@ public class TestDatabaseCommands {
         setup(tempDbDir);
         String tableName = "people";
         String attrName = "email";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertFalse(tempDBFile.exists());
 
@@ -439,7 +443,7 @@ public class TestDatabaseCommands {
         setup(tempDbDir);
         String tableName = "people";
         String attrName = "email";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -517,7 +521,7 @@ public class TestDatabaseCommands {
         setup(tempDbDir);
         String tableName = "people";
         String attrName = "doesNotExist";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -593,7 +597,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -605,6 +609,7 @@ public class TestDatabaseCommands {
         // cmd.addVariable("3"); - this is automatically generated by the server
         cmd.addVariable("France");
         cmd.addVariable("Paris");
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -681,7 +686,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -763,7 +768,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -844,7 +849,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "doesNotExist";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertFalse(tempDBFile.exists());
 
@@ -873,8 +878,8 @@ public class TestDatabaseCommands {
         String tableNameB = "PET";
         String attributeNameA = "ID";
         String attributeNameB = "OWNERID";
-        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
-        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        String fullPathA = tempDbDirName + File.separator + tableNameA + TABLE_EXT;
+        String fullPathB = tempDbDirName + File.separator + tableNameB + TABLE_EXT;
         File tempDBFileA = new File(fullPathA);
         assertTrue(tempDBFileA.createNewFile());
         assertTrue(tempDBFileA.exists());
@@ -890,7 +895,7 @@ public class TestDatabaseCommands {
         cmd.addTableName(tableNameB);
         cmd.addColumnName(attributeNameA);
         cmd.addColumnName(attributeNameB);
-
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up table and header
         Table tableA = new Table();
@@ -976,7 +981,7 @@ public class TestDatabaseCommands {
         String tableNameB = "PET";
         String attributeNameA = "ID";
         String attributeNameB = "OWNERID";
-        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        String fullPathA = tempDbDirName + File.separator + tableNameA + TABLE_EXT;
         File tempDBFileA = new File(fullPathA);
         assertTrue(tempDBFileA.createNewFile());
         assertTrue(tempDBFileA.exists());
@@ -1045,8 +1050,8 @@ public class TestDatabaseCommands {
         String tableNameB = "PET";
         String attributeNameA = "ID";
         String attributeNameB = "DOESNOTEXIST";
-        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
-        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        String fullPathA = tempDbDirName + File.separator + tableNameA + TABLE_EXT;
+        String fullPathB = tempDbDirName + File.separator + tableNameB + TABLE_EXT;
         File tempDBFileA = new File(fullPathA);
         assertTrue(tempDBFileA.createNewFile());
         assertTrue(tempDBFileA.exists());
@@ -1146,7 +1151,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1156,6 +1161,7 @@ public class TestDatabaseCommands {
         cmd = new SelectCMD();
         cmd.addTableName(tableName);
         cmd.addColumnName("*");
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1215,7 +1221,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1225,6 +1231,7 @@ public class TestDatabaseCommands {
         cmd = new SelectCMD();
         cmd.addTableName(tableName);
         cmd.addColumnName("*");
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1266,7 +1273,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1276,6 +1283,7 @@ public class TestDatabaseCommands {
         cmd = new SelectCMD();
         cmd.addTableName(tableName);
         cmd.addColumnName("*");
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1310,7 +1318,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1321,7 +1329,7 @@ public class TestDatabaseCommands {
         cmd.addTableName(tableName);
         cmd.addColumnName("*");
         cmd.addCondition(new ColumnHeader("Id"), "==", new Token(TokenType.LIT_NUM, "2"));
-
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up table and header
         Table table = new Table();
@@ -1379,7 +1387,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "marks";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1391,6 +1399,7 @@ public class TestDatabaseCommands {
         cmd.addColumnName("name");
         cmd.addColumnName("id");
         cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "TRUE"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1469,7 +1478,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "Country";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1481,6 +1490,7 @@ public class TestDatabaseCommands {
         cmd.addColumnName("Id");
         cmd.addColumnName("Name");
         cmd.addCondition(new ColumnHeader("Id"), "<=", new Token(TokenType.LIT_NUM, "2"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1540,7 +1550,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1552,6 +1562,7 @@ public class TestDatabaseCommands {
         cmd.addColumnName("name");
         cmd.addColumnName("grade");
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "\'Anna\'"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1610,7 +1621,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1623,6 +1634,7 @@ public class TestDatabaseCommands {
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "\'Anna\'"));
         cmd.addConditionJoinOperator("AND");
         cmd.addCondition(new ColumnHeader("grade"), ">=", new Token(TokenType.LIT_NUM, "50"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1681,7 +1693,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1696,6 +1708,7 @@ public class TestDatabaseCommands {
         cmd.addCondition(new ColumnHeader("grade"), ">=", new Token(TokenType.LIT_NUM, "50"));
         cmd.addConditionJoinOperator("OR");
         cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "TRUE"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1758,7 +1771,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1772,7 +1785,7 @@ public class TestDatabaseCommands {
         cmd.addColumnName("grade");
         cmd.addColumnName("pass");
         cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "FALSE"));
-
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up table and header
         Table table = new Table();
@@ -1845,7 +1858,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1861,6 +1874,7 @@ public class TestDatabaseCommands {
         cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "FALSE"));
         cmd.getConditionJoinOperators().add("OR");
         cmd.addCondition(new ColumnHeader("grade"), "<=", new Token(TokenType.LIT_NUM, "50"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1933,7 +1947,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -1949,6 +1963,7 @@ public class TestDatabaseCommands {
         cmd.addCondition(new ColumnHeader("pass"), "==", new Token(TokenType.LIT_BOOL, "FALSE"));
         cmd.getConditionJoinOperators().add("OR");
         cmd.addCondition(new ColumnHeader("grade"), "<=", new Token(TokenType.LIT_NUM, "50"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -1996,7 +2011,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -2010,6 +2025,7 @@ public class TestDatabaseCommands {
         cmd.addColumnName("grade");
         cmd.addColumnName("pass");
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Darren"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -2084,7 +2100,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -2099,6 +2115,7 @@ public class TestDatabaseCommands {
         cmd.addColumnName("pass");
         cmd.addNameValuePair("grade", "50");
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Bob"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -2185,7 +2202,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -2203,7 +2220,7 @@ public class TestDatabaseCommands {
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Bob"));
         cmd.addConditionJoinOperator("OR");
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Clive"));
-
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up table and header
         Table table = new Table();
@@ -2289,7 +2306,7 @@ public class TestDatabaseCommands {
         assertTrue(tempDbDir.isDirectory());
         setup(tempDbDir);
         String tableName = "students";
-        String fullPath = tempDbDirName + File.separator + tableName + fileExt;
+        String fullPath = tempDbDirName + File.separator + tableName + TABLE_EXT;
         File tempDBFile = new File(fullPath);
         assertTrue(tempDBFile.createNewFile());
         assertTrue(tempDBFile.exists());
@@ -2307,6 +2324,7 @@ public class TestDatabaseCommands {
         cmd.addCondition(new ColumnHeader("name"), "==", new Token(TokenType.LIT_STR, "Clive"));
         cmd.addConditionJoinOperator("AND");
         cmd.addCondition(new ColumnHeader("grade"), ">=", new Token(TokenType.LIT_STR, "48"));
+        server.setUseDatabaseDirectory(tempDbDir);
 
 
         // set up table and header
@@ -2395,7 +2413,7 @@ public class TestDatabaseCommands {
 
         // create coursework.tab
         String tableNameA = "coursework";
-        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        String fullPathA = tempDbDirName + File.separator + tableNameA + TABLE_EXT;
         File tempDBFileA = new File(fullPathA);
         assertTrue(tempDBFileA.createNewFile());
         assertTrue(tempDBFileA.exists());
@@ -2403,7 +2421,7 @@ public class TestDatabaseCommands {
 
         // create marks.tab
         String tableNameB = "marks";
-        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        String fullPathB = tempDbDirName + File.separator + tableNameB + TABLE_EXT;
         File tempDBFileB = new File(fullPathB);
         assertTrue(tempDBFileB.createNewFile());
         assertTrue(tempDBFileB.exists());
@@ -2415,6 +2433,7 @@ public class TestDatabaseCommands {
         cmd.addTableName(tableNameB);
         cmd.addColumnName("grade");
         cmd.addColumnName("id");
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up coursework table data
         Table course = new Table();
@@ -2542,7 +2561,7 @@ public class TestDatabaseCommands {
 
         // create coursework.tab
         String tableNameA = "coursework";
-        String fullPathA = tempDbDirName + File.separator + tableNameA + fileExt;
+        String fullPathA = tempDbDirName + File.separator + tableNameA + TABLE_EXT;
         File tempDBFileA = new File(fullPathA);
         assertTrue(tempDBFileA.createNewFile());
         assertTrue(tempDBFileA.exists());
@@ -2550,7 +2569,7 @@ public class TestDatabaseCommands {
 
         // create marks.tab
         String tableNameB = "marks";
-        String fullPathB = tempDbDirName + File.separator + tableNameB + fileExt;
+        String fullPathB = tempDbDirName + File.separator + tableNameB + TABLE_EXT;
         File tempDBFileB = new File(fullPathB);
         assertTrue(tempDBFileB.createNewFile());
         assertTrue(tempDBFileB.exists());
@@ -2562,6 +2581,7 @@ public class TestDatabaseCommands {
         cmd.addTableName(tableNameB);
         cmd.addColumnName("grade");
         cmd.addColumnName("id");
+        server.setUseDatabaseDirectory(tempDbDir);
 
         // set up coursework table data
         Table course = new Table();

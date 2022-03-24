@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+// import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestParser {
@@ -64,7 +65,7 @@ public class TestParser {
         // then
         assertTrue(cmd instanceof UseCMD);
         assertEquals(3, tokenizer.getTokens().size());
-        assertEquals(ROOT_DB_DIR + File.separator + "db", cmd.getDatabaseName());
+        assertEquals(/*ROOT_DB_DIR + File.separator + */"db", cmd.getDatabaseName());
     }
 
     @Test
@@ -90,7 +91,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof CreateCMD);
-        assertEquals("databases/dummydb", cmd.getDatabaseName());
+        assertEquals("dummydb", cmd.getDatabaseName());
         assertEquals("DATABASE", ((CreateCMD) cmd).getCreateType());
     }
 
@@ -142,7 +143,7 @@ public class TestParser {
 
         // then
         assertTrue(cmd instanceof DropCMD);
-        assertEquals("databases/testdb", cmd.getDatabaseName());
+        assertEquals("testdb", cmd.getDatabaseName());
         assertEquals("DATABASE", ((DropCMD) cmd).getDropType());
     }
 

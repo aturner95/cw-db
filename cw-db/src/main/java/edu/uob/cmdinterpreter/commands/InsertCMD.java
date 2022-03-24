@@ -51,7 +51,7 @@ public class InsertCMD extends DBCmd {
     private void insertEntity(DBServer server, List<Record> data, List<String> variables) throws Exception {
         List<Attribute> attributes = new ArrayList<>();
         //attributes.add(new Attribute(getNextSeq(data)));
-        attributes.add(new Attribute(getNextSeq(server.getDatabaseDirectory().getName(), getTableNames().get(0))));
+        attributes.add(new Attribute(getNextSeq(server.getUseDatabaseDirectory().getName(), getTableNames().get(0))));
         for(String var: variables){
             attributes.add(new Attribute(var));
         }

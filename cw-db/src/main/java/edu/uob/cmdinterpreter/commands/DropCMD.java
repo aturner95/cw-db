@@ -9,6 +9,7 @@ import edu.uob.exceptions.DBException;
 import edu.uob.exceptions.DBException.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class DropCMD extends DBCmd {
 
@@ -26,7 +27,7 @@ public class DropCMD extends DBCmd {
         try {
             if(hasDatabase(server)) {
                 if (BNFConstants.DATABASE.equalsIgnoreCase(commandParameter)) {
-                    dropDatabase();
+                    dropDatabase(server);
                     return STATUS_OK;
 
                 } if (BNFConstants.TABLE.equalsIgnoreCase(commandParameter)) {
@@ -42,19 +43,30 @@ public class DropCMD extends DBCmd {
         }
     }
 
-    private void dropDatabase() {
+    private void dropDatabase(DBServer server) throws FileNotFoundException {
         File database = new File(getDatabaseName());
+        if(server.getUseDatabaseDirectory()  != null) {
+            if (server.getUseDatabaseDirectory().getName().equalsIgnoreCase(getDatabaseName())) {
+                server.setUseDatabaseDirectory(null);
+            }
+        }
+        File [] contents = database.listFiles();
+        for(File dbfile: contents){
+            removeTableMetadata(database, dbfile, dbfile.getName().substring(0, dbfile.getName().length()-4));
+            dbfile.delete();
+        }
         deleteDirectory(database);
     }
 
     private void dropTable(DBServer server) throws Exception {
-        File db = server.getDatabaseDirectory();
+        File db = server.getUseDatabaseDirectory();
         byte indexOfTable = 0;
         File table = new File( db.toString() + File.separator + getTableNames().get(indexOfTable) + DBFileConstants.TABLE_EXT);
         if(table.exists() && table.isFile()){
-            table.delete();
-            DBTableFile dbFile = new DBTableFile();
-            dbFile.removeTableFromMetadata(db.getName(), getTableNames().get(indexOfTable));
+//            table.delete();
+//            DBTableFile dbFile = new DBTableFile();
+//            dbFile.removeTableFromMetadata(db.getName(), getTableNames().get(indexOfTable));
+            removeTableMetadata(db, table, getTableNames().get(indexOfTable));
             return;
         }
         throw new DBTableDoesNotExistException(table.getName());
@@ -66,5 +78,14 @@ public class DropCMD extends DBCmd {
             dbfile.delete();
         }
         dir.delete();
+    }
+
+    private void removeTableMetadata(File db, File table, String tablename) throws FileNotFoundException {
+        if(table.exists() && table.isFile()){
+            table.delete();
+            DBTableFile dbFile = new DBTableFile();
+            dbFile.removeTableFromMetadata(db.getName(), tablename);
+            return;
+        }
     }
 }

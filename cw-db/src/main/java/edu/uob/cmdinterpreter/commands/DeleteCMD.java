@@ -21,7 +21,7 @@ public class DeleteCMD extends DBCmd {
                 int indexOfTable = 0;
                 String tableName = getTableNames().get(indexOfTable);
                 if (hasTable(server, tableName)) {
-                    String tablePath = server.getDatabaseDirectory() + File.separator + tableName + TABLE_EXT;
+                    String tablePath = server.getUseDatabaseDirectory() + File.separator + tableName + TABLE_EXT;
                     Table table = new DBTableFile().readDBFileIntoEntity(tablePath);
 
                     Table dataToDelete = null;

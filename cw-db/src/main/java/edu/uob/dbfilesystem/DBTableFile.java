@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static edu.uob.dbfilesystem.DBFileConstants.METADATA_FILENAME;
+
 public class DBTableFile {
 
     public Table readDBFileIntoEntity(String dbFilePath) throws IOException, DBException {
@@ -197,7 +199,7 @@ public class DBTableFile {
     }
 
     public boolean containsDbTable(String databaseName, String tableName) throws Exception {
-        File fileToOpen = new File("databases" + File.separator + "databases.data");
+        File fileToOpen = new File(METADATA_FILENAME);
 
         FileReader reader = new FileReader(fileToOpen);
         try(BufferedReader br = new BufferedReader(reader)){
@@ -223,7 +225,7 @@ public class DBTableFile {
 
     public boolean addTableToMetadata(String databaseName, String tableName, int sequence) throws Exception {
 
-        File dbFile = new File("databases" + File.separator + "databases.data");
+        File dbFile = new File(METADATA_FILENAME);
         boolean appendMode = true;
 
         if(containsDbTable(databaseName, tableName)) {
@@ -242,7 +244,7 @@ public class DBTableFile {
 
     public boolean removeTableFromMetadata(String databaseName, String tableName) throws FileNotFoundException{
 
-        File file = new File("databases" + File.separator + "databases.data");
+        File file = new File(METADATA_FILENAME);
         FileReader reader = new FileReader(file);
         StringBuilder rewrite = null;
 
@@ -283,7 +285,7 @@ public class DBTableFile {
      */
     public int nextSeq(String databaseName, String tableName) throws Exception{
 
-        File fileToOpen = new File("databases" + File.separator + "databases.data");
+        File fileToOpen = new File(METADATA_FILENAME);
         FileReader reader = new FileReader(fileToOpen);
 
         try(BufferedReader br = new BufferedReader(reader)){

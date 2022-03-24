@@ -21,7 +21,7 @@ public class SelectCMD extends DBCmd {
                 String tableName = getTableNames().get(indexOfTable);
 
                 if (hasTable(server, tableName)) {
-                    String tablePath = server.getDatabaseDirectory() + File.separator + tableName + TABLE_EXT;
+                    String tablePath = server.getUseDatabaseDirectory() + File.separator + tableName + TABLE_EXT;
                     Table table = new DBTableFile().readDBFileIntoEntity(tablePath);
 
                     if(table.getColHeadings() == null || table.getColHeadings().size() == 0){

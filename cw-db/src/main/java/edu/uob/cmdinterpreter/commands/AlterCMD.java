@@ -48,7 +48,7 @@ public class AlterCMD extends DBCmd {
             if (hasDatabase(server)) {
                 if (hasTable(server, tableName)) {
                     DBTableFile dbFile = new DBTableFile();
-                    File file = new File(server.getDatabaseDirectory() + File.separator + tableName);
+                    File file = new File(server.getUseDatabaseDirectory() + File.separator + tableName);
                     Table table;
                     String filepath = file.getPath() + DBFileConstants.TABLE_EXT;
 

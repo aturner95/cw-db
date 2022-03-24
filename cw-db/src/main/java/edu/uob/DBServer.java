@@ -15,19 +15,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
-
 /** This class implements the DB server. */
 public final class DBServer {
 
   private static final char END_OF_TRANSMISSION = 4;
   private File databaseDirectory;
+  private File useDatabaseDirectory;
   private static final String STATUS_OK = "[OK]";
   private static final String STATUS_ERROR = "[ERROR] ";
+  private static final String METADATA_FILENAME = "databases.data";
 
 
   public static void main(String[] args) throws IOException {
-      new DBServer(Paths.get(ROOT_DB_DIR).toAbsolutePath().toFile()).blockingListenOn(8888);
+      new DBServer(Paths.get(".").toAbsolutePath().toFile()).blockingListenOn(8888);
   }
 
   /**
@@ -42,13 +42,25 @@ public final class DBServer {
    *     databases. You may assume *exclusive* ownership of this directory for the lifetime of this
    *     server instance.
    */
-  public DBServer(File databaseDirectory){
-    File rootDbDir = new File(ROOT_DB_DIR);
-    if(rootDbDir.exists() && rootDbDir.isDirectory()){
-      this.databaseDirectory = databaseDirectory;
-    } else {
-      System.out.println("ERROR: expect root database directory folder:  cw-db/databases");
-      System.out.println("I do not want files/directories created and deleted willy-nilly in the project workspace!");
+  public DBServer(File databaseDirectory) {
+
+    String top = databaseDirectory.getPath();
+
+    if(top.endsWith(".")){
+      top.substring(0, top.length() - 1);
+    }
+
+    File base = new File(top);
+    this.databaseDirectory = base;
+    this.useDatabaseDirectory = null;
+
+    File metadata = new File(METADATA_FILENAME);
+    try {
+      if (!metadata.exists() && !metadata.isFile()) {
+        metadata.createNewFile();
+      }
+    }catch(Exception e){
+      System.out.println("ERROR: the 'databases.data' metadata file databases.data does not exist and was not able to be created");
     }
 
   }
@@ -138,5 +150,14 @@ public final class DBServer {
   public void setDatabaseDirectory(File databaseDirectory){
     this.databaseDirectory = databaseDirectory;
   }
+
+  public File getUseDatabaseDirectory(){
+    return this.useDatabaseDirectory;
+  }
+
+  public void setUseDatabaseDirectory(File useDatabaseDirectory){
+    this.useDatabaseDirectory = useDatabaseDirectory;
+  }
+
 
 }

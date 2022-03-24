@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static edu.uob.dbfilesystem.DBFileConstants.ROOT_DB_DIR;
-
 public class CreateCMD extends DBCmd {
 
     public CreateCMD(String createType){
@@ -50,7 +48,7 @@ public class CreateCMD extends DBCmd {
     }
 
     private void createDatabase() throws DBException, IOException {
-        File database = new File(getDatabaseName().toLowerCase(Locale.ROOT));
+        File database = new File("." + File.separator + getDatabaseName().toLowerCase(Locale.ROOT));
         if(!database.exists() && !database.isDirectory()){
             if(database.mkdir()){
                 return;
@@ -63,11 +61,11 @@ public class CreateCMD extends DBCmd {
     private void createTable(DBServer server) throws Exception {
 
         if(hasDatabase(server)){
+            if(server.getUseDatabaseDirectory() != null) {
             String tableName = getTableNames().get(0);
-            String dbName = ROOT_DB_DIR + File.separator + server.getDatabaseDirectory().getName().toLowerCase(Locale.ROOT);
+            String dbName = /*ROOT_DB_DIR + File.separator + */ server.getUseDatabaseDirectory().getName().toLowerCase(Locale.ROOT);
             File file = new File(dbName + File.separator + tableName.toLowerCase(Locale.ROOT) + DBFileConstants.TABLE_EXT);
 
-            if(!usingRootDatabase(server)) {
                 if (!file.exists()) {
                     try {
 
@@ -94,7 +92,7 @@ public class CreateCMD extends DBCmd {
                 }
                 throw new DBTableExistsException(tableName);
             }
-            throw new DBException("No database has been selected, (hint: USE <database>)");
+             throw new DBException("No database has been selected, (hint: USE <database>)");
         }
         throw new DBDoesNotExistException(server.getDatabaseDirectory().getName());
     }
