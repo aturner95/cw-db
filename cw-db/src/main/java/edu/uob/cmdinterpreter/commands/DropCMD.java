@@ -30,7 +30,7 @@ public class DropCMD extends DBCmd {
                     return STATUS_OK;
 
                 } if (BNFConstants.TABLE.equalsIgnoreCase(commandParameter)) {
-                    dropTable(server.getDatabaseDirectory());
+                    dropTable(server);
                     return STATUS_OK;
                 }
                 throw new DBException();
@@ -47,13 +47,14 @@ public class DropCMD extends DBCmd {
         deleteDirectory(database);
     }
 
-    private void dropTable(File db) throws Exception {
+    private void dropTable(DBServer server) throws Exception {
+        File db = server.getDatabaseDirectory();
         byte indexOfTable = 0;
         File table = new File( db.toString() + File.separator + getTableNames().get(indexOfTable) + DBFileConstants.TABLE_EXT);
         if(table.exists() && table.isFile()){
             table.delete();
             DBTableFile dbFile = new DBTableFile();
-            dbFile.removeTableFromMetadata(databaseName, getTableNames().get(indexOfTable));
+            dbFile.removeTableFromMetadata(db.getName(), getTableNames().get(indexOfTable));
             return;
         }
         throw new DBTableDoesNotExistException(table.getName());
