@@ -5,7 +5,7 @@ import edu.uob.cmdinterpreter.BNFConstants;
 import edu.uob.cmdinterpreter.QueryCondition;
 import edu.uob.cmdinterpreter.Token;
 import edu.uob.cmdinterpreter.TokenType;
-import edu.uob.cmdinterpreter.commands.NameValuePair;
+import edu.uob.cmdinterpreter.NameValuePair;
 import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
@@ -330,10 +330,9 @@ public abstract class DBCmd {
         if(BNFConstants.NOT_EQUAL_TO.equals(operator)){
             return conditionNotEqualTo(value,condition);
         }
-        // TODO implement LIKE condition
-//        if(BNFConstants.LIKE.equals(operator)){
-//
-//        }
+        if(BNFConstants.LIKE.equals(operator)){
+            return conditionLike(value,condition);
+        }
         return false;
     }
 
@@ -401,9 +400,14 @@ public abstract class DBCmd {
         }
         return false;
     }
-// TODO implement LIKE condition
-//    private boolean conditionLike(String value, Token condition){
-//
-//    }
+
+    private boolean conditionLike(String value, Token condition){
+        if(condition.getTokenType() == TokenType.LIT_STR){
+            if(value.contains(condition.getSequence())){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

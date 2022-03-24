@@ -1,8 +1,8 @@
 package edu.uob.cmdinterpreter.commands;
 
 import edu.uob.DBServer;
+import edu.uob.cmdinterpreter.NameValuePair;
 import edu.uob.cmdinterpreter.commands.abstractcmd.DBCmd;
-import edu.uob.dbelements.Attribute;
 import edu.uob.dbelements.ColumnHeader;
 import edu.uob.dbelements.Record;
 import edu.uob.dbelements.Table;
@@ -11,9 +11,6 @@ import edu.uob.exceptions.DBException;
 import edu.uob.exceptions.QueryException;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static edu.uob.dbfilesystem.DBFileConstants.TABLE_EXT;
 

@@ -22,9 +22,9 @@ edu/uob/cmdinterpreter/Token.class
 edu/uob/exceptions/DBException$DBTableExistsException.class
 edu/uob/cmdinterpreter/Tokenizer.class
 edu/uob/exceptions/DBException.class
+edu/uob/cmdinterpreter/NameValuePair.class
 edu/uob/exceptions/ParsingException.class
 edu/uob/DBClient.class
-edu/uob/cmdinterpreter/commands/NameValuePair.class
 edu/uob/exceptions/QueryException.class
 edu/uob/dbelements/Record.class
 edu/uob/cmdinterpreter/QueryCondition.class

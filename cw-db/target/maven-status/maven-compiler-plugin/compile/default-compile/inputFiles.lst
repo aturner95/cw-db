@@ -16,6 +16,7 @@
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/cmdinterpreter/commands/CreateCMD.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/cmdinterpreter/TokenType.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/DBServer.java
+/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/cmdinterpreter/NameValuePair.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/dbfilesystem/DBRowType.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/cmdinterpreter/commands/UpdateCMD.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/DBClient.java
@@ -29,4 +30,3 @@
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/exceptions/ParsingException.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/exceptions/QueryException.java
 /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/dbelements/Attribute.java
-/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/src/main/java/edu/uob/cmdinterpreter/commands/NameValuePair.java

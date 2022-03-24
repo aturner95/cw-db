@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.275" tests="39" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.235" tests="39" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -12,7 +12,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="GB"/>
     <property name="sun.boot.library.path" value="/home/andy/.jdks/temurin-17.0.1/lib"/>
-    <property name="sun.java.command" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter14217075884937691938.jar /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire 2022-03-24T17-56-41_029-jvmRun1 surefire16944445832698138214tmp surefire_012536064825251380082tmp"/>
+    <property name="sun.java.command" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter16000378538849434664.jar /home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire 2022-03-24T18-07-55_025-jvmRun1 surefire4901414334997606913tmp surefire_016138321022151468145tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/test-classes:/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/classes:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter/5.8.2/junit-jupiter-5.8.2.jar:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/andy/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/andy/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/andy/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite/1.8.2/junit-platform-suite-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite-api/1.8.2/junit-platform-suite-api-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite-engine/1.8.2/junit-platform-suite-engine-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-suite-commons/1.8.2/junit-platform-suite-commons-1.8.2.jar:/home/andy/.m2/repository/org/junit/platform/junit-platform-launcher/1.8.2/junit-platform-launcher-1.8.2.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -27,7 +27,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter14217075884937691938.jar"/>
+    <property name="surefire.real.class.path" value="/home/andy/Documents/uob-msc/4-object-orientated-programming-with-java/IdeaProjects/coursework/cw-db/cw-db/target/surefire/surefirebooter16000378538849434664.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.1+12"/>
     <property name="user.name" value="andy"/>
@@ -52,43 +52,43 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="test_alterCMD_dropColumnThree_statusCodeOK_tableHasTwoCols" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.027"/>
-  <testcase name="test_selectCmd_updateCmdNamePairList_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.006"/>
-  <testcase name="test_dropCMD_databaseDropped_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
+  <testcase name="test_alterCMD_dropColumnThree_statusCodeOK_tableHasTwoCols" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.037"/>
+  <testcase name="test_selectCmd_updateCmdNamePairList_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.007"/>
+  <testcase name="test_dropCMD_databaseDropped_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
   <testcase name="test_insertCMD_insertedNewEntity_statusCodeOK_tableContainsNewRecord" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.006"/>
   <testcase name="test_joinCmd_attributeBDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.005"/>
-  <testcase name="test_alterCMD_dropColumn_columnDoesNotExist_statusCodeError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_alterCMD_dropColumn_columnDoesNotExist_statusCodeError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
   <testcase name="test_selectCmd_selectStarWithAndConditions_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.006"/>
-  <testcase name="test_selectCmd_joinCmd_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.016"/>
+  <testcase name="test_selectCmd_joinCmd_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.014"/>
   <testcase name="test_useCMD_noTableNamesInTree_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_selectCmd_deleteCmdNoRows_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
-  <testcase name="test_selectCmd_deleteCmdNoRowsDeleted_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_createCMD_tableCreatedWithColumnHeadings_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.005"/>
+  <testcase name="test_selectCmd_deleteCmdNoRows_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.005"/>
+  <testcase name="test_selectCmd_deleteCmdNoRowsDeleted_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_createCMD_tableCreatedWithColumnHeadings_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
   <testcase name="test_createCMD_databaseCreated_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_dropCMD_databaseDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.009"/>
+  <testcase name="test_dropCMD_databaseDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
   <testcase name="test_selectCmd_updateCmd_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
-  <testcase name="test_selectCmd_selectAttributesWithOrConditions_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.008"/>
-  <testcase name="test_selectCmd_updateCmdNoRowsFound_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
-  <testcase name="test_insertCMD_tooManyAttributes_statusCodeError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
+  <testcase name="test_selectCmd_selectAttributesWithOrConditions_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.01"/>
+  <testcase name="test_selectCmd_updateCmdNoRowsFound_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_insertCMD_tooManyAttributes_statusCodeError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
   <testcase name="test_selectCmd_selectAttrWithCondition_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
-  <testcase name="test_selectCmd_selectAttrWithCondition2_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
-  <testcase name="test_selectCmd_selectStarNoCondition_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.046"/>
-  <testcase name="test_dropCMD_tableDropped_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_alterCMD_dropColumn_tableDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.001"/>
-  <testcase name="test_selectCmd_selectStarWithCondition_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.023"/>
+  <testcase name="test_selectCmd_selectAttrWithCondition2_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_selectCmd_selectStarNoCondition_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_dropCMD_tableDropped_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_alterCMD_dropColumn_tableDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_selectCmd_selectStarWithCondition_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
   <testcase name="test_insertCMD_tableDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_joinCmd_tablesJoins_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
-  <testcase name="test_selectCmd_selectAttributesNotInOrder_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_joinCmd_tablesJoins_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_selectCmd_selectAttributesNotInOrder_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
   <testcase name="test_selectCmd_selectStarNoRecords_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
-  <testcase name="test_createCMD_tableCreated_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_dropCMD_tableDoesNotExist_statusCodeERROR" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.001"/>
+  <testcase name="test_createCMD_tableCreated_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_dropCMD_tableDoesNotExist_statusCodeERROR" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
   <testcase name="test_useCMD_databaseExists_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.001"/>
-  <testcase name="test_selectCmd_joinCmdNoResult_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.006"/>
-  <testcase name="test_selectCmd_deleteCmdWithOrConds_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
-  <testcase name="test_selectCmd_deleteCmdWithSingleCond_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_selectCmd_joinCmdNoResult_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_selectCmd_deleteCmdWithOrConds_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_selectCmd_deleteCmdWithSingleCond_statusCodeOK" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
   <testcase name="test_useCMD_databaseDoesNotExists_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_insertCMD_entityAlreadyExists_statusCodeError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.006"/>
-  <testcase name="test_joinCmd_tableBDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_alterCMD_addAttribute_attributeAlreadyExists_errorStatusError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.002"/>
-  <testcase name="test_alterCMD_addedColumnFour_StatusCodeOK_headersAndRowsHaveSizeFour" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_insertCMD_entityAlreadyExists_statusCodeError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_joinCmd_tableBDoesNotExist_statusCodeError" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.003"/>
+  <testcase name="test_alterCMD_addAttribute_attributeAlreadyExists_errorStatusError_tableUnchanged" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
+  <testcase name="test_alterCMD_addedColumnFour_StatusCodeOK_headersAndRowsHaveSizeFour" classname="edu.uob.cmdinterpreter.commands.TestDatabaseCommands" time="0.004"/>
 </testsuite>
